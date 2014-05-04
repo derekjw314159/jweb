@@ -63,7 +63,7 @@ stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 djwBlueprintCSS ''
 stdout LF,'</head><body>'
-stdout LF,'<div class="container">'
+stdout LF,'<div class="container showgrid">'
 NB. Error page - No such course
 if. 0<#err do.
 stdout LF,TAB,'<div class="span-24">'
@@ -84,7 +84,7 @@ stdout LF,'<thead><tr>'
 stdout LF,'<th>Course</th><th>Description</th><th>Par</th><th>Yards</th></tr></thead><tbody>'
 NB. Loop round the courses
 for_cc. i. #tbl_course_name do.
-	stdout LF,'<tr><td>',(>cc{tbl_course_name),'</td>'
+	stdout LF,'<tr><td><a href="http://',(,getenv 'SERVER_NAME'),'/jw/denhambowl/course/v/',(,>cc{tbl_course_name),'">',(>cc{tbl_course_name),'</td>'
 	stdout LF,'<td>',(>cc{tbl_course_desc),'</td>'
 	stdout LF,'<td>',(": cc{tbl_course_sss),'</td>'
 	stdout LF,'<td>',(": + / cc{tbl_course_yards),'</td></tr>'
@@ -124,22 +124,23 @@ stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 djwBlueprintCSS ''
-stdout LF,'</head><body>'
+stdout LF,'</head>',LF,'<body>'
 stdout LF,'<div class="container">'
 NB. Error page - No such course
 if. 0<#err do.
     stdout LF,TAB,'<div class="span-24">'
-    stdout, LF,TAB,TAB,'<h1>',err,'</h1>'
-    stdout, '<div class="error">No such course name : ',y
-    stdout  ,2$,: '</div>'
-    stdout LF,'<br><a href="/jw/denhambowl/course/v">Back to course list</a>'
-    stdout, '</div></body>'
+    stdout LF,TAB,TAB,'<h1>',err,'</h1>'
+    stdout LF,TAB,TAB,'<div class="error">No such course name : ',y
+    stdout '</div>'
+	stdout LF,TAB,'</div>'
+    stdout LF,TAB,'<br><a href="/jw/denhambowl/course/v">Back to course list</a>'
+    stdout LF, '</div>',LF,'</body>'
     exit ''
 end.
 NB. Print scorecard and yardage
-stdout LF,TAB,TAB,'<h2>Course : ', (; tbl_course_desc),'</h2>'
-stdout LF,TAB,'<div class="span-14">'
-stdout LF,'Standard Scratch = ',(":,tbl_course_sss),'<hr>'
+stdout LF,TAB,'<h2>Course : ', (; tbl_course_desc),'</h2>'
+stdout LF,TAB,'<div class="span-16 last">'
+stdout LF,TAB,'Standard Scratch = ',(":,tbl_course_sss),'<hr>'
 NB. Front 9
 for_half. i. 2 do.
     if. 0=half do.
@@ -172,9 +173,9 @@ for_half. i. 2 do.
 
 end.
 NB. Add the Edit Option
-stdout LF,'<div class="span-2 last">'
-stdout LF,'<a href="https://',(,getenv 'SERVER_NAME'),'/jw/denhambowl/course/e/',(,>tbl_course_name),'">Edit</a><div>'
-NB. stdout LF,'<input type="button" value="eDit" onClick="redirect(''http://',(getenv 'SERVER_NAME'),'/jw/denhambowl/course/e/',(,>tbl_course_name),''')">edit<div>'
+stdout LF,'<div class="span-3 prepend-1 last">'
+stdout LF,'<a href="https://',(,getenv 'SERVER_NAME'),'/jw/denhambowl/course/e/',(,>tbl_course_name),'">Edit: ',(,>tbl_course_name),'</a></br></br>'
+stdout LF,'<a href="http://',(,getenv 'SERVER_NAME'),'/jw/denhambowl/course/v">Back to list</a></div>'
 stdout LF,'<hr></div>' NB. main span
 stdout LF,'</div>' NB. container
 stdout '</body></html>'
