@@ -40,10 +40,6 @@ denhambowl_course_view y
 )
 
 NB. =========================================================
-<<<<<<< HEAD
-NB. denhambowl_course_view
-NB. View scores for participant
-=======
 NB. denhambowl_course_all  
 NB. View all courses and summary yards
 NB. =========================================================
@@ -109,7 +105,6 @@ NB. =========================================================
 NB. denhambowl_course_view
 NB. View scores for participant
 NB. =========================================================
->>>>>>> d129623f9891f45d597ccc1284ca2064d74f6b25
 denhambowl_course_view=: 3 : 0
 NB. Retrieve the details
 xx=.glDbFile djwSqliteR 'select * from tbl_control;'
@@ -188,10 +183,7 @@ exit ''
 
 NB. =========================================================
 NB. jweb_denhambowl_course_e
-<<<<<<< HEAD
-=======
 NB. =========================================================
->>>>>>> d129623f9891f45d597ccc1284ca2064d74f6b25
 NB. View scores for participant
 jweb_denhambowl_course_e=: 3 : 0
 y=.cgiparms ''
@@ -213,10 +205,7 @@ denhambowl_course_edit y
 
 NB. =========================================================
 NB. denhambowl_course_edit
-<<<<<<< HEAD
-=======
 NB. =========================================================
->>>>>>> d129623f9891f45d597ccc1284ca2064d74f6b25
 NB. View scores for participant
 denhambowl_course_edit=: 3 : 0
 NB. Retrieve the details
@@ -250,11 +239,7 @@ if. 0<#err do.
     exit ''
 end.
 NB. Print scorecard and yardage
-<<<<<<< HEAD
-stdout LF,TAB,TAB,'<h2>Edit Course Details : ', ( ; tbl_course_desc),'</h2>'
-=======
 stdout LF,TAB,TAB,'<h2>Edit Course Details : ', ( ; tbl_course_desc),'</h2>',": getenv 'REMOTE_USER'
->>>>>>> d129623f9891f45d597ccc1284ca2064d74f6b25
 stdout LF,TAB,'<div class="span-12">'
 stdout LF, TAB,'<form action="/jw/denhambowl/course/editpost/',y,'" method="post">'
 stdout LF, TAB,'<input type="hidden" name="tbl_course_name" value="',y,'">'
@@ -303,14 +288,11 @@ NB. exit 0
 
 
 NB. =========================================================
-<<<<<<< HEAD
 NB. cgitest v defines html with a timestamp and cgi parameters
-=======
 NB. jweb_denhambowl_course_editpost
 NB. =========================================================
 NB. Process entries after edits to course
 NB. based on the contents after the "post"
->>>>>>> d129623f9891f45d597ccc1284ca2064d74f6b25
 jweb_denhambowl_course_editpost=: 3 : 0
 y=. cgiparms ''
 y=. }. y NB. Drop the URI GET string
@@ -350,11 +332,7 @@ NB. Choose page based on what was pressed
     if. 0= 4!:0 <'control_calc' do.
 	stdout '</head><body onLoad="redirect(''https://',(getenv 'SERVER_NAME'),'/jw/denhambowl/course/e/',(,>tbl_course_name),''')"'
     else.  
-<<<<<<< HEAD
-	stdout '</head><body onLoad="redirect(''https://',(getenv 'SERVER_NAME'),'/jw/denhambowl/course/v/',(,>tbl_course_name),''')"'
-=======
 	stdout '</head><body onLoad="redirect(''http://',(getenv 'SERVER_NAME'),'/jw/denhambowl/course/v/',(,>tbl_course_name),''')"'
->>>>>>> d129623f9891f45d597ccc1284ca2064d74f6b25
     end.
 stdout LF,'</body></html>'
 exit ''
