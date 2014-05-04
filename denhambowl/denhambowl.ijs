@@ -35,13 +35,13 @@ if. -.answer do. NB. Need to add columns
     answer=. 2!:0 sql
 end.
 NB. Update the date
-sql=. 'UPDATE TABLE tbl_course set (updatename=''system'', updatetime=''1990-01-01'') WHERE updatename IS NULL;'
+sql=. 'UPDATE  tbl_course set updatename=''system'', updatetime=''1990-01-01'' WHERE updatename IS NULL;'
 sql=. 'echo "',sql,'" | sqlite3 -header ',glDbFile
 answer=. 2!:0 sql
 )
 
 NB. Need to run it
-denham_check_db ''
+denhambowl_check_db ''
 
 NB. =========================================================
 NB. jweb_denhambowl_course_v
