@@ -265,10 +265,12 @@ if. 0<#err do.
     exit ''
 end.
 NB. Print scorecard and yardage
-stdout LF,TAB,TAB,'<h2>Edit Course Details : ', ( ; tbl_course_desc),'</h2>',": getenv 'REMOTE_USER'
+stdout LF,TAB,TAB,'<h2>Edit Course Details : ', ( ; tbl_course_desc),'</h2><i>',(": getenv 'REMOTE_USER'),'</i>'
 stdout LF,TAB,'<div class="span-12">'
 stdout LF, TAB,'<form action="/jw/denhambowl/course/editpost/',y,'" method="post">'
-stdout LF, TAB,'<input type="hidden" name="tbl_course_name" value="',y,'">'
+stdout LF, TAB,'<input type="hidden" name="tbl_course_name" value="',y,'">' NB. Have to pass through this value
+stdout LF, TAB,'<input type="hidden" name="prevname" value="',(;tbl_course_updatename),'">'
+stdout LF, TAB,'<input type="hidden" name="prevtime" value="',(;tbl_course_updatetime),'">'
 stdout LF,'<span class="span-3">Standard Scratch</span><input name="tbl_course_sss" value="',(":,tbl_course_sss),'" tabindex="1" ',(InputField 3),'>'
 stdout LF,'<br><span class="span-3">Description</span><input name="tbl_course_desc" value="',(;tbl_course_desc),'" tabindex="2" ',(InputField 25),'><hr>'
 for_half. i. 2 do.
@@ -334,6 +336,34 @@ end.
 
 NB. Assign to variables
 xx=. djwCGIPost y ; 'tbl_course_par' ; 'tbl_course_index' ; 'tbl_course_yards' ; 'tbl_course_sss'
+
+NB. Check the time stamp
+yy=.glDbFile djwSqliteR 'select updatename,updatetime from tbl_course WHERE name=''',(;tbl_course_name),''';'
+yy=.'tbl_course' djwSqliteSplit yy
+ 
+NB. Throw error page if updated
+if. (tbl_course_updatetime) ~: (prevtime) do.
+	stdout 'Content-type: text/html',LF,LF,'<html>',LF
+ 	stdout LF,'<head>'
+ 	stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
+ 	djwBlueprintCSS ''
+ 	stdout LF,'</head><body>'
+ 	stdout LF,'<div class="container">'
+ 	stdout LF,TAB,'<div class="span-24">'
+ 	stdout LF,TAB,TAB,'<h1>Error updating ',(;tbl_course_name),'</h1>'
+ 	stdout LF,'<div class="error">Synch error updating ',(;tbl_course_name)
+ 	stdout LF,'</br></br>',(":getenv 'REMOTE_USER'),' started to update record previously saved by ',(;prevname),' at ',;prevtime
+ 	stdout LF,'</br><br>It has since been updated by: ',(; tbl_course_updatename),' at ',(;tbl_course_updatetime)
+ 	stdout LF,'</br><br><b>**Update has been CANCELLED**</b>'
+ 	stdout  ,2$,: '</div>'
+ 	stdout LF,'</br><a href="/jw/denhambowl/course/e/',(;tbl_course_name),'">Restart edit of: ',(;tbl_course_name),'</a>'
+ 	stdout, '</div></body>'
+ 	exit ''
+end.
+
+tbl_course_updatename=: ,<getenv 'REMOTE_USER'
+tbl_course_updatetime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
+
 string=. djwSqliteUpdate 'tbl_course' ; 'tbl_course_' ; 'tbl_course_name' ; 'tbl_course_'
 NB. Can't handle too big a file on "echo"
 NB. so write out to random seed
