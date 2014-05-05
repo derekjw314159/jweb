@@ -8,7 +8,6 @@ InputFieldnum=: 3 : 0
 r=. ' class="normal" style="font-size: 8pt; height: 16px; width: ',(":wid),'em;" type="text" name="',nam,'" id="',nam,'" onkeyup="validatenum2(''',nam,''')"'
 )
 
-
 djwBlueprintCSS=: 3 : 0
 stdout LF,'<link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen, projection">'
 stdout LF,'<link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print">'
@@ -17,6 +16,32 @@ stdout LF,TAB,'<link rel="stylesheet" href="/css/blueprint/ie.css" type="text/cs
 stdout LF,'<![endif]-->'
 )
 
+NB. =========================================================
+NB. denhambowl_check_db
+NB. =========================================================
+NB. Check the columns are all present
+denhambowl_check_db=: 3 : 0
+NB. Check for update columns
+sql=. 'select sql from sqlite_master where name=''tbl_course'';'
+sql=. 'echo "',sql,'" | sqlite3 -header ',glDbFile
+answer=.; 2!:0 sql NB. Raze the answer
+answer=. +. / 'updatename' E. answer
+if. -.answer do. NB. Need to add columns
+    sql=. 'ALTER TABLE tbl_course ADD COLUMN updatename VARCHAR(20);'
+    sql=. 'echo "',sql,'" | sqlite3 -header ',glDbFile
+    answer=. 2!:0 sql
+    sql=. 'ALTER TABLE tbl_course ADD COLUMN updatetime VARCHAR(20);'
+    sql=. 'echo "',sql,'" | sqlite3 -header ',glDbFile
+    answer=. 2!:0 sql
+end.
+NB. Update the date
+sql=. 'UPDATE  tbl_course set updatename=''system'', updatetime=''1990-01-01'' WHERE updatename IS NULL;'
+sql=. 'echo "',sql,'" | sqlite3 -header ',glDbFile
+answer=. 2!:0 sql
+)
+
+NB. Need to run it
+denhambowl_check_db ''
 
 NB. =========================================================
 NB. jweb_denhambowl_course_v
@@ -40,8 +65,71 @@ denhambowl_course_view y
 )
 
 NB. =========================================================
+NB. denhambowl_course_all  
+NB. View all courses and summary yards
+NB. =========================================================
+denhambowl_course_all=: 3 : 0
+NB. Retrieve the details
+xx=.glDbFile djwSqliteR 'select * from tbl_control;'
+xx=.'tbl_control' djwSqliteSplit xx
+xx=.glDbFile djwSqliteR 'select * from tbl_course;' 
+err=. ''
+if. 0<#xx do.
+    xx=.'tbl_course' djwSqliteSplit xx
+    xx=. djwBuildArray 'tbl_course_yards'
+    xx=. djwBuildArray 'tbl_course_par'
+    xx=. djwBuildArray 'tbl_course_index'
+else.
+    err=. 'No courses loaded'
+end.
+
+stdout 'Content-type: text/html',LF,LF,'<html>',LF
+stdout LF,'<head>'
+stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
+djwBlueprintCSS ''
+stdout LF,'</head><body>'
+stdout LF,'<div class="container showgrid">'
+NB. Error page - No such course
+if. 0<#err do.
+stdout LF,TAB,'<div class="span-24">'
+stdout, LF,TAB,TAB,'<h1>',err,'</h1>'
+stdout, '<div class="error">No such course name : ',y
+stdout  ,2$,: '</div>'
+stdout LF,'<br><a href="/jw/denhambowl/course/v">Back to course list</a>'
+stdout, '</div></body>'
+exit ''
+end.
+NB. Print scorecard and yardage
+stdout LF, '<div class="span-14">'
+stdout LF,TAB,TAB,'<h2>Course List</h2>', ": getenv 'REMOTE_USER'
+stdout LF,TAB,' ',(": getenv 'HTTP_REFERER'),": getenv 'REMOTE_ADDR'
+stdout LF,TAB,'<div class="span-14">'
+stdout LF,'<table>'
+stdout LF,'<thead><tr>'
+stdout LF,'<th>Course</th><th>Description</th><th>Par</th><th>Yards</th></tr></thead><tbody>'
+NB. Loop round the courses
+for_cc. i. #tbl_course_name do.
+	stdout LF,'<tr><td><a href="http://',(,getenv 'SERVER_NAME'),'/jw/denhambowl/course/v/',(,>cc{tbl_course_name),'">',(>cc{tbl_course_name),'</td>'
+	stdout LF,'<td>',(>cc{tbl_course_desc),'</td>'
+	stdout LF,'<td>',(": cc{tbl_course_sss),'</td>'
+	stdout LF,'<td>',(": + / cc{tbl_course_yards),'</td></tr>'
+end.
+NB. Add the Edit Option
+stdout LF,'<div class="span-2 last">'
+stdout LF,'<a href="https://',(,getenv 'SERVER_NAME'),'/jw/denhambowl/course/e/',(,>tbl_course_name),'">Edit</a><div>'
+NB. stdout LF,'<input type="button" value="eDit" onClick="redirect(''http://',(getenv 'SERVER_NAME'),'/jw/denhambowl/course/e/',(,>tbl_course_name),''')">edit<div>'
+stdout LF,'<hr></div>' NB. main span
+stdout LF,'</div>' NB. container
+stdout '</body></html>'
+exit ''
+)
+
+
+
+NB. =========================================================
 NB. denhambowl_course_view
 NB. View scores for participant
+NB. =========================================================
 denhambowl_course_view=: 3 : 0
 NB. Retrieve the details
 xx=.glDbFile djwSqliteR 'select * from tbl_control;'
@@ -61,22 +149,23 @@ stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 djwBlueprintCSS ''
-stdout LF,'</head><body>'
+stdout LF,'</head>',LF,'<body>'
 stdout LF,'<div class="container">'
 NB. Error page - No such course
 if. 0<#err do.
     stdout LF,TAB,'<div class="span-24">'
-    stdout, LF,TAB,TAB,'<h1>',err,'</h1>'
-    stdout, '<div class="error">No such course name : ',y
-    stdout  ,2$,: '</div>'
-    stdout LF,'<br><a href="/jw/denhambowl/course/v">Back to course list</a>'
-    stdout, '</div></body>'
+    stdout LF,TAB,TAB,'<h1>',err,'</h1>'
+    stdout LF,TAB,TAB,'<div class="error">No such course name : ',y
+    stdout '</div>'
+	stdout LF,TAB,'</div>'
+    stdout LF,TAB,'<br><a href="/jw/denhambowl/course/v">Back to course list</a>'
+    stdout LF, '</div>',LF,'</body>'
     exit ''
 end.
 NB. Print scorecard and yardage
-stdout LF,TAB,TAB,'<h2>Course : ', (; tbl_course_desc),'</h2>'
-stdout LF,TAB,'<div class="span-14">'
-stdout LF,'Standard Scratch = ',(":,tbl_course_sss),'<hr>'
+stdout LF,TAB,'<h2>Course : ', (; tbl_course_desc),'</h2>'
+stdout LF,TAB,'<div class="span-16 last">'
+stdout LF,TAB,'Standard Scratch = ',(":,tbl_course_sss),'<hr>'
 NB. Front 9
 for_half. i. 2 do.
     if. 0=half do.
@@ -109,9 +198,9 @@ for_half. i. 2 do.
 
 end.
 NB. Add the Edit Option
-stdout LF,'<div class="span-2 last">'
-stdout LF,'<a href="https://',(,getenv 'SERVER_NAME'),'/jw/denhambowl/course/e/',(,>tbl_course_name),'">Edit</a><div>'
-NB. stdout LF,'<input type="button" value="eDit" onClick="redirect(''http://',(getenv 'SERVER_NAME'),'/jw/denhambowl/course/e/',(,>tbl_course_name),''')">edit<div>'
+stdout LF,'<div class="span-3 prepend-1 last">'
+stdout LF,'<a href="https://',(,getenv 'SERVER_NAME'),'/jw/denhambowl/course/e/',(,>tbl_course_name),'">Edit: ',(,>tbl_course_name),'</a></br></br>'
+stdout LF,'<a href="http://',(,getenv 'SERVER_NAME'),'/jw/denhambowl/course/v">Back to list</a></div>'
 stdout LF,'<hr></div>' NB. main span
 stdout LF,'</div>' NB. container
 stdout '</body></html>'
@@ -120,6 +209,7 @@ exit ''
 
 NB. =========================================================
 NB. jweb_denhambowl_course_e
+NB. =========================================================
 NB. View scores for participant
 jweb_denhambowl_course_e=: 3 : 0
 y=.cgiparms ''
@@ -141,6 +231,7 @@ denhambowl_course_edit y
 
 NB. =========================================================
 NB. denhambowl_course_edit
+NB. =========================================================
 NB. View scores for participant
 denhambowl_course_edit=: 3 : 0
 NB. Retrieve the details
@@ -174,10 +265,12 @@ if. 0<#err do.
     exit ''
 end.
 NB. Print scorecard and yardage
-stdout LF,TAB,TAB,'<h2>Edit Course Details : ', ( ; tbl_course_desc),'</h2>'
+stdout LF,TAB,TAB,'<h2>Edit Course Details : ', ( ; tbl_course_desc),'</h2><i>',(": getenv 'REMOTE_USER'),'</i>'
 stdout LF,TAB,'<div class="span-12">'
 stdout LF, TAB,'<form action="/jw/denhambowl/course/editpost/',y,'" method="post">'
-stdout LF, TAB,'<input type="hidden" name="tbl_course_name" value="',y,'">'
+stdout LF, TAB,'<input type="hidden" name="tbl_course_name" value="',y,'">' NB. Have to pass through this value
+stdout LF, TAB,'<input type="hidden" name="prevname" value="',(;tbl_course_updatename),'">'
+stdout LF, TAB,'<input type="hidden" name="prevtime" value="',(;tbl_course_updatetime),'">'
 stdout LF,'<span class="span-3">Standard Scratch</span><input name="tbl_course_sss" value="',(":,tbl_course_sss),'" tabindex="1" ',(InputField 3),'>'
 stdout LF,'<br><span class="span-3">Description</span><input name="tbl_course_desc" value="',(;tbl_course_desc),'" tabindex="2" ',(InputField 25),'><hr>'
 for_half. i. 2 do.
@@ -224,6 +317,10 @@ NB. exit 0
 
 NB. =========================================================
 NB. cgitest v defines html with a timestamp and cgi parameters
+NB. jweb_denhambowl_course_editpost
+NB. =========================================================
+NB. Process entries after edits to course
+NB. based on the contents after the "post"
 jweb_denhambowl_course_editpost=: 3 : 0
 y=. cgiparms ''
 y=. }. y NB. Drop the URI GET string
@@ -239,6 +336,34 @@ end.
 
 NB. Assign to variables
 xx=. djwCGIPost y ; 'tbl_course_par' ; 'tbl_course_index' ; 'tbl_course_yards' ; 'tbl_course_sss'
+
+NB. Check the time stamp
+yy=.glDbFile djwSqliteR 'select updatename,updatetime from tbl_course WHERE name=''',(;tbl_course_name),''';'
+yy=.'tbl_course' djwSqliteSplit yy
+ 
+NB. Throw error page if updated
+if. (tbl_course_updatetime) ~: (prevtime) do.
+	stdout 'Content-type: text/html',LF,LF,'<html>',LF
+ 	stdout LF,'<head>'
+ 	stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
+ 	djwBlueprintCSS ''
+ 	stdout LF,'</head><body>'
+ 	stdout LF,'<div class="container">'
+ 	stdout LF,TAB,'<div class="span-24">'
+ 	stdout LF,TAB,TAB,'<h1>Error updating ',(;tbl_course_name),'</h1>'
+ 	stdout LF,'<div class="error">Synch error updating ',(;tbl_course_name)
+ 	stdout LF,'</br></br>',(":getenv 'REMOTE_USER'),' started to update record previously saved by ',(;prevname),' at ',;prevtime
+ 	stdout LF,'</br><br>It has since been updated by: ',(; tbl_course_updatename),' at ',(;tbl_course_updatetime)
+ 	stdout LF,'</br><br><b>**Update has been CANCELLED**</b>'
+ 	stdout  ,2$,: '</div>'
+ 	stdout LF,'</br><a href="/jw/denhambowl/course/e/',(;tbl_course_name),'">Restart edit of: ',(;tbl_course_name),'</a>'
+ 	stdout, '</div></body>'
+ 	exit ''
+end.
+
+tbl_course_updatename=: ,<getenv 'REMOTE_USER'
+tbl_course_updatetime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
+
 string=. djwSqliteUpdate 'tbl_course' ; 'tbl_course_' ; 'tbl_course_name' ; 'tbl_course_'
 NB. Can't handle too big a file on "echo"
 NB. so write out to random seed
@@ -263,7 +388,7 @@ NB. Choose page based on what was pressed
     if. 0= 4!:0 <'control_calc' do.
 	stdout '</head><body onLoad="redirect(''https://',(getenv 'SERVER_NAME'),'/jw/denhambowl/course/e/',(,>tbl_course_name),''')"'
     else.  
-	stdout '</head><body onLoad="redirect(''https://',(getenv 'SERVER_NAME'),'/jw/denhambowl/course/v/',(,>tbl_course_name),''')"'
+	stdout '</head><body onLoad="redirect(''http://',(getenv 'SERVER_NAME'),'/jw/denhambowl/course/v/',(,>tbl_course_name),''')"'
     end.
 stdout LF,'</body></html>'
 exit ''
