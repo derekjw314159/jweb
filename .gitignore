@@ -1,0 +1,4 @@
+# Files to ignore
+cgi/**
+cgis/**
+# Ignoring cgi and cgis because SSL and authentication is different
