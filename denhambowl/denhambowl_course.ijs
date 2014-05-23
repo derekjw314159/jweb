@@ -11,7 +11,7 @@ r=. ' class="normal" style="font-size: 8pt; height: 16px; width: ',(":y),'em;" t
 
 InputFieldnum=: 3 : 0
 ('nam';'wid')=. y
-r=. ' class="normal" style="font-size: 8pt; height: 16px; width: ',(":wid),'em;" type="text" name="',nam,'" id="',nam,'" onkeyup="validatenum2(''',nam,''')"'
+r=. ' class="normal" style="font-size: 8pt; height: 16px; margin: 0px; width: ',(":wid),'em;" type="text" name="',nam,'" id="',nam,'" onkeyup="validatenum2(''',nam,''')"'
 )
 
 NB. ===================================
@@ -83,7 +83,7 @@ denhambowl_course_all=: 3 : 0
 NB. Retrieve the details
 xx=.glDbFile djwSqliteR 'select * from tbl_control;'
 xx=.'tbl_control' djwSqliteSplit xx
-xx=.glDbFile djwSqliteR 'select * from tbl_course;' 
+xx=.glDbFile djwSqliteR 'select * from tbl_course ORDER BY name;' 
 err=. ''
 if. 0<#xx do.
     xx=.'tbl_course' djwSqliteSplit xx
@@ -119,17 +119,18 @@ stdout LF,TAB, '<div class="span-15">'
 
 stdout LF,'<table>'
 stdout LF,'<thead><tr>'
-stdout LF,'<th>Course</th><th>Description</th><th>Par</th><th>Yards</th></tr></thead><tbody>'
+stdout LF,'<th>Course</th><th>Description</th><th>Par</th><th>SSS</th><th>Yards</th></tr></thead><tbody>'
 NB. Loop round the courses
 for_cc. i. #tbl_course_name do.
 	stdout LF,'<tr><td><a href="http://',(,getenv 'SERVER_NAME'),'/jw/denhambowl/course/v/',(,>cc{tbl_course_name),'">',(>cc{tbl_course_name),'</td>'
 	stdout LF,'<td>',(>cc{tbl_course_desc),'</td>'
+	stdout LF,'<td>',(": + / cc{tbl_course_par),'</td>'
 	stdout LF,'<td>',(": cc{tbl_course_sss),'</td>'
 	stdout LF,'<td>',(": + / cc{tbl_course_yards),'</td></tr>'
 end.
 stdout LF,'</table><hr></div>'
 NB. Add the Edit Option
-stdout LF,'<div class="span-2 prepend-1 last">'
+stdout LF,'<div class="span-4 prepend-1 last">'
 stdout LF,'<a href="https://',(,getenv 'SERVER_NAME'),'/jw/denhambowl/course/a">Add new course</a><div>'
 NB. stdout LF,'<input type="button" value="eDit" onClick="redirect(''http://',(getenv 'SERVER_NAME'),'/jw/denhambowl/course/e/',(,>tbl_course_name),''')">edit<div>'
 stdout LF,'</div>' NB. main span
@@ -175,7 +176,7 @@ if. 0<#err do.
     exit ''
 end.
 NB. Print scorecard and yardage
-stdout LF,TAB,'<h2>Course : ', (; tbl_course_desc),'</h2>'
+stdout LF,TAB,'<h2>Course : ',(;tbl_course_name),' : ', (; tbl_course_desc),'</h2>'
 stdout LF,TAB,'<div class="span-16 last">'
 stdout LF,TAB,'Standard Scratch = ',(":,tbl_course_sss),'<hr>'
 NB. Front 9
@@ -203,8 +204,8 @@ for_half. i. 2 do.
 	stdout LF,'<td>',(": +/(9+i.9)  { ,tbl_course_yards),'</td><td>',(": +/(9+i.9) {,tbl_course_par),'</td></tr>'
 	stdout LF,'<tr><td>OUT</td>'
 	stdout LF,'<td>',(": +/9 {. ,tbl_course_yards),'</td><td>',(": +/9{.,tbl_course_par),'</td></tr>'
-	stdout LF,'<span class="loud"><tr><td>TOTAL</td>'
-	stdout LF,'<td>',(": +/18 {. ,tbl_course_yards),'</td><td>',(": +/18 {.,tbl_course_par),'</td></tr></span>'
+	stdout LF,'<tr><td><b>TOTAL</b></td>'
+	stdout LF,'<td><b>',(": +/18 {. ,tbl_course_yards),'</b></td><td><b>',(": +/18 {.,tbl_course_par),'</b></td></tr>'
 	stdout LF,'</tfoot></table></div>'
     end.
 
@@ -277,7 +278,7 @@ if. 0<#err do.
     exit ''
 end.
 NB. Print scorecard and yardage
-stdout LF,TAB,TAB,'<h2>Edit Course Details : ', ( ; tbl_course_desc),'</h2><i>',(": getenv 'REMOTE_USER'),'</i>'
+stdout LF,TAB,TAB,'<h2>Edit Course Details : ', (;tbl_course_name),' : ', ( ; tbl_course_desc),'</h2><i>',(": getenv 'REMOTE_USER'),'</i>'
 stdout LF,TAB,'<div class="span-12">'
 stdout LF, TAB,'<form action="/jw/denhambowl/course/editpost/',y,'" method="post">'
 stdout LF, TAB,'<input type="hidden" name="tbl_course_name" value="',y,'">' NB. Have to pass through this value
@@ -422,7 +423,7 @@ else.
 	y=. (#'denhambowl/course/a/')}. >(<0 1){y
     else.
 	if. 'error' -: >(<1 0){ y do.
-	    y=.( (#'denhambowl/course/a/')}.>(<0 1) { y),'&error'
+	    y=.( (#'denhambowl/course/a/')}.>(<0 1) { y),'&error=', >(<1 1) { y
 	else.
 	    pagenotfound ''
 	end.
@@ -445,8 +446,12 @@ NB. If two parameters it is in error no edit
 x=.'&error' E. y
 if. +. / x do.
 	x=. I. x
+	if. +. / 'Duplicate' E. y do.
+		err=. 'Duplicate entry : '
+	else. 
+		err=. 'Name not valid: use only letters and numbers : '
+	end.
 	y=. x {. y
-	err=. 'Duplicate'
 else. err=. ''
 end.
 
@@ -460,7 +465,7 @@ stdout LF,TAB,TAB,'<h2>New Course</h2><i>',(": getenv 'REMOTE_USER'),'</i>'
 NB. Error page - No such course
 if. 0<# err do.
     stdout LF,TAB,'<div class="span-24">'
-    stdout, '<div class="error">Course already exists : ',y
+    stdout, '<div class="error">',err,y
     stdout  ,2$,: '</div>'
 end.
 NB. Print scorecard and yardage
@@ -495,12 +500,22 @@ end.
 
 NB. Assign to variables
 xx=. djwCGIPost y 
-
+err=. ''
 NB. Check whether the value already exists
 yy=.glDbFile djwSqliteR 'select updatename,updatetime from tbl_course WHERE name=''',(;tbl_course_name),''';'
  
-NB. Throw error page if updated
 if. (0 <  # yy ) do.
+	err=. 'Duplicate'
+end.
+
+yy=. *. / (;tbl_course_name) e. 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'
+yy=. yy *. -. ({. ; tbl_course_name) e. '01234567890-_'
+if. -.yy do.
+	err=.'Not+Valid'
+ end.
+
+NB. Throw error page if updated
+if. 0 < # err do.
 	yy=. '/jw/denhambowl/course/a/',(;tbl_course_name),'&error'
 	stdout 'Content-type: text/html',LF,LF,'<html>',LF
  	stdout LF,'<head>'
@@ -509,11 +524,12 @@ if. (0 <  # yy ) do.
  	stdout LF,'</head><body>'
  	stdout LF,'<div class="container">'
  	stdout LF,TAB,'<div class="span-24">'
- 	stdout LF,TAB,TAB,'<h1>Error updating ',(;tbl_course_name),'</h1>'
- 	stdout LF,'<div class="error">Synch error updating ',(;tbl_course_name)
- 	stdout LF,'</br><br><b>**Update has been CANCELLED**</b>'
+ 	stdout LF,TAB,TAB,'<h2>Error adding : ',(;tbl_course_name),'</h2>'
+ 	stdout LF,'<div class="error">Database error trying to add : ',(;tbl_course_name)
+ 	stdout LF,'</br><br><b>**Addition has been CANCELLED**</b>'
  	stdout  ,2$,: '</div>'
- 	stdout LF,'</br><a href="/jw/denhambowl/course/a/',(;tbl_course_name),'&error">Restart adding: ',(;tbl_course_name),'</a>'
+	NB. Strip out invalid characters in link string
+ 	stdout LF,'</br><a href="/jw/denhambowl/course/a/',((-.(;tbl_course_name) e. ' /\&?')#;tbl_course_name),'&error=',err,'">Restart to add: ',(;tbl_course_name),'</a>'
  	stdout, '</div></body>'
 	exit ''
 end.
