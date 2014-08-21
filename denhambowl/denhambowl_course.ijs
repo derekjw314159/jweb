@@ -58,21 +58,21 @@ NB. =========================================================
 NB. jweb_denhambowl_course_v
 NB. View scores for participant
 jweb_denhambowl_course_v=: 3 : 0
-y=.cgiparms ''
-if. 'denhambowl/course/v' -: >(< 0 1){y do.
+NB. y=.cgiparms ''
+if. 0=#y do.
     denhambowl_course_all ''
-else.
-    if. 1=#y do. NB. Passed as parameter
-	y=. (#'denhambowl/course/v/')}. >(<0 1){y
-    else.
-	if. 'id' -: >(<1 0){ y do.
-	    y=. >(<1 1) { y
-	else.
-	    pagenotfound ''
-	end.
-    end.
+elseif. 1=#y do. NB. Passed as parameter
+    denhambowl_course_view >{. y
+elseif. 1 do.
+    pagenotfound ''
 end.
-denhambowl_course_view y
+)
+NB. =========================================================
+NB. Synonyms
+NB. jweb_denhambowl_course
+NB. =========================================================
+jweb_denhambowl_course=: 3 : 0
+denhambowl_course_all ''
 )
 
 NB. =========================================================

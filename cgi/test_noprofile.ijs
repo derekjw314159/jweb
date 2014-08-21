@@ -188,7 +188,8 @@ if. 0 < # 1!:0 <filepath,'/',basename do.
 	ff=. 'jweb', ; (<'_') , each ff
 	if. 3= 4!:0 < ff do. 
 	    NB. Killer line which executes the right function
-	    ". 'xx=.',ff,' '''' '
+	    NB. Pass the remaining parameters
+	    ". 'xx=.',ff,' (1+chunk) }. params'
 	    NB. jweb_denhambowl_course_e ''
 	end.
     end.
