@@ -5,21 +5,21 @@ NB. jweb_denhambowl_course_v
 NB. View scores for participant
 NB. =========================================================
 jweb_denhambowl_course_v=: 3 : 0
-y=.cgiparms ''
-if. 'denhambowl/course/v' -: >(< 0 1){y do.
+NB. y=.cgiparms ''
+if. 0=#y do.
     denhambowl_course_all ''
-else.
-    if. 1=#y do. NB. Passed as parameter
-	y=. (#'denhambowl/course/v/')}. >(<0 1){y
-    else.
-	if. 'id' -: >(<1 0){ y do.
-	    y=. >(<1 1) { y
-	else.
-	    pagenotfound ''
-	end.
-    end.
+elseif. 1=#y do. NB. Passed as parameter
+    denhambowl_course_view >{. y
+elseif. 1 do.
+    pagenotfound ''
 end.
-denhambowl_course_view y
+)
+NB. =========================================================
+NB. Synonyms
+NB. jweb_denhambowl_course
+NB. =========================================================
+jweb_denhambowl_course=: 3 : 0
+denhambowl_course_all ''
 )
 
 NB. =========================================================
@@ -229,7 +229,7 @@ stdout LF,TAB,TAB,'<h2>Edit Course Details : ', (;tbl_course_name),' : ', ( ; tb
 stdout LF,TAB,'<div class="span-12">'
 stdout LF, TAB,'<form action="/jw/denhambowl/course/editpost/',y,'" method="post">'
 stdout LF, TAB,'<input type="hidden" name="tbl_course_name" value="',y,'">' NB. Have to pass through this value
-stdout LF, TAB,'<input type="hidden" name="prevname" value="',(;tbl_course_updatename),'">'
+stdout LF, TAB,'<input type="hidden" name="prevname" value="',(":;tbl_course_updatename),'">'
 stdout LF, TAB,'<input type="hidden" name="prevtime" value="',(;tbl_course_updatetime),'">'
 stdout LF,'<span class="span-3">Standard Scratch</span><input name="tbl_course_sss" value="',(":,tbl_course_sss),'" tabindex="1" ',(InputField 3),'>'
 stdout LF,'<br><span class="span-3">Description</span><input name="tbl_course_desc" value="',(;tbl_course_desc),'" tabindex="2" ',(InputField 25),'><hr>'
@@ -481,7 +481,7 @@ if. 0 < # err do.
 	exit ''
 end.
 
-tbl_course_updatename=: ,<getenv 'REMOTE_USER'
+tbl_course_updatename=: ,<": getenv 'REMOTE_USER'
 tbl_course_updatetime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 tbl_course_desc=: ,<'Please add a description'
 
