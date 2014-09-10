@@ -1,5 +1,9 @@
 NB. J Utilities for Denhambowl
+<<<<<<< HEAD
 NB. Central functions
+=======
+NB. 
+>>>>>>> e33f0c2c63e909c0461e7f5153711e1230b832dd
 
 NB. Standard input field behaviours
 NB. ================================
@@ -26,6 +30,7 @@ stdout LF,TAB,'<link rel="stylesheet" href="/css/blueprint/ie.css" type="text/cs
 stdout LF,'<![endif]-->'
 )
 
+<<<<<<< HEAD
 NB. =========================================================
 NB. denhambowl_check_db
 NB. =========================================================
@@ -54,3 +59,5 @@ answer=. 2!:0 sql
 NB. Need to run it
 denhambowl_check_db ''
 
+=======
+>>>>>>> e33f0c2c63e909c0461e7f5153711e1230b832dd
