@@ -68,13 +68,16 @@ if. 0 -: user do. user=. '' end.
 stdout LF,TAB,'<h2>Team List : ',(":,>tbl_comp_name),'</h2>', user
 stdout LF,TAB, '<div class="span-15">'
 
+NB. Table to loop round the teams
 stdout LF,'<table>'
 stdout LF,'<thead><tr>'
 stdout LF,'<th>Course</th><th>Description</th><th>Par</th><th>SSS</th><th>Yards</th></tr></thead><tbody>'
 NB. Loop round the courses
 for_cc. i. #tbl_team_name do.
-	stdout LF,'<tr><td><a href="http://',(,getenv 'SERVER_NAME'),'/jw/denhambowl/team/v/',(,>cc{tbl_team_name),'">',(>cc{tbl_team_name),'</td>'
-	stdout LF,'</tr>'
+	stdout LF,'<tr><td rowspan=2 style="border-bottom: 2px solid lightgrey"><a href="http://',(,getenv 'SERVER_NAME'),'/jw/denhambowl/team/v/',(,>cc{tbl_team_name),'">',(>cc{tbl_team_name),'</td>'
+	stdout LF,'<td>Person1</td></tr>'
+	stdout LF,'<td>Person 2</td>'
+	stdout LF,'<hr></tr>'
 end.
 stdout LF,'</table><hr></div>'
 NB. Add the Edit Option
