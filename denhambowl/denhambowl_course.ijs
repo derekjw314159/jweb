@@ -1,10 +1,7 @@
-<<<<<<< HEAD
 NB. Utilities for CRUD of courses
-=======
 NB. J Utilities for Denhambowl
 NB. 
 
->>>>>>> e33f0c2c63e909c0461e7f5153711e1230b832dd
 
 NB. =========================================================
 NB. jweb_denhambowl_course_v
