@@ -1,10 +1,10 @@
 NB. J Utilities for Denhambowl
 NB. 
 
-
 NB. =========================================================
 NB. jweb_denhambowl_team_v
 NB. View scores for participant
+NB. =========================================================
 jweb_denhambowl_team_v=: 3 : 0
 NB. y=.cgiparms ''
 if. 0=#y do.
@@ -51,13 +51,13 @@ stdout LF,'<script src="/javascript/pagescroll.js"></script>'
 djwBlueprintCSS ''
 stdout LF,'</head>',LF,'<body>'
 stdout LF,'<div class="container">'
-NB. Error page - No such course
+NB. Error page - No such team
 if. 0<#err do.
 stdout LF,TAB,'<div class="span-24">'
 stdout, LF,TAB,TAB,'<h1>',err,'</h1>'
-stdout, '<div class="error">No such course name : ',y
+stdout, '<div class="error">No such team name : ',y
 stdout  ,2$,: '</div>'
-stdout LF,'<br><a href="/jw/denhambowl/course/v">Back to course list</a>'
+stdout LF,'<br><a href="/jw/denhambowl/course/v">Back to team list</a>'
 stdout, '</div></body>'
 exit ''
 end.
@@ -77,7 +77,7 @@ for_cc. i. #tbl_team_name do.
 	stdout LF,'<tr><td rowspan=2 style="border-bottom: 2px solid lightgrey"><a href="http://',(,getenv 'SERVER_NAME'),'/jw/denhambowl/team/v/',(,>cc{tbl_team_name),'">',(>cc{tbl_team_name),'</td>'
 	stdout LF,'<td>Person1</td></tr>'
 	stdout LF,'<td>Person 2</td>'
-	stdout LF,'<hr></tr>'
+	stdout LF,'</tr>'
 end.
 stdout LF,'</table><hr></div>'
 NB. Add the Edit Option
