@@ -143,7 +143,8 @@ for_rr. }. i. # res do.
 	str=. str,'='
 	val=. (<rr,1+col_index) { res
 	if. 2= (3!:0) >val do.
-	    str=. str, '''', (>val), ''''
+    	    NB. Need to stringreplace single quote
+	    str=. str, '''', ( (''''; '''''' ) stringreplace >val), ''''
 	else.
 	    str=. str, ": >val
 	end.
