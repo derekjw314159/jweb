@@ -35,6 +35,8 @@ xx=.glDbFile djwSqliteR 'select * from tbl_comp WHERE id=',(":,tbl_control_compi
 xx=.'tbl_comp' djwSqliteSplit xx
 xx=.glDbFile djwSqliteR 'select * from tbl_team WHERE compid=',(":,tbl_control_compid),' ORDER BY sortname;' 
 yy=.glDbFile djwSqliteR 'select * from tbl_partic WHERE compid=',(":,tbl_control_compid),' ORDER BY sortname;'
+zz=.glDbFile djwSqliteR 'select * from tbl_partic_round JOIN tbl_partic ON tbl_partic_round.partid = tbl_partic.id WHERE compid=',(":,tbl_control_compid),';'
+
 err=. ''
 if. 0<#xx do.
     xx=.'tbl_team' djwSqliteSplit xx
@@ -55,6 +57,24 @@ else.
     tbl_partic_compid=: 0$0
 	tbl_partic_teamid=: 0$0;
 end.
+
+if. 0<#zz do.
+    zz=.'tbl_partic_round' djwSqliteSplit zz
+else.
+    tbl_partic_round_id=: 0$0
+    tbl_partic_round_partid=: 0$0
+    tbl_partic_round_round=: 0$0
+	tbl_partic_round_tee=: 0$a:
+	tbl_partic_round_starttime=: 0$a:
+end.
+
+NB. Loop round the rounds for start time and tees
+xx=. ((''$tbl_comp_rounds) # i. #tbl_partic_id)
+xx=. xx,. (tbl_comp_rounds*(#tbl_partic_id)) $ i. tbl_comp_rounds
+NB. this should look like 0 1 2 0 1 2 ,. 0 0 0 1 1 1 
+xx=. (tbl_partic_round_partid,. tbl_partic_round_round) i. xx
+tbl_partic_tee=: ((#tbl_partic_id),tbl_comp_rounds)$ (xx { (tbl_partic_round_tee, <'tee') )
+tbl_partic_starttime=: ((#tbl_partic_id),tbl_comp_rounds)$ ( xx { (tbl_partic_round_starttime, <'time') )
 
 stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
@@ -82,21 +102,32 @@ stdout LF,TAB, '<div class="span-15">'
 NB. Table to loop round the teams
 stdout LF,'<table>'
 stdout LF,'<thead><tr>'
-stdout LF,'<th> </th><th>Team</th><th>Participants</th></tr></thead><tbody>'
+stdout LF,'<th> </th><th>Team</th><th>Participants</th>'
+for_rr. i. tbl_comp_rounds do.
+	stdout '<th>Round ', (":rr+1),'</th>'
+end.
+stdout '</tr></thead><tbody>'
 NB. Loop round the teams
 for_cc. i. #tbl_team_name do.
 	ct=. 1 >.  +/(tbl_partic_teamid=cc{tbl_team_id)
 	stdout LF,'<tr><td rowspan=',(":ct),' align="center"><img src="',glDbRoot,'/',(>cc{tbl_team_logopath),'" height="',(":17*ct),'px" width="auto" align="center" VALIGN="Middle"></td>'
 	stdout LF,'<td rowspan=',(":ct),' style="border-bottom: 2px solid lightgrey"><a href="http://',(,getenv 'SERVER_NAME'),'/jw/denhambowl/team/v/',(,>cc{tbl_team_name),'">',(>cc{tbl_team_name),'</td>'
 	for_pp. I. (tbl_partic_teamid=cc{tbl_team_id) do.
-		stdout LF,'<td>',(,>pp{tbl_partic_name),'</td></tr>'
+		stdout LF,'<td>',(,>pp{tbl_partic_name),'</td>'
+		for_rr. i. tbl_comp_rounds do.
+			stdout LF,'<td>',(,>(<pp,rr){tbl_partic_tee)
+			stdout ': ',(,>(<pp,rr){tbl_partic_starttime)
+			stdout '</td>'
+		end.
+		stdout LF,'</tr>'
 	end.
 	if. -. (+./ (tbl_partic_teamid=cc{tbl_team_id)) do. stdout LF,'<td>&lt;No participants&gt;</td></tr>' end.
 end.
 stdout LF,'</table><hr></div>'
 NB. Add the Edit Option
 stdout LF,'<div class="span-4 prepend-1 last">'
-stdout LF,'<a href="https://',(,getenv 'SERVER_NAME'),'/jw/denhambowl/team/a">Add new team</a><div>'
+stdout LF,'<a href="https://',(,getenv 'SERVER_NAME'),'/jw/denhambowl/team/a">Add new team</a></br>'
+stdout LF,'<a href="https://',(,getenv 'SERVER_NAME'),'/jw/denhambowl/partic/a">Add new participant</a><div>'
 NB. stdout LF,'<input type="button" value="eDit" onClick="redirect(''http://',(getenv 'SERVER_NAME'),'/jw/denhambowl/course/e/',(,>tbl_team_name),''')">edit<div>'
 stdout LF,'</div>' NB. main span
 stdout LF,'</div>' NB. container
