@@ -34,6 +34,7 @@ xx=.'tbl_control' djwSqliteSplit xx
 xx=.glDbFile djwSqliteR 'select * from tbl_comp WHERE id=',(":,tbl_control_compid),';'
 xx=.'tbl_comp' djwSqliteSplit xx
 xx=.glDbFile djwSqliteR 'select * from tbl_team WHERE compid=',(":,tbl_control_compid),' ORDER BY sortname;' 
+yy=.glDbFile djwSqliteR 'select * from tbl_partic WHERE compid=',(":,tbl_control_compid),' ORDER BY sortname;'
 err=. ''
 if. 0<#xx do.
     xx=.'tbl_team' djwSqliteSplit xx
@@ -43,6 +44,16 @@ else.
     tbl_team_sortname=: 0$a:
     tbl_team_compid=: 0$0
     tbl_team_logopath=: 0$a:
+end.
+
+if. 0<#yy do.
+    yy=.'tbl_partic' djwSqliteSplit yy
+else.
+    tbl_partic_id=: 0$0
+    tbl_partic_name=: 0$a:
+    tbl_partic_sortname=: 0$a:
+    tbl_partic_compid=: 0$0
+	tbl_partic_teamid=: 0$0;
 end.
 
 stdout 'Content-type: text/html',LF,LF,'<html>',LF
@@ -57,11 +68,11 @@ stdout LF,TAB,'<div class="span-24">'
 stdout, LF,TAB,TAB,'<h1>',err,'</h1>'
 stdout, '<div class="error">No such team name : ',y
 stdout  ,2$,: '</div>'
-stdout LF,'<br><a href="/jw/denhambowl/course/v">Back to team list</a>'
+stdout LF,'<br><a href="/jw/denhambowl/team/v">Back to team list</a>'
 stdout, '</div></body>'
 exit ''
 end.
-NB. Print scorecard and yardage
+NB. Print teams and participants
 stdout LF, '<div class="span-24">'
 user=.getenv 'REMOTE_USER'
 if. 0 -: user do. user=. '' end.
@@ -71,13 +82,16 @@ stdout LF,TAB, '<div class="span-15">'
 NB. Table to loop round the teams
 stdout LF,'<table>'
 stdout LF,'<thead><tr>'
-stdout LF,'<th>Course</th><th>Description</th><th>Par</th><th>SSS</th><th>Yards</th></tr></thead><tbody>'
-NB. Loop round the courses
+stdout LF,'<th> </th><th>Team</th><th>Participants</th></tr></thead><tbody>'
+NB. Loop round the teams
 for_cc. i. #tbl_team_name do.
-	stdout LF,'<tr><td rowspan=2 style="border-bottom: 2px solid lightgrey"><a href="http://',(,getenv 'SERVER_NAME'),'/jw/denhambowl/team/v/',(,>cc{tbl_team_name),'">',(>cc{tbl_team_name),'</td>'
-	stdout LF,'<td>Person1</td></tr>'
-	stdout LF,'<td>Person 2</td>'
-	stdout LF,'</tr>'
+	ct=. 1 >.  +/(tbl_partic_teamid=cc{tbl_team_id)
+	stdout LF,'<tr><td rowspan=',(":ct),' align="center"><img src="',glDbRoot,'/',(>cc{tbl_team_logopath),'" height="',(":17*ct),'px" width="auto" align="center" VALIGN="Middle"></td>'
+	stdout LF,'<td rowspan=',(":ct),' style="border-bottom: 2px solid lightgrey"><a href="http://',(,getenv 'SERVER_NAME'),'/jw/denhambowl/team/v/',(,>cc{tbl_team_name),'">',(>cc{tbl_team_name),'</td>'
+	for_pp. I. (tbl_partic_teamid=cc{tbl_team_id) do.
+		stdout LF,'<td>',(,>pp{tbl_partic_name),'</td></tr>'
+	end.
+	if. -. (+./ (tbl_partic_teamid=cc{tbl_team_id)) do. stdout LF,'<td>&lt;No participants&gt;</td></tr>' end.
 end.
 stdout LF,'</table><hr></div>'
 NB. Add the Edit Option
