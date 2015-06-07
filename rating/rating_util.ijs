@@ -44,6 +44,6 @@ for_ii. i. (1+#y) do. NB. Loop round with 1, 2, 3 elements etc.
 	end.
 	if. found do. break. end.
 end.
-ans=. ans
+ans=. ans /: ans
 )
 
