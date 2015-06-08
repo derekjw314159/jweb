@@ -1,3 +1,4 @@
+NB. Utilities for CRUD of courses
 NB. J Utilities for Denhambowl
 NB. 
 
@@ -5,6 +6,7 @@ NB.
 NB. =========================================================
 NB. jweb_denhambowl_course_v
 NB. View scores for participant
+NB. =========================================================
 jweb_denhambowl_course_v=: 3 : 0
 NB. y=.cgiparms ''
 if. 0=#y do.

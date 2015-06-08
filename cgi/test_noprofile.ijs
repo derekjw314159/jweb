@@ -70,6 +70,7 @@ if. 0 < # 1!:0 <glHome,'/djw' do. glHome=: glHome, '/djw' else. glHome=: glHome,
 if. 0 < # 1!:0 <'/Users' do. glDocument_Root=: '/Library/WebServer/Documents' else. glDocument_Root=: '/var/www' end.
 glBasename=: > {. (<;._1) '/',>(<0 1){cgiparms ''
 glDbFile=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glBasename,'.db'
+glDbRoot=: '/yii/',glBasename,'/protected/data'
 glJPath=: _4 }. BINPATH_z_
 NB. glJPath=: glHome,'/j602'
 )
