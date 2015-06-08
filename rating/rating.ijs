@@ -31,30 +31,3 @@ stdout LF,TAB,'<link rel="stylesheet" href="/css/blueprint/ie.css" type="text/cs
 stdout LF,'<![endif]-->'
 )
 
-NB. =========================================================
-NB. denhambowl_check_db
-NB. =========================================================
-NB. Check the columns are all present
-NB. in the database
-denhambowl_check_db=: 3 : 0
-NB. Check for update columns
-sql=. 'select sql from sqlite_master where name=''tbl_course'';'
-sql=. 'echo "',sql,'" | sqlite3 -header ',glDbFile
-answer=.; 2!:0 sql NB. Raze the answer
-answer=. +. / 'updatename' E. answer
-if. -.answer do. NB. Need to add columns
-    sql=. 'ALTER TABLE tbl_course ADD COLUMN updatename VARCHAR(20);'
-    sql=. 'echo "',sql,'" | sqlite3 -header ',glDbFile
-    answer=. 2!:0 sql
-    sql=. 'ALTER TABLE tbl_course ADD COLUMN updatetime VARCHAR(20);'
-    sql=. 'echo "',sql,'" | sqlite3 -header ',glDbFile
-    answer=. 2!:0 sql
-end.
-NB. Update the date
-sql=. 'UPDATE  tbl_course set updatename=''system'', updatetime=''1990-01-01'' WHERE updatename IS NULL;'
-sql=. 'echo "',sql,'" | sqlite3 -header ',glDbFile
-answer=. 2!:0 sql
-)
-
-NB. Need to run it
-denhambowl_check_db ''
