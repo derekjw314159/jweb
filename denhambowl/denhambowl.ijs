@@ -19,8 +19,10 @@ NB. CSS Standards
 NB. djwBlueprintCSS
 NB. ===================================
 djwBlueprintCSS=: 3 : 0
-stdout LF,'<link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen, projection">'
-stdout LF,'<link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print">'
+stdout LF,'<link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css">'
+stdout LF, '<style>a:link:after, a:visited:after{'
+stdout LF,TAB,'    content: normal;'
+stdout LF, TAB,'}</style>'
 stdout LF,'<!--[if lt IE 8]>'
 stdout LF,TAB,'<link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection">'
 stdout LF,'<![endif]-->'
