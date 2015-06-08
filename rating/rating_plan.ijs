@@ -160,7 +160,82 @@ stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 djwBlueprintCSS ''
+
+NB. Add the header stuff for the map
+stdout LF,'<style>'
+stdout LF,'  html, body, #map-canvas {'
+stdout LF,'  height: 480px;'
+stdout LF,'  width: 640px;'
+stdout LF,'  }'
+stdout LF,'</style>'
+stdout LF,'<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>'
+stdout LF,'<script>',LF,'var map;'
+NB. Work out map centre
+path=. glGPSName i. ('r<0>2.0' 8!:0 (1+hole)),each (' ' cut 'TW GC')
+path=. LatLontoFullOS path { glGPSLatLon
+path=. 0.5 * +/path
+path=.;  +. FullOStoLatLon path
+ww=. 9!:11 (9) 
+stdout LF,'var myCenter=new google.maps.LatLng(',(>'' 8!:0  (0{path)),',',(>'' 8!:0 (1{path)),');'
+NB. stdout LF,'var myCenter=new google.maps.LatLng(51.5,-0.57);'
+
+
+stdout LF,'function dyncircle(inner, outer) {'
+stdout LF,'   var circ={'
+stdout LF,'      path: google.maps.SymbolPath.CIRCLE,'
+stdout LF,'      fillColor: inner,'
+stdout LF,'      fillOpacity: 1,'
+stdout LF,'      scale: 3.5,'
+stdout LF,'      strokeColor: outer,'
+stdout LF,'      strokeWeight: 3'
+stdout LF,'      };'
+stdout LF,'   return circ;'
+stdout LF,'}'
+
+stdout LF,'function initialize() {'
+stdout LF,'   var mapOptions = {'
+stdout LF,'     zoom: 17,'
+stdout LF,'     center: myCenter,'
+stdout LF,'     mapTypeId: google.maps.MapTypeId.SATELLITE,'
+stdout LF,'     mapTypeControl: false'
+stdout LF,'     };'
+stdout LF,'  map = new google.maps.Map(document.getElementById(''map-canvas''),mapOptions);'
+
+NB. Add the various points here, starting with tees
+for_t. i.#glTees  do.
+	stdout LF,'   var markerT',(t{glTees),'=new google.maps.Marker({'
+	path=. glGPSName i. <(>'r<0>2.0' 8!:0 (1+hole)),'T',t{glTees
+	path=. +. path { glGPSLatLon
+	stdout LF,'      position: new google.maps.LatLng(',(>'' 8!:0  (0{path)),',',(>'' 8!:0 (1{path)),'),'
+	rgb=. t{glTeesRGB
+	rgb=. (0{"1 glRGB) i. rgb
+	rgb=. >(<rgb,1) { glRGB
+	rgb=. '#',rgb
+NB.	stdout LF,'      icon: dyncircle( ''white'', ''white''),'
+	stdout LF,'      icon: dyncircle( ''',rgb,''', ''',rgb,'''),'
+	stdout LF,'      title: ''Tee ',(>t{glTeesName),''''
+	stdout LF,'      });'
+	stdout LF,'   markerT',(t{glTees),'.setMap(map);'
+end. 
+
+ 
+stdout LF,'   var markerGC=new google.maps.Marker({'
+path=. glGPSName i. <(>'r<0>2.0' 8!:0 (1+hole)),'GC'
+path=. +. path { glGPSLatLon
+stdout LF,'      position: new google.maps.LatLng(',(>'' 8!:0  (0{path)),',',(>'' 8!:0 (1{path)),'),'
+stdout LF,'      icon: "http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|FF99CC|8|_|',(":1+hole),'"'
+stdout LF,'      });'
+stdout LF,'   markerGC.setMap(map);'
+
+
+
+stdout LF,'}'
+stdout LF,'google.maps.event.addDomListener(window, ''load'', initialize);'
+stdout LF,'</script>'
+
+
 stdout LF,'</head>',LF,'<body>'
+stdout LF,'  <div id="map-canvas"></div>'
 stdout LF,'<div class="container">'
 NB. Error page - No such course
 if. 0<#err do.
