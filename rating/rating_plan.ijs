@@ -218,7 +218,7 @@ NB.	stdout LF,'      icon: dyncircle( ''white'', ''white''),'
 	stdout LF,'   markerT',(t{glTees),'.setMap(map);'
 end. 
 
- 
+NB. Green marker 
 stdout LF,'   var markerGC=new google.maps.Marker({'
 path=. glGPSName i. <(>'r<0>2.0' 8!:0 (1+hole)),'GC'
 path=. +. path { glGPSLatLon
@@ -227,6 +227,25 @@ stdout LF,'      icon: "http://chart.apis.google.com/chart?chst=d_map_spin&chld=
 stdout LF,'      });'
 stdout LF,'   markerGC.setMap(map);'
 
+NB. Flightpath
+path=. PathTeeToGreen hole ; 'W'
+stdout LF,'var flightPathCoord = ['
+for_p. path do.
+	pp=. +. p
+	stdout LF,'   new google.maps.LatLng(', (>'' 8!:0  (0{pp)),', ',(>'' 8!:0 (1{pp)),')'
+	if. p_index < _1 + #path do.
+		stdout ','
+	end.
+end.
+	stdout LF,'   ];'
+stdout LF,'var flightPath = new google.maps.Polyline({'
+stdout LF,'       path: flightPathCoord,'
+stdout LF,'       geodesic: true,'
+stdout LF,'       strokeColor: ''#FFFFFF'','
+stdout LF,'       strokeOpacity: 1,'
+stdout LF,'       strokeWeight: 1,'
+stdout LF,'       });'
+stdout LF,'flightPath.setMap(map);'
 
 
 stdout LF,'}'
