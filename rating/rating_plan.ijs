@@ -268,17 +268,17 @@ stdout LF, '</div>',LF,'</body>'
 exit ''
 end.
 NB. Print scorecard and yardage
-stdout LF,TAB,'<h2>Course : ',glFilename,' : ', glCourseName,'</h2><h3>Hole : ',(":1+ ; hole),'</h3>'
+stdout LF,TAB,'<h2>Course : ', glCourseName,'</h2><h3>Hole : ',(":1+ ; hole),'</h3>'
 stdout LF,TAB,'<div class="span-8 last">'
 
 stdout LF,'<table><thead><tr>'
-stdout '<th>Tee</th><th>Card</th><th>Measured</th></th></tr>'
+stdout '<th>Tee</th><th>Card</th><th>Measured</th><th>Alt</th></tr>'
 stdout '</thead><tbody>'
 for_t.  i. #glTees do.
 	stdout LF,'<tr><td>',(>t{glTeesName),'</td>'
 	stdout '<td>',(": <. 0.5 + (<t,hole){glTeesYards),'</td>'
 	stdout '<td>',(": <. 0.5 + (<t,hole){glTeesGroundYards),'</td>'
-	stdout '</tr>'
+	stdout '<td></td></tr>'
 end.
 stdout '</tbody></table></div>'
 stdout LF,TAB,'<div class="span-24 last">'
@@ -290,7 +290,7 @@ tees=. >hole{glTeesMeasured
 for_t. tees do.
 	stdout '<th>',(>(glTees i. t){glTeesName),'</th>'
 end.
-stdout '<th>Player</th><th>Shot</th><th>Hit</th><th>Lay</th><th>To Green</th><th>Alt</th><th>F/width</th><th>#Bunk</th><th>Dist OB</th><th>Dist Tr</th><th>F/w slope</th></tr></thead><tbody>'
+stdout '<th>Player</th><th>Shot</th><th>Hit</th><th>Lay</th><th>To Green</th><th>Alt</th><th>Roll</th><th>F/width</th><th>#Bunk</th><th>Dist OB</th><th>Dist Tr</th><th>F/w slope</th></tr></thead><tbody>'
 for_rr. I. glPlanHole = hole do.
 	stdout '<tr>'
 	for_t. tees do.
@@ -306,7 +306,7 @@ for_rr. I. glPlanHole = hole do.
 		stdout '</td>'
 	end.
 	stdout '<td>',(>(rr{glPlanGender){'Man';'Wmn'),(>(rr{glPlanAbility){' Scr';' Bgy'),'</td><td>',(": 1+rr{glPlanShot),'</td>'
-	stdout '<td>',(": rr{glPlanHitYards),'</td><td>',( (rr{glPlanLayup){' Y'),'</td><td>', (": <. 0.5 + rr{glPlanRemGroundYards),'</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'
+	stdout '<td>',(": rr{glPlanHitYards),'</td><td>',( (rr{glPlanLayup){' Y'),'</td><td>', (": <. 0.5 + rr{glPlanRemGroundYards),'</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'
 end.
 
 stdout '</tbody></table>'
