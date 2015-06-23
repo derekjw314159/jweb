@@ -295,7 +295,11 @@ NB. transpose and box by row
 for_col. key do.
 	(>col)=: col_index{"1 res
 	NB. If boxed number, unbox
-	if. (3!:0 >". (>col)) e. 1 4 8 16 do. (>col)=: >". (>col) end.
+	if. (3!:0 >". (>col)) e. 1 4 8 16 do. (>col)=: >". (>col) 
+	NB. If single characters, open
+	elseif.  0=+/; ($&$) each ". > col do.
+		(>col)=: >". (>col)
+	end.
 end. 
 ww=. $res
 )

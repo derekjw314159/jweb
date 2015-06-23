@@ -450,9 +450,9 @@ end.
 res=. res,each <'-T'
 res=. res, each <"0 ,tee
 res=. res, each <'-'
-res=. res, each <"0 gender{'MW'
-res=. res, each <"0 ability{'SB'
-res=. res, each <"0 shot{'012345'
+res=. res, each <"0 ,gender{'MW'
+res=. res, each <"0 ,ability{'SB'
+res=. res, each <"0 ,shot{'012345'
 if. 0=$$hole do. res=. ''$res end.
 )
 
