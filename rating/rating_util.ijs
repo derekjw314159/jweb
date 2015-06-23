@@ -91,7 +91,7 @@ NB. Usage:  InterceptPath  path ; startpoint ; radius in yards
 NB. Returns the latlon of the intercept, and the distance along
 NB. the path
 NB. ----------------------------------------------
-InterceptPath=: 3 : 0
+InterceptPathold=: 3 : 0
 (' ' cut 'path start radius')=. y
 radius=. radius % glMY NB. Need to do the geometry in meters
 
@@ -146,6 +146,64 @@ res=. res, glMY*length
 
 )
 
+NB. ============================================
+NB. InterceptPath
+NB. --------------------------------------------
+NB. A fairly complicated bit of trig and vector
+NB. stuff to calculate where a shot of a given
+NB. length cuts the path to the green, e.g. for
+NB. a dogleg
+NB. Usage:  InterceptPath  path ; startpoint ; radius in yards
+NB. Returns the latlon of the intercept, and the distance along
+NB. the path
+NB. Changed 12/5/15 to make it easier
+NB. Now assumes it follows the route of the fairway
+NB. and returns the LatLon of the new position
+NB. and the crow's flight distance of the ball
+NB. ----------------------------------------------
+InterceptPath=: 3 : 0
+(' ' cut 'path start radius')=. y
+radius=. radius % glMY NB. Need to do the geometry in meters
+
+NB. Assume the green is the last point in path, and
+NB. delete any points further away than the start
+path=. LatLontoFullOS path
+start=. LatLontoFullOS start
+path=.((| path - _1{path) < (|start - _1{path)) # path
+
+NB. If first point of path is further than radius, simple calc
+if. radius < (|start - 0{path) do.
+	prop=. radius % (|start -0{path)
+	res=. start + prop * (0{path) - start
+	res=. FullOStoLatLon res
+	res=. res, <. 0.5 + radius * glMY
+	return.
+end.
+
+NB. Else add the start point to the path
+path=. start,path
+length=. 0, +/ \ (|(}. path) - }:path)
+
+NB. If last point of path is less than radius, zoom there
+if. radius >: ({:length) do.
+	res=. FullOStoLatLon _1{path
+	NB. Truncate path to startpoint
+	res=. res, <. 0.5 + glMY *  _1{length
+	return.
+end.
+
+NB. Need to find out which chunk of the path is crossed by radius
+dist=.( length > radius) i. 1
+NB. Need to image a triangle with point <B> at the start
+NB. length of b
+b=. radius - (dist-1){length
+blarge=. -/ (dist,dist-1) { path
+res=. ((dist-1){path) + (b % |blarge) * blarge
+res=. FullOStoLatLon res
+res=. res, <. 0.5 + glMY * radius
+
+)
+
 
 
 NB. =============================================
@@ -190,6 +248,28 @@ for_h. y do. NB. Start of hole loop <h>
 	end. NB. End of tee loop	
 
 end. NB. End of hole loop <h>	
+
+NB. Finally, adjust tee position to be the same as the card
+for_h. y do. NB. Start of hole loop <h>
+
+	NB. Other tees
+	for_t. glTees do. NB. start of tee loop
+		path=. PathTeeToGreen h ; t
+		NB. Difference between card values
+		card=. -/(<(t_index) ; h) { glTeesYards
+		path=. LatLontoFullOS path
+		length=. glMY * +/ | (}. path) - (}:path) 
+		NB. Move first point
+		latlon=. (0{path) + ((length-card) % glMY * |-/2{.path) * (-/1 0 { path)
+		latlon=. FullOStoLatLon latlon
+		xx=. <(>'r<0>2.0' 8!:0 (1+h)),'T',t
+		xx=. glGPSName i. xx
+		glGPSLatLon=: latlon (xx)} glGPSLatLon
+	
+	end. NB. End of tee loop	
+
+end. NB. End of hole loop <h>	
+
 utFilePut glFilepath
 )
 
@@ -219,10 +299,10 @@ for_ab. abilities do.
 	shot=. _1
 	cumgroundyards=. 0 
 	path=. LatLontoFullOS PathTeeToGreen h ; t
-	remgroundyards=. glMY * +/ |(}.path) - }:path
+	remgroundyards=. <. 0.5 + glMY * +/ |(}.path) - }:path
 	glTeesGroundYards=: <. 0.5+remgroundyards (< (glTees i. t), h)}glTeesGroundYards
 	path=. LatLontoFullOS PathTeeToGreen h ; 0{tees
-	rembackyards=. glMY * +/ |(}.path) - }:path
+	rembackyards=. <. 0.5 + glMY * +/ |(}.path) - }:path
 	cumbackyards=. rembackyards - remgroundyards
 	path=. PathTeeToGreen h ; t
 	start=. 0{path
@@ -258,7 +338,7 @@ label_shot.
 		layup=. 1
 	end.
 	NB. If hitting beyond green, no entry	
-	if. radius >: (glMY * |(-/LatLontoFullOS start, _1{path)) do. continue. end.
+NB.	if. radius >: (glMY * |(-/LatLontoFullOS start, _1{path)) do.  continue. end.
 	
 	NB. If here, we can use the intercept logic
 	ww=. InterceptPath path ; start ; radius
@@ -267,17 +347,20 @@ label_shot.
 	glPlanGender=: glPlanGender, g
 	glPlanAbility=: glPlanAbility, ab
 	glPlanShot=: glPlanShot, shot
-	glPlanHitYards=: glPlanHitYards, radius
-	cumgroundyards=. cumgroundyards + 1{ww
-	remgroundyards=. remgroundyards - 1{ww
-	cumbackyards=. cumbackyards + 1{ww
-	rembackyards=. rembackyards - 1{ww
+	glPlanHitYards=: glPlanHitYards, 1{ww
+	cumgroundyards=. <. 0.5 + cumgroundyards + 1{ww
+	remgroundyards=. <. 0.5  + remgroundyards - 1{ww
+	cumbackyards=. <. 0.5 + cumbackyards + 1{ww
+	rembackyards=. <. 0.5 + rembackyards - 1{ww
 	glPlanCumGroundYards=: glPlanCumGroundYards, cumgroundyards
 	glPlanBackGroundYards=: glPlanBackGroundYards, cumbackyards
 	glPlanLatLon=: glPlanLatLon, 0 {ww
 	glPlanLayup=: glPlanLayup, layup
 	glPlanRemGroundYards=: glPlanRemGroundYards, remgroundyards
 	start=. 0{ww
+	
+	if. 0=remgroundyards do. continue. end.
+
 	goto_shot.	
 
 end. NB. end of abilities loop
@@ -350,5 +433,26 @@ for_ii. i. (1+#y) do. NB. Loop round with 1, 2, 3 elements etc.
 	if. found do. break. end.
 end.
 ans=. ans /: ans
+)
+
+
+NB. =============================================================
+NB. EnKey
+NB. -------------------------------------------------------------
+EnKey=: 3 : 0
+y=. 6{. y
+('hole distance tee gender ability shot')=. y
+res=. ('r<0>2.0' 8!:0 ,hole)
+if. 0<#distance do.
+	res=. res, each <'-'
+	res=. res, each 'r<0>3.0' 8!:0 ,distance
+end.
+res=. res,each <'-T'
+res=. res, each <"0 ,tee
+res=. res, each <'-'
+res=. res, each <"0 gender{'MW'
+res=. res, each <"0 ability{'SB'
+res=. res, each <"0 shot{'012345'
+if. 0=$$hole do. res=. ''$res end.
 )
 

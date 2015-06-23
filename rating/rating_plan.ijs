@@ -290,22 +290,32 @@ tees=. >hole{glTeesMeasured
 for_t. tees do.
 	stdout '<th>',(>(glTees i. t){glTeesName),'</th>'
 end.
-stdout '<th>Player</th><th>Shot</th><th>Hit</th><th>Lay</th><th>To Green</th><th>Alt</th><th>Roll</th><th>F/width</th><th>#Bunk</th><th>Dist OB</th><th>Dist Tr</th><th>F/w slope</th></tr></thead><tbody>'
+stdout '<th>Shot</th><th>Hit</th><th>Lay</th><th>To Green</th><th>Alt</th><th>Roll</th><th>F/width</th><th>#Bunk</th><th>Dist OB</th><th>Dist Tr</th><th>F/w slope</th></tr></thead><tbody>'
 for_rr. I. glPlanHole = hole do.
 	stdout '<tr>'
-	for_t. tees do.
-		stdout '<td>'
-		if. (t_index = 0.) *. (t=rr{glPlanTee) do.
-			stdout '<b>',(": <. 0.5+ rr{glPlanBackGroundYards),'</b>'
-		elseif. t_index = 0. do.
-			stdout '<i>',(": <. 0.5+ rr{glPlanBackGroundYards),'</i>'
-		elseif. t=rr{glPlanTee do.
-			stdout '<b>',(": <. 0.5 + rr{glPlanCumGroundYards),'</b>' 
-		elseif. 1 do.
+	if. 0 = rr{glPlanRemGroundYards do.
+		for_t. tees do.
+			stdout '<td>'
+			if. (t=rr{glPlanTee) do.
+				stdout '<b>Hole</b>'
+			end.
+			stdout '</td>'
 		end.
-		stdout '</td>'
+	else.
+		for_t. tees do.
+			stdout '<td>'
+			if. (t_index = 0.) *. (t=rr{glPlanTee) do.
+				stdout '<b>',(": <. 0.5+ rr{glPlanBackGroundYards),'</b>'
+			elseif. t_index = 0. do.
+				stdout '<i>',(": <. 0.5+ rr{glPlanBackGroundYards),'</i>'
+			elseif. t=rr{glPlanTee do.
+				stdout '<b>',(": <. 0.5 + rr{glPlanCumGroundYards),'</b>' 
+			elseif. 1 do.
+			end.
+			stdout '</td>'
+		end.
 	end.
-	stdout '<td>',(>(rr{glPlanGender){'Man';'Wmn'),(>(rr{glPlanAbility){' Scr';' Bgy'),'</td><td>',(": 1+rr{glPlanShot),'</td>'
+	stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr{glPlanShot),'</td>'
 	stdout '<td>',(": rr{glPlanHitYards),'</td><td>',( (rr{glPlanLayup){' Y'),'</td><td>', (": <. 0.5 + rr{glPlanRemGroundYards),'</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'
 end.
 

@@ -235,3 +235,118 @@ res=. ". each x
 x,. ($ each $ each res),. ($ each res),. (3!:0 each res),. (L. each res) ,. ": each res
 )
 
+
+NB. =============================================================
+NB. utKeyPut
+NB. -------------------------------------------------------------
+NB. Put variables to the keyfile <y>
+NB. x holds a subset of the keys, but if it is not present
+NB. then update all the items in the dictionary
+
+NB. Assumes the dictionary starts with the key as the first entry
+NB. Usage:  subset utKeyPut filename
+NB. =============================================================
+utKeyPut=: 3 : 0
+key=. >keyread y ; '_dictionary'
+key=. >0{ key
+if. -. 0 -: 4!:0 <key do.
+	stderr 'No key data : ',key,' to write to ',y
+	return.
+end.
+(". key) utKeyPut y NB. Write them all
+: 
+res=. ((#x),0)$a:
+for_col. (>keyread y ; '_dictionary') do.
+	val=. ". >col
+	if. col_index=0 do. key=. val end.
+	NB. If not boxed, box now
+	if. 0=L. val do. val=. <"_1 val end.
+	res=. res,. val
+end. 
+NB. box each row
+res=. <"1 res
+res keywrite y ; <key
+NB. returns the matrix of values
+)
+
+NB. =============================================================
+NB. utKeyRead
+NB. -------------------------------------------------------------
+NB. Reads the keyfile <y>
+NB. x holds a subset of the keys, but if it is not present
+NB. then read all the items in the dictionary
+
+NB. Assumes the dictionary starts with the key as the first entry
+NB. Usage:  subset utKeyRead filename
+NB. =============================================================
+utKeyRead=: 3 : 0
+x=. keydir y
+x=. (-. x = <'_dictionary')#x
+x utKeyRead y NB. Read them all
+: 
+x=. ,x
+res=. keyread y ; <x
+res=. >res
+key=. >keyread y; '_dictionary'
+if. 0=#x do. res=. (0,#key)$a: end. NB. Special case if no rows
+NB. Fix the width in case a column has been added
+res=. (#key) {."1 res
+NB. transpose and box by row
+for_col. key do.
+	(>col)=: col_index{"1 res
+	NB. If boxed number, unbox
+	if. (3!:0 >". (>col)) e. 1 4 8 16 do. (>col)=: >". (>col) end.
+end. 
+ww=. $res
+)
+
+NB. =============================================================
+NB. utKeyDrop
+NB. -------------------------------------------------------------
+NB. Drop keys 
+NB. x holds a subset of the keys, but if it is not present
+NB. then read all the items in the dictionary
+
+NB. Assumes the dictionary starts with the key as the first entry
+NB. Usage:  keys utKeyDrop filename
+NB. =============================================================
+utKeyDrop=: 4 : 0
+x=. ,x
+keydrop y ; <x
+)
+
+NB. =============================================================
+NB. utKeyAddColumn
+NB. -------------------------------------------------------------
+NB. Add columns to a keyed file
+NB. Left argument should be boxed list of columns
+NB. Usage:  column utKeyAddColumn filename
+NB. =============================================================
+utKeyAddColumn=: 4 : 0
+x=. ,x
+if. 0=L. x do. x=. ,<x end.
+key=. >keyread y ; '_dictionary'
+(<key, x) keywrite y ; '_dictionary'
+)
+
+NB. =============================================================
+NB. utKeyDropColumn
+NB. -------------------------------------------------------------
+NB. Deletes columns to a keyed file
+NB. Left argument should be boxed list of columns
+NB. Usage:  column utKeyDropColumn filename
+NB. =============================================================
+utKeyDropColumn=: 4 : 0
+x=. ,x
+if. 0=L. x do. x=. ,<x end.
+dict=. >keyread y ; '_dictionary'
+key=. keydir y NB. Including directory
+mask=. -. dict e. x
+for_rec. key do.
+	xx=. > keyread y ; rec
+	xx=. mask # xx
+	(<xx) keywrite y ; rec
+end.
+)
+
+
