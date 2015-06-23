@@ -11,8 +11,10 @@ r=. ' class="normal" style="font-size: 8pt; height: 16px; width: ',(":y),'em;" t
 )
 
 InputFieldnum=: 3 : 0
+NB. Need to have combination of "pattern" and "tel" to bring up
+NB. the numberic keypad on ios and android devices
 ('nam';'wid')=. y
-r=. ' class="normal" style="font-size: 8pt; height: 16px; margin: 0px; width: ',(":wid),'em;" type="tel" pattern="\d*" name="',nam,'" id="',nam,'" onkeyup="validatenum2(''',nam,''')"'
+r=. ' class="normal" style="font-size: 8pt; height: 16px; margin: 0px; width: ',(":wid),'em;" type="tel" pattern="\d*\.*\d*" name="',nam,'" id="',nam,'" onkeyup="validatenum2(''',nam,''')"'
 )
 
 NB. ===================================
