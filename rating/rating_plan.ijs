@@ -15,6 +15,23 @@ elseif. 1 do.
     pagenotfound ''
 end.
 )
+
+NB. =========================================================
+NB. jweb_rating_plan_v
+NB. View scores for participant
+NB. =========================================================
+jweb_rating_plannomap_v=: 3 : 0
+NB. y=.cgiparms ''
+if. 1=#y do.
+    rating_plan_all  y
+elseif. 2=#y do. NB. Passed as parameter
+    0 rating_plan_view y
+elseif. 1 do.
+    pagenotfound ''
+end.
+)
+
+
 NB. =========================================================
 NB. Synonyms
 NB. jweb_rating_plan
@@ -140,8 +157,11 @@ NB. rating_plan_view
 NB. View scores for participant
 NB. =========================================================
 rating_plan_view=: 3 : 0
+1 rating_plan_view y
+:
+showmap=. x
 NB. Retrieve the details
-NB. y has two elements
+NB. y has two elements, coursename & hole (+1)
 hole=. ''$ 0". >1{y
 hole=. <. 0.5 + hole
 hole=. hole-1 
@@ -178,7 +198,6 @@ path=.;  +. FullOStoLatLon path
 ww=. 9!:11 (9) 
 stdout LF,'var myCenter=new google.maps.LatLng(',(>'' 8!:0  (0{path)),',',(>'' 8!:0 (1{path)),');'
 NB. stdout LF,'var myCenter=new google.maps.LatLng(51.5,-0.57);'
-
 
 stdout LF,'function dyncircle(inner, outer) {'
 stdout LF,'   var circ={'
@@ -247,14 +266,16 @@ stdout LF,'       strokeWeight: 1,'
 stdout LF,'       });'
 stdout LF,'flightPath.setMap(map);'
 
-
 stdout LF,'}'
 stdout LF,'google.maps.event.addDomListener(window, ''load'', initialize);'
 stdout LF,'</script>'
 
 
 stdout LF,'</head>',LF,'<body>'
-stdout LF,'  <div id="map-canvas"></div>'
+NB. Control map display
+if. showmap do.
+	stdout LT1,'  <div id="map-canvas"></div>'
+end.
 stdout LF,'<div class="container">'
 NB. Error page - No such course
 if. 0<#err do.
@@ -267,8 +288,9 @@ stdout LF,TAB,'<br><a href="/jw/rating/plan/v">Back to course list</a>'
 stdout LF, '</div>',LF,'</body>'
 exit ''
 end.
-NB. Print scorecard and yardage
+NB. Print course yardage and measurements
 stdout LF,TAB,'<h2>Course : ', glCourseName,'</h2><h3>Hole : ',(":1+ ; hole),'</h3>'
+stdout LF,'<a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/rating/plan',(showmap#'nomap'),'/v/',glFilename,'/',(": 1+hole),'">',(>showmap{'/' cut 'Show Map/Suppress map'),'</a>'
 stdout LF,TAB,'<div class="span-8 last">'
 
 stdout LF,'<table><thead><tr>'
@@ -327,9 +349,10 @@ for_h. i. 18 do.
 	if. h=hole do.
 		stdout '   ',(": 1+h)
 	else.
-		stdout '    <a href="http://',(,getenv 'SERVER_NAME'),'/jw/rating/plan/v/',glFilename,'/',(": 1+h),'">',(":1+h),'</a>'
+		stdout '    <a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/rating/plan',((-. showmap)#'nomap'),'/v/',glFilename,'/',(": 1+h),'">',(":1+h),'</a>'
 	end.
 end.
+NB. Switch for map / nomap
 	
 stdout LF,'</div>' NB. container
 stdout '</body></html>'

@@ -156,12 +156,12 @@ utFileDrop=: 4 : 0
 NB. =======================================================
 NB. utFileDrop
 NB. =======================================================
-NB. Utility to blank out elements from a component file
+NB. Utility to remove elements from a component file
 NB. y is the file
 vars=.>jread y ; 0
 x=. dltb each x
 ix=. vars i. x
-NB, .. check for non existant names 
+NB. .. check for non existent names 
 if. +. / ix >: #vars do.
 	err=. '**** FAILED : no variable ', ;(<' '),each (ix >: #vars) # x
 	return.
@@ -248,7 +248,7 @@ NB. Usage:  subset utKeyPut filename
 NB. =============================================================
 utKeyPut=: 3 : 0
 key=. >keyread y ; '_dictionary'
-key=. >0{ key
+key=. >0{ key NB. First element is the variable holding the keys
 if. -. 0 -: 4!:0 <key do.
 	stderr 'No key data : ',key,' to write to ',y
 	return.
@@ -330,7 +330,7 @@ utKeyAddColumn=: 4 : 0
 x=. ,x
 if. 0=L. x do. x=. ,<x end.
 key=. >keyread y ; '_dictionary'
-(<key, x) keywrite y ; '_dictionary'
+(<key, x) keywrite y ; <'_dictionary'
 )
 
 NB. =============================================================
@@ -348,7 +348,7 @@ key=. keydir y NB. Including directory
 mask=. -. dict e. x
 for_rec. key do.
 	xx=. > keyread y ; rec
-	xx=. mask # xx
+	xx=. mask # ($mask) {. xx NB. Need to check the length 'cos could have added a column
 	(<xx) keywrite y ; rec
 end.
 )
