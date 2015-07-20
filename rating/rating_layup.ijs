@@ -57,7 +57,8 @@ ix=. glPlanHole=hole
 ix=. ix *. glPlanTee=tee
 ix=. ix *. glPlanGender=gender
 ix=. ix *. glPlanAbility=ability
-ix=. I. ix *. glPlanShot=shot
+ix=. ix *. glPlanShot=shot
+ix=. I. ix *. glPlanRecType='P'
 ix=. ix { glPlanID
 
 NB. Need to check this is a valid shot
@@ -88,7 +89,7 @@ if. ( _4 -: >glLayupID ) do.  NB. Not found
 	glLayupUpdateName=: ,a:
 	glLayupUpdateTime=: ,a:
 	glLayupType=: ,'L'
-	glLayupUpdateName=: ,<getenv 'REMOTE_USER'
+	glLayupUpdateName=: ,<": getenv 'REMOTE_USER'
 	glLayupUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 	ww=. utKeyPut glFilepath,'_layup'
 end. 
@@ -285,9 +286,11 @@ httpreferer=. getenv 'HTTP_REFERER'
 https=. getenv 'HTTPS'
 servername=. getenv 'SERVER_NAME'
 httphost=. getenv 'HTTP_HOST'
-NB. if. (-. +. / 'rating/layup/e/' E. httpreferer) +. (-. 'on'-: https) +. (-.  servername -: httphost) +. (-. +. / servername E. httpreferer) do.
-NB.	pagenotvalid ''
-NB. end.
+if. -. glSimulate do.
+	if. (-. +. / 'rating/layup/e/' E. httpreferer) +. (-. 'on'-: https) +. (-.  servername -: httphost) +. (-. +. / servername E. httpreferer) do.
+		pagenotvalid ''
+	end.
+end.
 
 NB. Assign to variables
 xx=. djwCGIPost y ; ' ' cut 'defaulthit cumbackyards prevcumbackyards hityards prevhithards cumyards prevcumyards remyards prevremyards roll prevroll'
@@ -301,7 +304,7 @@ ww=. (<keyplan) utKeyRead glFilepath,'_plan'
 ww=. (<keylayup) utKeyRead glFilepath,'_layup'
 
 NB. Throw error page if updated
-if. -. (;glLayupUpdateTime) -: (;prevtime) do.
+if. (-. glSimulate) *. (-. (;glLayupUpdateTime) -: (;prevtime)) do.
 	stdout 'Content-type: text/html',LF,LF,'<html>',LF
  	stdout LF,'<head>'
  	stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
@@ -309,7 +312,7 @@ if. -. (;glLayupUpdateTime) -: (;prevtime) do.
  	stdout LF,'</head><body>'
  	stdout LF,'<div class="container">'
  	stdout LF,TAB,'<div class="span-24">'
- 	stdout LF,TAB,TAB,'<h1>Error updating ',(;glLayupID),'</h1>'
+ 	stdout LF,TAB,TAB,'<h1>Error updating ',(,;glLayupID),'</h1>'
  	stdout LF,'<div class="error">Synch error updating ',(;glLayupID)
  	stdout LF,'</br></br>',(":getenv 'REMOTE_USER'),' started to update record previously saved by ',(;prevname),' at ',;prevtime
  	stdout LF,'</br><br>It has since been updated by: ',(; glLayupUpdateName),' at ',(;glLayupUpdateTime)
@@ -320,7 +323,7 @@ if. -. (;glLayupUpdateTime) -: (;prevtime) do.
  	exit ''
 end.
 
-glLayupUpdateName=: ,<getenv 'REMOTE_USER'
+glLayupUpdateName=: ,<": getenv 'REMOTE_USER'
 glLayupUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 glPlanUpdateName=: glLayupUpdateName
 glPlanUpdateTime=: glPlanUpdateTime
@@ -367,16 +370,17 @@ end.
 
 NB. Write to two files
 if. changed do.
-	(<keylayup) utKeyPut glFilepath,'_layup'
-	(<keyplan) utKeyPut glFilepath,'_plan'
+	(,<keylayup) utKeyPut glFilepath,'_layup'
+	(,<keyplan) utKeyPut glFilepath,'_plan'
 	NB. Write another measurepoint record based on original readings
 	glPlanRemGroundYards=: ,prevremyards
 	glPlanRecType=: ,'M'
 	glPlanLayupType=: ,' '
-	(<6{. keyplan) utKeyPut glFilepath,'_plan'
+	glPlanID=: ,<6{. keyplan
+	(,<6{. keyplan) utKeyPut glFilepath,'_plan'
 end.
 
-if. defaulthit ~: glPlanHitYards do.
+if. defaulthit = glPlanHitYards do.
 	deletelayup=. 1
 end.
 
@@ -388,14 +392,15 @@ NB. Choose page based on what was pressed
 		NB. Delete the layup record
 		(<keylayup) utKeyDrop glFilepath,'_layup'
 		glPlanHitYards=: defaulthit
+		glPlanRecType=: ,'P'
 		glPlanLayupType=: ,' '
 		(<keyplan) utKeyPut glFilepath,'_plan'
-		stdout '</head><body onLoad="redirect(''http://',(getenv 'SERVER_NAME'),'/jw/rating/plan/v/',(;":glPlanHole),''')"'
+		stdout '</head><body onLoad="redirect(''/jw/rating/plan/v/',glFilename,'/',(;":1+glPlanHole),''')"'
 	elseif. 0= 4!:0 <'control_calc' do.
-		stdout '</head><body onLoad="redirect(''',httpreferer,''')"'
+		stdout '</head><body onLoad="redirect(''',(":httpreferer),''')"'
 
 	elseif. 1 do.
-		stdout '</head><body onLoad="redirect(''http://',(getenv 'SERVER_NAME'),'/jw/rating/course/v'')"'
+		stdout '</head><body onLoad="redirect(''/jw/rating/plan/v/',glFilename,'/',(;":1+glPlanHole),''')"'
     end.
 stdout LF,'</body></html>'
 exit ''

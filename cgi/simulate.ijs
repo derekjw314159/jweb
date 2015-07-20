@@ -33,6 +33,8 @@ exitexit=: 2!:55
 
 18!:4 <'base'
 
+glSimulate=: 1
+
 each=: &.>
 dltb_z_=: #~ [: (+./\ *. +./\.) ' '&~:
 18!:4 <'base'

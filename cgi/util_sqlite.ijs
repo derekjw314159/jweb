@@ -255,11 +255,13 @@ columns=. ~. columns
 NB. Correct the chosen items to numbers
 res=.  (<0) ".each columns { vals
 res=. }. each (<2) {.each (<0),each res
+NB. reset to scalar
+res=. (<'') $each res
 vals=. (res)  (columns)}vals 
 NB. and box the others
 columns=. (i. # vals) -. columns
 res=. <each columns { vals
-res=. ,each res
+NB. res=. ,each res this was killing the assigments
 vals=. (res) (columns)}vals
 NB. finally do the assignment
 (names)=: vals

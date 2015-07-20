@@ -28,6 +28,7 @@ getenv=: 2!:5
 
 18!:4 <'base'
 
+glSimulate=: 0
 glPostVars=: stdin ''
 
 each=: &.>

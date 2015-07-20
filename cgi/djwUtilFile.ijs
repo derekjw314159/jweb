@@ -353,4 +353,42 @@ for_rec. key do.
 end.
 )
 
+NB. ==============================================================
+NB. utPlanDisplay
+NB. --------------------------------------------------------------
+NB. Displays the items in a file
+NB. Usage: (hole ; tee ; player ; ability) utKeyDisplay filename
+NB. ==============================================================
+utPlanDisplay=: 3 : 0
+'hole tee gender ability'=. y
+ix=. glPlanHole e. hole
+NB. Either a planned item, or it matches
+ix2=. glPlanRecType='P'
+ix2=. ix2 *. glPlanTee e. tee
+ix2=. ix2 *. glPlanGender e. gender
+ix2=. ix2 *. glPlanAbility e. ability
+ix2=. ix2 +. glPlanRecType ~: 'P'
+
+ix=. ix *. ix2
+res=. |: > keyread (glFilepath,'_plan')  ; <'_dictionary' ; ix # glPlanID
+)
+
+NB. ==============================================================
+NB. utLayupDisplay
+NB. --------------------------------------------------------------
+NB. Displays the items in a file
+NB. Usage: (hole ; tee ; player ; ability) utKeyDisplay filename
+NB. ==============================================================
+utLayupDisplay=: 3 : 0
+'hole tee gender ability'=. y
+ix=. glLayupHole e. hole
+NB. Either a planned item, or it matches
+ix2=. glLayupTee e. tee
+ix2=. ix2 *. glLayupGender e. gender
+ix2=. ix2 *. glLayupAbility e. ability
+
+ix=. ix *. ix2
+res=. |: > keyread (glFilepath,'_layup')  ; <'_dictionary' ; ix # glLayupID
+)
+
 
