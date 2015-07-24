@@ -86,8 +86,6 @@ if. ( _4 -: >glLayupID ) do.  NB. Not found
 	glLayupAbility=: ,ability
 	glLayupShot=: ,shot
 	glLayupRemGroundYards=: glPlanRemGroundYards
-	glLayupUpdateName=: ,a:
-	glLayupUpdateTime=: ,a:
 	glLayupType=: ,'L'
 	glLayupUpdateName=: ,<": getenv 'REMOTE_USER'
 	glLayupUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'

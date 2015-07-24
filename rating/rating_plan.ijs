@@ -171,6 +171,7 @@ glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
 if. fexist glFilepath,'.ijf' do.
 	xx=. utFileGet glFilepath
+	xx=. utKeyRead glFilepath,'_plan'
 	err=. ''
 else.
 	err=. 'No such course'
@@ -313,32 +314,61 @@ for_t. tees do.
 	stdout '<th>',(>(glTees i. t){glTeesName),'</th>'
 end.
 stdout '<th>Shot</th><th>Hit</th><th>Lay</th><th>To Green</th><th>Alt</th><th>Roll</th><th>F/width</th><th>#Bunk</th><th>Dist OB</th><th>Dist Tr</th><th>F/w slope</th></tr></thead><tbody>'
-for_rr. I. glPlanHole = hole do.
-	stdout '<tr>'
-	if. 0 = rr{glPlanRemGroundYards do.
-		for_t. tees do.
-			stdout '<td>'
-			if. (t=rr{glPlanTee) do.
-				stdout '<b>Hole</b>'
+NB. Sort the records and re-read
+rr=. I. glPlanHole=hole
+rr=. rr /: rr { glPlanShot
+rr=. rr /: rr { glPlanAbility
+rr=. rr /: rr { glPlanGender
+rr=. rr /: glTees i. rr { glPlanTee
+rr=. (rr { glPlanID) \: rr { glPlanMeasDist
+rr utKeyRead glFilepath,'_plan'
+
+for_rr. i. #glPlanID do.
+	if. 'P' = rr{glPlanRecType do.
+		stdout '<tr>'
+		if. 0 = rr{glPlanRemGroundYards do.
+			for_t. tees do.
+				stdout '<td>'
+				if. (t=rr{glPlanTee) do.
+					stdout '<b>Hole</b>'
+				end.
+				stdout '</td>'
 			end.
-			stdout '</td>'
-		end.
-	else.
-		for_t. tees do.
-			stdout '<td>'
-			if. (t_index = 0.) *. (t=rr{glPlanTee) do.
-				stdout '<b>',(": <. 0.5+ rr{glPlanBackGroundYards),'</b>'
-			elseif. t_index = 0. do.
-				stdout '<i>',(": <. 0.5+ rr{glPlanBackGroundYards),'</i>'
-			elseif. t=rr{glPlanTee do.
-				stdout '<b>',(": <. 0.5 + rr{glPlanCumGroundYards),'</b>' 
-			elseif. 1 do.
+		else.
+			for_t. tees do.
+				stdout '<td>'
+				if. (t_index = 0.) *. (t=rr{glPlanTee) do.
+					stdout '<b>',(": <. 0.5+ (rr{glPlanBackGroundYards)+ (rr{glPlanRemGroundYards) - (rr{glPlanMeasDist) ),'</b>'
+				elseif. t_index = 0. do.
+					stdout '<i>',(": <. 0.5+ (rr{glPlanBackGroundYards) + (rr{glPlanRemGroundYards) - (rr{glPlanMeasDist) ),'</i>'
+				elseif. t=rr{glPlanTee do.
+					stdout '<b>',(": <. 0.5 + (rr{glPlanCumGroundYards) + (rr{glPlanRemGroundYards) - (rr{glPlanMeasDist) ),'</b>' 
+				elseif. 1 do.
+				end.
+				stdout '</td>'
 			end.
-			stdout '</td>'
 		end.
+		stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr{glPlanShot),'</td>'
+		stdout '<td>',(": rr{glPlanHitYards),'</td><td>',(rr{glPlanLayupType),'</td><td>', (": <. 0.5 + rr{glPlanRemGroundYards),'</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'
+	elseif. 'M' = rr{glPlanRecType do.
+		stdout '<tr>'
+		if. 0 = rr{glPlanRemGroundYards do.
+			for_t. tees do.
+				stdout '<td>'
+				stdout 'Hole'
+				stdout '</td>'
+			end.
+		else.
+			for_t. tees do.
+				stdout '<td>'
+				holelength=. (<t_index,hole){glTeesYards
+				stdout ": <. 0.5+ holelength - (rr{glPlanMeasDist) 
+				stdout '</td>'
+			end.
+		end.
+		stdout '<td colspan="2"><i>Measured Point</i></td>'
+		stdout '<td> </td><td> </td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'
 	end.
-	stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr{glPlanShot),'</td>'
-	stdout '<td>',(": rr{glPlanHitYards),'</td><td>',( (rr{glPlanLayup){' Y'),'</td><td>', (": <. 0.5 + rr{glPlanRemGroundYards),'</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'
 end.
 
 stdout '</tbody></table>'
