@@ -295,12 +295,11 @@ stdout LF,'<a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/rating/plan',(showm
 stdout LF,TAB,'<div class="span-8 last">'
 
 stdout LF,'<table><thead><tr>'
-stdout '<th>Tee</th><th>Card</th><th>Measured</th><th>Alt</th></tr>'
+stdout '<th>Tee</th><th>Card</th><th>Alt</th></tr>'
 stdout '</thead><tbody>'
 for_t.  i. #glTees do.
 	stdout LF,'<tr><td>',(>t{glTeesName),'</td>'
 	stdout '<td>',(": <. 0.5 + (<t,hole){glTeesYards),'</td>'
-	stdout '<td>',(": <. 0.5 + (<t,hole){glTeesGroundYards),'</td>'
 	stdout '<td></td></tr>'
 end.
 stdout '</tbody></table></div>'
@@ -313,13 +312,14 @@ tees=. >hole{glTeesMeasured
 for_t. tees do.
 	stdout '<th>',(>(glTees i. t){glTeesName),'</th>'
 end.
-stdout '<th>Shot</th><th>Hit</th><th>Lay</th><th>To Green</th><th>Alt</th><th>Roll</th><th>F/width</th><th>#Bunk</th><th>Dist OB</th><th>Dist Tr</th><th>F/w slope</th></tr></thead><tbody>'
+stdout '<th>Shot</th><th>Hit</th><th>Lay/Roll/Tran</th><th>To Green</th><th>Alt</th><th>F/width</th><th>#Bunk</th><th>Dist OB</th><th>Dist Tr</th><th>F/w slope</th></tr></thead><tbody>'
 NB. Sort the records and re-read
 rr=. I. glPlanHole=hole
 rr=. rr /: rr { glPlanShot
 rr=. rr /: rr { glPlanAbility
 rr=. rr /: rr { glPlanGender
 rr=. rr /: glTees i. rr { glPlanTee
+rr=. rr /: 'CPM' i. rr { glPlanRecType
 rr=. (rr { glPlanID) \: rr { glPlanMeasDist
 rr utKeyRead glFilepath,'_plan'
 
@@ -349,7 +349,12 @@ for_rr. i. #glPlanID do.
 			end.
 		end.
 		stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr{glPlanShot),'</td>'
-		stdout '<td>',(": rr{glPlanHitYards),'</td><td>',(rr{glPlanLayupType),'</td><td>', (": <. 0.5 + rr{glPlanRemGroundYards),'</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'
+		stdout '<td><a href="/jw/rating/layup/e/',(glFilename),'/'
+		stdout ;": 1+rr{glPlanHole
+		stdout (;rr{glPlanTee),'/'
+		stdout ((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),(": 1+rr{glPlanShot),'">'
+		stdout (": rr{glPlanHitYards),'</a></td><td>',(rr{glPlanLayupType),'</td><td>', (": <. 0.5 + rr{glPlanRemGroundYards),'</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'
+
 	elseif. 'M' = rr{glPlanRecType do.
 		stdout '<tr>'
 		if. 0 = rr{glPlanRemGroundYards do.
@@ -367,7 +372,7 @@ for_rr. i. #glPlanID do.
 			end.
 		end.
 		stdout '<td colspan="2"><i>Measured Point</i></td>'
-		stdout '<td> </td><td> </td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'
+		stdout '<td> </td><td> </td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'
 	end.
 end.
 

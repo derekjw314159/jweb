@@ -302,7 +302,7 @@ for_ab. abilities do.
 	path=. LatLontoFullOS PathTeeToGreen h ; t
 	remgroundyards=. <. 0.5 + glMY * +/ |(}.path) - }:path
 	glTeesGroundYards=: <. 0.5+remgroundyards (< (glTees i. t), h)}glTeesGroundYards
-	path=. LatLontoFullOS PathTeeToGreen h ; 0{tees
+	path=. LatLontoFullOS PathTeeToGreen h ; 0{(>h{glTeesMeasured)
 	rembackyards=. <. 0.5 + glMY * +/ |(}.path) - }:path
 	cumbackyards=. rembackyards - remgroundyards
 	path=. PathTeeToGreen h ; t
@@ -399,6 +399,10 @@ label_shot.
 	elseif. 1 do. NB. Normal stroke
 		glPlanMeasDist=: glPlanRemGroundYards + 10
 	end.
+	glPlanCarryDist=: ,<' '
+	glPlanFWWidth=: ,0
+	glPlanOOBDist=: ,0
+	glPlanTreeDist=: ,0
 
 	utKeyPut glFilepath,'_plan'
 	
