@@ -25,27 +25,25 @@ stdout=: 1!:2&4
 stderr=: 1!:2&5
 getenv=: 2!:5
 
+NB. Change the exit function
+exit=: 3 : 0
+	stdout LF,'*** exit ***',LF
+)
+exitexit=: 2!:55 
 
 18!:4 <'base'
 
-glSimulate=: 0
-glPostVars=: stdin ''
+glSimulate=: 1
 
 each=: &.>
 dltb_z_=: #~ [: (+./\ *. +./\.) ' '&~:
+18!:4 <'base'
 
 
 NB. =========================================================
 NB. cgiparms v return cgi parameters
 cgiparms=: 3 : 0
-select. getenv 'REQUEST_METHOD'
-case. 'GET' do.
-  p=. getenv 'QUERY_STRING'
-case. 'POST' do.
-  p=. (getenv 'QUERY_STRING') ,'&',glPostVars
-case. do.
-  p=.  'r=denhambowl/course/editpost/DenhamW'
-end.
+p=. >2{ARGV
 cgiparms1 p
 )
 
@@ -70,6 +68,10 @@ p=. a. {~ 16 #. 16 | a i. 2 {.&> y
 }. ; p ,&.> 2 }.&.> y
 )
 
+NB. Postvars are the second parameter onwards
+glPostVars=:  1}. cgiparms''
+
+
 NB. ==========================================================
 NB. Global variables
 NB. ==========================================================
@@ -85,11 +87,6 @@ NB. glJPath=: glHome,'/j602'
 )
 
 x=.setglobals ''
-NB. x=.0!:0 <glJPath,'/bin/profile.ijs'
-NB. 0!:0 <glJPath,'/system/main/sysenv.ijs'
-NB. 0!:0 <glJPath,'/system/main/stdlib.ijs'
-
-NB. 0!:0 <    glJPath,'/addons/tables/csv/csv.ijs'
 
 NB. =========================================================
 NB. cgitest v defines html with a timestamp and cgi parameters
@@ -111,7 +108,7 @@ stdout LF,TAB,'<div class="span-24">'
 stdout LF,TAB,TAB,'<h3>The header</h3>'
 stdout LF,'<table><tr><th>Table Header</th></tr>'
 for_x. i. 8 do.
-stdout LF,'<br><tr><td>Line ',(":x),'</td></tr>'
+    stdout LF,'<br><tr><td>Line ',(":x),'</td></tr>'
 end.
 
 
@@ -135,10 +132,7 @@ stdout LF,'<link rel="stylesheet" href="/css/blueprint/print.css" type="text/css
 stdout LF,'</head>','<title>404 Not Found</title>'
 stdout LF,'<h1>404 Not Found</h1>'
 string=. (": getenv'HTTP_HOST'),'/jw/',(2}. ": getenv 'QUERY_STRING')
-stdout LF,'<br><body class="error loud">',string,'<br><pre>'
-stdout LF,~": getenv 'HTTP_REFERER'
-stdout LF,.~":cgiparms ''
-stdout '</pre></body>'
+stdout LF,'<br><body class="error loud">',string,'</body>'
 exit ''
 NB. exit 0 
 )
@@ -165,8 +159,6 @@ stdout LF,'<br>REMOTE USER=', ": getenv 'REMOTE_USER'
 stdout LF,'</body>'
 exit ''
 )
-
-
 
 NB. =========================================================
 NB. Control which function to run
@@ -202,8 +194,8 @@ if. 0 < # 1!:0 <filepath,'/',basename do.
 	if. 3= 4!:0 < ff do. 
 	    NB. Killer line which executes the right function
 	    NB. Pass the remaining parameters
-	    ". 'xx=.',ff,' (1+chunk) }. params'
-		return.
+		". 'xx=.',ff,' (1+chunk) }. params'
+		return.    
 	    NB. jweb_denhambowl_course_e ''
 	end.
     end.

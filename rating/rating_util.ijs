@@ -278,8 +278,152 @@ NB. BuildPlan
 NB. -----------------------------------------------------
 NB. This is the monster function to loop round and build
 NB. all the measurement distances
-NB. Usage: BuildPlan holes ; genders ; abilities
+NB. Usage: BuildPlan holes ; tees ; genders ; abilities
 BuildPlan=: 3 : 0
+if. 0=L. y do. y=. 4{. <y end.
+y=. 4{. y
+(' ' cut 'holes tees genders abilities')=. y
+holes=. , holes
+if. 0=#holes do. holes=. i. 18 end.
+genders=. ,genders
+if. 0=#genders do. genders=. 0 1 end.
+abilities=. , abilities
+if. 0=#abilities do. abilities=. 0 1 end.
+tees=. , tees
+if. 0=#tees do. tees=. glTees end.
+
+for_h. holes do.
+for_t. (tees e. >h{glTeesMeasured) # tees do. NB. Only relevant tees for the hole
+for_g. genders do.
+if. -. t e. >g{glTeesPlayer do. continue. end. 
+for_ab. abilities do.
+	shot=. _1
+	cumgroundyards=. 0 
+	path=. LatLontoFullOS PathTeeToGreen h ; t
+	remgroundyards=. <. 0.5 + glMY * +/ |(}.path) - }:path
+	glTeesGroundYards=: <. 0.5+remgroundyards (< (glTees i. t), h)}glTeesGroundYards
+	path=. LatLontoFullOS PathTeeToGreen h ; 0{(>h{glTeesMeasured)
+	rembackyards=. <. 0.5 + glMY * +/ |(}.path) - }:path
+	cumbackyards=. rembackyards - remgroundyards
+	path=. PathTeeToGreen h ; t
+	start=. 0{path
+
+label_shot.
+	NB. Remove this record
+	shot=. shot + 1
+
+	NB. Find the matching records and shift to measurement records
+	NB. Logic is to find the keys
+	utKeyRead glFilepath,'_plan'
+	ww=. glPlanHole =  h
+	ww=. ww *. glPlanTee =  t
+	ww=. ww *. glPlanGender =  g
+	ww=. ww *. glPlanAbility =  ab
+	ww=. ww *. glPlanShot = shot
+	ww=. ww *. glPlanRecType = 'P'
+	ww=. ww # glPlanID
+	if. 1 < $ww do.
+		NB. No should not happen
+		stderr 'Too many records in plan file'
+		return.
+	elseif. 0=$ww do.
+		NB. Nothing to do
+		NB. but do need to restore glPlanID
+		glPlanID=: ,EnKey h ; '' ; t ; g ; ab ; shot
+	elseif. 1=$ww do.
+		ww utKeyRead glFilepath,'_plan'
+
+		NB. player on this tee
+		NB. Should only be one record
+		newkey=. EnKey h ; glPlanMeasDist ; t ; g ;ab ; shot
+		newkey=. <6 {. >newkey NB. Just need first six characters
+		glPlanHitYards=: ,0
+		glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
+		glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
+		glPlanLayupType=: ,' '
+		glPlanRecType=: ,'M'
+		glPlanCarryType=: ,' '
+		glPlanID=: ,newkey
+		utKeyPut glFilepath,'_plan'
+		
+		NB. Read it back again
+		ww utKeyRead glFilepath,'_plan'
+	end.
+
+	NB. Pull normal shot distance
+	NB. Check if there is a layup record
+	defaulthit=.  (<g,ab, 1<.shot){glPlayerDistances
+	glPlanID utKeyRead glFilepath,'_layup'
+	if. ( -. _4 -: >glLayupID) do. NB. Found
+		radius2=. ''$ remgroundyards - glLayupRemGroundYards 
+		glPlanLayupType=: glLayupType
+	else.
+		radius2=. ''$ defaulthit
+ 		glPlanLayupType=: ,' '
+	end.
+	ww=. InterceptPath path ; start ; radius2
+	NB. New logic for transition
+	rem=. remgroundyards - <. 0.5 + 1{ww
+	if. ( 0 < rem) *. (10 >: rem) *. (glPlanLayupType=' ') do.
+		radius2=. radius2 + rem
+		ww=. InterceptPath path ; start ; radius2
+		glPlanLayupType=: ,'T'
+	end.
+
+	glPlanTee=: ,t
+	glPlanHole=: ,h
+	glPlanGender=: ,g
+	glPlanAbility=: ,ab
+	glPlanShot=: ,shot
+	glPlanHitYards=: , <. 0.5+ 1{ww
+	cumgroundyards=. <. 0.5 + cumgroundyards + 1{ww
+	remgroundyards=. <. 0.5  + remgroundyards - 1{ww
+	cumbackyards=. <. 0.5 + cumbackyards + 1{ww
+	glPlanCumGroundYards=: ,cumgroundyards
+	glPlanBackGroundYards=: ,cumbackyards
+	glPlanLatLon=: , 0{ww
+	glPlanRemGroundYards=: ,remgroundyards
+	glPlanRecType=: ,'P'
+	glPlanCarryType=: ,' '
+	glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
+	glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
+	start=. 0{ww
+	NB. Measurepoint is in middle of roll
+	if. glPlanRecType ~: 'P' do.
+		glPlanMeasDist=: glPlanRemGroundYards
+	elseif. glPlanLayupType =  'R' do. NB. Roll
+		midpoint=. 10 + <. 0.5 * glPlanHitYards - defaulthit
+		glPlanMeasDist=: glPlanRemGroundYards + midpoint
+	elseif. glPlanRemGroundYards = 0 do. NB. Fly all the way there
+		glPlanMeasDist=: ,0
+	elseif. 1 do. NB. Normal stroke
+		glPlanMeasDist=: glPlanRemGroundYards + 10
+	end.
+	glPlanCarryDist=: ,<' '
+	glPlanFWWidth=: ,0
+	glPlanOOBDist=: ,0
+	glPlanTreeDist=: ,0
+
+	utKeyPut glFilepath,'_plan'
+	
+	if. 0=remgroundyards do. continue. end.
+
+	goto_shot.	
+
+end. NB. end of abilities loop
+end. NB. end of genders loop
+end. NB. end of tees loop
+end. NB. end of holes loop
+)
+
+
+NB. =====================================================
+NB. BuildPlanOld
+NB. -----------------------------------------------------
+NB. This is the monster function to loop round and build
+NB. all the measurement distances
+NB. Usage: BuildPlan holes ; genders ; abilities
+BuildPlanOld=: 3 : 0
 if. 0=L. y do. y=. 3{. <y end.
 y=. 3{. y
 (' ' cut 'holes genders abilities')=. y
@@ -450,9 +594,9 @@ end.
 res=. res,each <'-T'
 res=. res, each <"0 ,tee
 res=. res, each <'-'
-res=. res, each <"0 gender{'MW'
-res=. res, each <"0 ability{'SB'
-res=. res, each <"0 shot{'012345'
+res=. res, each <"0 ,gender{'MW'
+res=. res, each <"0 ,ability{'SB'
+res=. res, each <"0 ,shot{'012345'
 if. 0=$$hole do. res=. ''$res end.
 )
 

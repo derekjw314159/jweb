@@ -156,12 +156,12 @@ utFileDrop=: 4 : 0
 NB. =======================================================
 NB. utFileDrop
 NB. =======================================================
-NB. Utility to blank out elements from a component file
+NB. Utility to remove elements from a component file
 NB. y is the file
 vars=.>jread y ; 0
 x=. dltb each x
 ix=. vars i. x
-NB, .. check for non existant names 
+NB. .. check for non existent names 
 if. +. / ix >: #vars do.
 	err=. '**** FAILED : no variable ', ;(<' '),each (ix >: #vars) # x
 	return.
@@ -248,7 +248,7 @@ NB. Usage:  subset utKeyPut filename
 NB. =============================================================
 utKeyPut=: 3 : 0
 key=. >keyread y ; '_dictionary'
-key=. >0{ key
+key=. >0{ key NB. First element is the variable holding the keys
 if. -. 0 -: 4!:0 <key do.
 	stderr 'No key data : ',key,' to write to ',y
 	return.
@@ -295,7 +295,11 @@ NB. transpose and box by row
 for_col. key do.
 	(>col)=: col_index{"1 res
 	NB. If boxed number, unbox
-	if. (3!:0 >". (>col)) e. 1 4 8 16 do. (>col)=: >". (>col) end.
+	if. (3!:0 >". (>col)) e. 1 4 8 16 do. (>col)=: >". (>col) 
+	NB. If single characters, open
+	elseif.  0=+/; ($&$) each ". > col do.
+		(>col)=: >". (>col)
+	end.
 end. 
 ww=. $res
 )
@@ -326,7 +330,7 @@ utKeyAddColumn=: 4 : 0
 x=. ,x
 if. 0=L. x do. x=. ,<x end.
 key=. >keyread y ; '_dictionary'
-(<key, x) keywrite y ; '_dictionary'
+(<key, x) keywrite y ; <'_dictionary'
 )
 
 NB. =============================================================
@@ -344,9 +348,47 @@ key=. keydir y NB. Including directory
 mask=. -. dict e. x
 for_rec. key do.
 	xx=. > keyread y ; rec
-	xx=. mask # xx
+	xx=. mask # ($mask) {. xx NB. Need to check the length 'cos could have added a column
 	(<xx) keywrite y ; rec
 end.
+)
+
+NB. ==============================================================
+NB. utPlanDisplay
+NB. --------------------------------------------------------------
+NB. Displays the items in a file
+NB. Usage: (hole ; tee ; player ; ability) utKeyDisplay filename
+NB. ==============================================================
+utPlanDisplay=: 3 : 0
+'hole tee gender ability'=. y
+ix=. glPlanHole e. hole
+NB. Either a planned item, or it matches
+ix2=. glPlanRecType='P'
+ix2=. ix2 *. glPlanTee e. tee
+ix2=. ix2 *. glPlanGender e. gender
+ix2=. ix2 *. glPlanAbility e. ability
+ix2=. ix2 +. glPlanRecType ~: 'P'
+
+ix=. ix *. ix2
+res=. |: > keyread (glFilepath,'_plan')  ; <'_dictionary' ; ix # glPlanID
+)
+
+NB. ==============================================================
+NB. utLayupDisplay
+NB. --------------------------------------------------------------
+NB. Displays the items in a file
+NB. Usage: (hole ; tee ; player ; ability) utKeyDisplay filename
+NB. ==============================================================
+utLayupDisplay=: 3 : 0
+'hole tee gender ability'=. y
+ix=. glLayupHole e. hole
+NB. Either a planned item, or it matches
+ix2=. glLayupTee e. tee
+ix2=. ix2 *. glLayupGender e. gender
+ix2=. ix2 *. glLayupAbility e. ability
+
+ix=. ix *. ix2
+res=. |: > keyread (glFilepath,'_layup')  ; <'_dictionary' ; ix # glLayupID
 )
 
 
