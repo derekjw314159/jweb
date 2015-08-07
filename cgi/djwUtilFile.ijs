@@ -254,10 +254,22 @@ if. -. 0 -: 4!:0 <key do.
 	return.
 end.
 (". key) utKeyPut y NB. Write them all
-: 
+:
 res=. ((#x),0)$a:
-for_col. (>keyread y ; '_dictionary') do.
-	val=. ". >col
+varnames=. >keyread y; '_dictionary'
+for_col. varnames do.
+	NB. Added a safety feature to write a default value to protect
+	NB. against the case where we are adding a single row and not
+	NB. all the variables are properly added 
+	if. (0 ~: 4!:0 col) do.
+		val=. (#x)$a: NB. Set to null if doesn't exit
+	else. 
+		val=. ". >col NB. Take the global variable value
+	end.
+	if. (1=#x) *. (1<#val) do.
+		val=. ,a: NB. Protection case for single, new added
+	end.
+
 	if. col_index=0 do. key=. val end.
 	NB. If not boxed, box now
 	if. 0=L. val do. val=. <"_1 val end.
@@ -266,6 +278,24 @@ end.
 NB. box each row
 res=. <"1 res
 res keywrite y ; <key
+NB. returns the matrix of values
+)
+ 
+NB. =============================================================
+NB. utKeyClear
+NB. -------------------------------------------------------------
+NB. Clears down all the variables with the exception of the
+NB. key in the first column
+NB. It is useful in the case where we are adding a new row
+NB. and want to protect against some old values hanging around
+NB. When the record is "put" any missing variables are set to the
+NB. default values by the utKeyPut function.
+NB. Usage:  utKeyClear filename
+NB. =============================================================
+utKeyClear=: 3 : 0
+key=. >keyread y ; '_dictionary'
+key=. }. key NB. First element is the key itself
+4!:55 key
 NB. returns the matrix of values
 )
 

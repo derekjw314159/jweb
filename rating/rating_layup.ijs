@@ -91,6 +91,10 @@ if. ( _4 -: >glLayupID ) do.  NB. Not found
 	glLayupType=: ,'L'
 	glLayupUpdateName=: ,<": getenv 'REMOTE_USER'
 	glLayupUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
+	glLayupValue=: ,<'forced'
+	glLayupReason=: ,<'Water'
+	glLayupRollLevel=: ,<'level'
+	glLayupRollFirmness=: ,<'average'
 	ww=. utKeyPut glFilepath,'_layup'
 end. 
 
@@ -127,7 +131,7 @@ for_seq. sequence do.
 if. seq = 'L' do. 
 
 	stdout LT1,'<div class="span-15 last">'
-	stdout LF,'<h3>Layup</h3>'
+NB.	stdout LF,'<h3>Layup</h3>'
 	stdout LT2,'<input type="hidden" name="prevname" value="',(":;glLayupUpdateName),'">'
 	stdout LT2,'<input type="hidden" name="prevtime" value="',(;glLayupUpdateTime),'">'
 	stdout LT2,'<input type="hidden" name="keyplan" value="',(;ix),'">'
@@ -135,7 +139,7 @@ if. seq = 'L' do.
 	stdout LT2,'<input type="hidden" name="filename" value="',(;glFilename),'">'
 
 	stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-	stdout LT4,'<th></th>',LT4,'<th>Previous</th>',LT4,'<th>Hit/Layup</th>',LT4,'<th>Cumulative</th>',LT4,'<th>Remain</th>',LT4,'<th>Total</th>',LT3,'</tr>',LT2,'</thead>',LT2,'<tbody>'
+	stdout LT4,'<th>Layup</th>',LT4,'<th>Previous</th>',LT4,'<th>Hit/Layup</th>',LT4,'<th>Cumulative</th>',LT4,'<th>Remain</th>',LT4,'<th>Total</th>',LT3,'</tr>',LT2,'</thead>',LT2,'<tbody>'
 	backtee=. 0{ >hole{glTeesMeasured
 
 	NB. Layup Table and Tyoe = Layup
@@ -177,16 +181,30 @@ if. seq = 'L' do.
 			stdout '</td></tr>'
 		end.
 	end.
+
+	NB. Add the rows for the Layup Reason
+	stdout LT3,'<tr>',LT4,'<td>Layup type</td><td colspan="4"><select name="layvalue" id="layvalue" tabindex="5" style="font-size: 8pt; height: 16px;">'
+	for_ll. glLayValue do.
+		stdout LT5,'<option value="',(>ll)
+		if. ll = glLayupValue do.
+			stdout '" selected>'
+		else. stdout '">'
+		end.
+		stdout (>ll_index{glLayDesc),'</option>'
+	end. 
+	stdout LT4,'</select></td</tr>'
+	stdout LT3,'<tr>',LT4,'<td>Layup Reason</td><td colspan="4">'
+	stdout '<input name="layreason" value="',(;glLayupReason),'" tabindex="6" ',(InputField 15),'></td></tr>'
+
 	stdout '</tbody></table></div>'
 
 elseif. seq = 'R' do.
 	stdout LT1,'<div class="span-15 last">'
 
 NB. Second table is simple roll logic
-	stdout LF,'<h3>Roll</h3>'
 
 	stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-	stdout LT4,'<th></th>',LT4,'<th>Previous</th>',LT4,'<th>Carry</th>',LT4,'<th>Roll</th>',LT4,'<th>Total Hit</th><th>Remain</th>',LT3,'</tr>',LT2,'</thead>',LT2,'<tbody>'
+	stdout LT4,'<th>Roll</th>',LT4,'<th>Previous</th>',LT4,'<th>Carry</th>',LT4,'<th>Roll</th>',LT4,'<th>Total Hit</th><th>Remain</th>',LT3,'</tr>',LT2,'</thead>',LT2,'<tbody>'
 	stdout LT3,'<tr>',LT4,'<td>Default hit</td>',LT4,'<td></td><td></td><td></td>',LT4,'<td><font color="red">',(": defaulthit),(transition{' T'),'</font></td>',LT4,'<td></td>',LT4,'<td></td>',LT4,'<td></td>',LT3,'</tr>'
 	t_index=. glTees i. tee
 	stdout LT4,'<tr>',LT4,'<td><b>From ',>t_index { glTeesName
@@ -212,7 +230,6 @@ stdout LF,'</div>' NB. end main container
 stdout '</body></html>'
 res=. 1
 exit ''
-
 )
 
 NB. =========================================================
@@ -277,6 +294,8 @@ glLayupUpdateName=: ,<": getenv 'REMOTE_USER'
 glLayupUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 glPlanUpdateName=: glLayupUpdateName
 glPlanUpdateTime=: glPlanUpdateTime
+glLayupValue=: ,layvalue
+glLayupReason=: ,layreason
 
 NB. Check for changes
 deletelayup=. 0
@@ -319,7 +338,7 @@ elseif. roll ~: prevroll do.
 end.
 
 NB. Write to two files
-if. changed do.
+if. 1 +. changed do.
 	(,<keylayup) utKeyPut glFilepath,'_layup'
 	(,<keyplan) utKeyPut glFilepath,'_plan'
 
@@ -357,3 +376,4 @@ NB. Choose page based on what was pressed
 stdout LF,'</body></html>'
 exit ''
 )
+

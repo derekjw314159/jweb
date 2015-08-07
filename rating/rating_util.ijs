@@ -309,7 +309,8 @@ for_ab. abilities do.
 	start=. 0{path
 
 label_shot.
-	NB. Remove this record
+	NB. Remove this record by pushing out a measurement-only
+	NB. record.
 	shot=. shot + 1
 
 	NB. Find the matching records and shift to measurement records
@@ -362,7 +363,8 @@ label_shot.
  		glPlanLayupType=: ,' '
 	end.
 	ww=. InterceptPath path ; start ; radius2
-	NB. New logic for transition
+	NB. New logic for transition within 10 yards of 
+	NB. of the green
 	rem=. remgroundyards - <. 0.5 + 1{ww
 	if. ( 0 < rem) *. (10 >: rem) *. (glPlanLayupType=' ') do.
 		radius2=. radius2 + rem
