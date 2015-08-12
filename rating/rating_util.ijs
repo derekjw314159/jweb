@@ -408,7 +408,19 @@ label_shot.
 
 	utKeyPut glFilepath,'_plan'
 	
-	if. 0=remgroundyards do. continue. end.
+	if. 0=remgroundyards do. 
+	    NB. Need to delete any records hanging around when there were more shots
+	    utKeyRead glFilepath,'_plan'
+	    ww=. glPlanHole =  h
+	    ww=. ww *. glPlanTee =  t
+	    ww=. ww *. glPlanGender =  g
+	    ww=. ww *. glPlanAbility =  ab
+	    ww=. ww *. glPlanShot > shot
+	    ww=. ww *. glPlanRecType = 'P'
+	    ww=. ww # glPlanID
+	    ww utKeyDrop glFilepath,'_plan' 
+	    continue.
+	end.
 
 	goto_shot.	
 
@@ -416,6 +428,7 @@ end. NB. end of abilities loop
 end. NB. end of genders loop
 end. NB. end of tees loop
 end. NB. end of holes loop
+CleanupPlan holes
 )
 
 
@@ -602,3 +615,29 @@ res=. res, each <"0 ,shot{'012345'
 if. 0=$$hole do. res=. ''$res end.
 )
 
+
+NB. =============================================================
+NB. CleanupPlan
+NB. -------------------------------------------------------------
+NB. Remove dead measurement records
+NB. Usage CleanupPlan holes
+NB. -------------------------------------------------------------
+CleanupPlan=: 3 : 0
+holes=. ,<. 0.5 + y
+holes=. (holes e. i. 18) # holes
+
+NB. Delete if a measurement record and no recordings
+utKeyRead glFilepath,'_plan'
+ww=. glPlanFWWidth = 0
+ww=. ww *. glPlanNumberBunkers = 0
+ww=. ww *. glPlanHole e. holes
+ww=. ww *. glPlanRecType = 'M'
+( ww # glPlanID) utKeyDrop glFilepath,'_plan'
+
+NB. Delete if a measurement record and at the hole
+utKeyRead glFilepath,'_plan'
+ww=. glPlanRemGroundYards = 0
+ww=. ww *. glPlanHole e. holes
+ww=. ww *. glPlanRecType = 'M'
+( ww # glPlanID) utKeyDrop glFilepath,'_plan'
+)

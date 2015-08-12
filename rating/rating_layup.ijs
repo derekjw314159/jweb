@@ -40,14 +40,7 @@ stdout LF,'<div class="container">'
 
 NB. Error page - No such course
 if. 0<#err do.
-	stdout LF,TAB,'<div class="span-24">'
-	stdout LF,TAB,TAB,'<h1>',err,'</h1>'
-	stdout LF,TAB,TAB,'<div class="error">No such course name : ',glFilename
-	stdout '</div>'
-	stdout LF,TAB,'</div>'
-	stdout LF,TAB,'<br><a href="/jw/rating/plan/v">Back to rating plan</a>'
-	stdout LF, '</div>',LF,'</body></html>'
-	exit ''
+    djwErrorPage err ; ('No such course name : ',glFilename) ; '/jw/rating/plan/v' ; 'Back to rating plan'
 end.
 
 NB. file exists if we have got this far
@@ -65,14 +58,7 @@ ix=. ix { glPlanID
 
 NB. Need to check this is a valid shot
 if. 0=#ix do.
-	stdout LF,TAB,'<div class="span-24">'
-	stdout LF,TAB,TAB,'<h1>',err,'</h1>'
-	stdout LF,TAB,TAB,'<div class="error">No such hole combination : ',}. ; (<'/'),each y
-	stdout '</div>'
-	stdout LF,TAB,'</div>'
-	stdout LF,TAB,'<br><a href="/jw/rating/plan/v/',filename,'/',(":hole+1),'">Back to rating plan</a>'
-	stdout LF, '</div>',LF,'</body></html>'
-	exit ''
+    djwErrorPage err ; ('No such hole combination : ',}. ; (<'/'),each y) ; ('/jw/rating/plan/v/',filename,'/',":1+hole) ; 'Back to rating plan'
 end.
 
 ww=. ix utKeyRead glFilepath,'_plan' NB. Read one record only
@@ -366,6 +352,7 @@ NB. Choose page based on what was pressed
 		glPlanLayupType=: ,' '
 		(<keyplan) utKeyPut glFilepath,'_plan'
 		BuildPlan glPlanHole ; glPlanTee ; glPlanGender ; glPlanAbility
+		(,<keyplan) utKeyRead glFilepath,'_plan' NB. Changed above
 		stdout '</head><body onLoad="redirect(''/jw/rating/plannomap/v/',glFilename,'/',(;":1+glPlanHole),''')"'
 	elseif. 0= 4!:0 <'control_calc' do.
 		stdout '</head><body onLoad="redirect(''',(":httpreferer),''')"'
