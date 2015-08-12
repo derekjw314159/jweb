@@ -309,7 +309,8 @@ for_ab. abilities do.
 	start=. 0{path
 
 label_shot.
-	NB. Remove this record
+	NB. Remove this record by pushing out a measurement-only
+	NB. record.
 	shot=. shot + 1
 
 	NB. Find the matching records and shift to measurement records
@@ -362,7 +363,8 @@ label_shot.
  		glPlanLayupType=: ,' '
 	end.
 	ww=. InterceptPath path ; start ; radius2
-	NB. New logic for transition
+	NB. New logic for transition within 10 yards of 
+	NB. of the green
 	rem=. remgroundyards - <. 0.5 + 1{ww
 	if. ( 0 < rem) *. (10 >: rem) *. (glPlanLayupType=' ') do.
 		radius2=. radius2 + rem
@@ -406,7 +408,19 @@ label_shot.
 
 	utKeyPut glFilepath,'_plan'
 	
-	if. 0=remgroundyards do. continue. end.
+	if. 0=remgroundyards do. 
+	    NB. Need to delete any records hanging around when there were more shots
+	    utKeyRead glFilepath,'_plan'
+	    ww=. glPlanHole =  h
+	    ww=. ww *. glPlanTee =  t
+	    ww=. ww *. glPlanGender =  g
+	    ww=. ww *. glPlanAbility =  ab
+	    ww=. ww *. glPlanShot > shot
+	    ww=. ww *. glPlanRecType = 'P'
+	    ww=. ww # glPlanID
+	    ww utKeyDrop glFilepath,'_plan' 
+	    continue.
+	end.
 
 	goto_shot.	
 
@@ -414,6 +428,7 @@ end. NB. end of abilities loop
 end. NB. end of genders loop
 end. NB. end of tees loop
 end. NB. end of holes loop
+CleanupPlan holes
 )
 
 
@@ -600,3 +615,29 @@ res=. res, each <"0 ,shot{'012345'
 if. 0=$$hole do. res=. ''$res end.
 )
 
+
+NB. =============================================================
+NB. CleanupPlan
+NB. -------------------------------------------------------------
+NB. Remove dead measurement records
+NB. Usage CleanupPlan holes
+NB. -------------------------------------------------------------
+CleanupPlan=: 3 : 0
+holes=. ,<. 0.5 + y
+holes=. (holes e. i. 18) # holes
+
+NB. Delete if a measurement record and no recordings
+utKeyRead glFilepath,'_plan'
+ww=. glPlanFWWidth = 0
+ww=. ww *. glPlanNumberBunkers = 0
+ww=. ww *. glPlanHole e. holes
+ww=. ww *. glPlanRecType = 'M'
+( ww # glPlanID) utKeyDrop glFilepath,'_plan'
+
+NB. Delete if a measurement record and at the hole
+utKeyRead glFilepath,'_plan'
+ww=. glPlanRemGroundYards = 0
+ww=. ww *. glPlanHole e. holes
+ww=. ww *. glPlanRecType = 'M'
+( ww # glPlanID) utKeyDrop glFilepath,'_plan'
+)

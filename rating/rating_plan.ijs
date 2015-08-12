@@ -23,7 +23,7 @@ NB. =========================================================
 jweb_rating_plannomap_v=: 3 : 0
 NB. y=.cgiparms ''
 if. 1=#y do.
-    rating_plan_all  y
+    0 rating_plan_all  y
 elseif. 2=#y do. NB. Passed as parameter
     0 rating_plan_view y
 elseif. 1 do.
@@ -45,111 +45,87 @@ NB. rating_plan_all
 NB. View all courses and summary yards
 NB. =========================================================
 rating_plan_all=: 3 : 0
-NB. Retrieve the details
-xx=.glDbFile djwSqliteR 'select * from tbl_control;'
-xx=.'tbl_control' djwSqliteSplit xx
-xx=.glDbFile djwSqliteR 'select * from tbl_comp WHERE id=',(":,tbl_control_compid),';'
-xx=.'tbl_comp' djwSqliteSplit xx
-xx=.glDbFile djwSqliteR 'select * from tbl_plan WHERE compid=',(":,tbl_control_compid),' ORDER BY sortname;' 
-yy=.glDbFile djwSqliteR 'select * from tbl_partic WHERE compid=',(":,tbl_control_compid),' ORDER BY sortname;'
-zz=.glDbFile djwSqliteR 'select * from tbl_partic_round JOIN tbl_partic ON tbl_partic_round.partid = tbl_partic.id WHERE compid=',(":,tbl_control_compid),';'
+1 rating_plan_all y
+:
+showmap=. x
+glFilename=: dltb > 0{ y
+glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
-err=. ''
-if. 0<#xx do.
-    xx=.'tbl_plan' djwSqliteSplit xx
+if. fexist glFilepath,'.ijf' do.
+	xx=. utFileGet glFilepath
+	xx=. utKeyRead glFilepath,'_plan'
+	xx=. utKeyRead glFilepath,'_tee'
+	err=. ''
 else.
-    tbl_plan_id=: 0$0
-    tbl_plan_name=: 0$a:
-    tbl_plan_sortname=: 0$a:
-    tbl_plan_compid=: 0$0
-    tbl_plan_logopath=: 0$a:
+	err=. 'No such course'
 end.
-
-if. 0<#yy do.
-    yy=.'tbl_partic' djwSqliteSplit yy
-else.
-    tbl_partic_id=: 0$0
-    tbl_partic_name=: 0$a:
-    tbl_partic_sortname=: 0$a:
-    tbl_partic_compid=: 0$0
-	tbl_partic_planid=: 0$0;
-end.
-
-if. 0<#zz do.
-    zz=.'tbl_partic_round' djwSqliteSplit zz
-else.
-    tbl_partic_round_id=: 0$0
-    tbl_partic_round_partid=: 0$0
-    tbl_partic_round_round=: 0$0
-	tbl_partic_round_tee=: 0$a:
-	tbl_partic_round_starttime=: 0$a:
-end.
-
-NB. Loop round the rounds for start time and tees
-xx=. ((''$tbl_comp_rounds) # i. #tbl_partic_id)
-xx=. xx,. (tbl_comp_rounds*(#tbl_partic_id)) $ i. tbl_comp_rounds
-NB. this should look like 0 1 2 0 1 2 ,. 0 0 0 1 1 1 
-xx=. (tbl_partic_round_partid,. tbl_partic_round_round) i. xx
-tbl_partic_tee=: ((#tbl_partic_id),tbl_comp_rounds)$ (xx { (tbl_partic_round_tee, <'tee') )
-tbl_partic_starttime=: ((#tbl_partic_id),tbl_comp_rounds)$ ( xx { (tbl_partic_round_starttime, <'time') )
 
 stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
-stdout LF,'<script src="/javascript/pagescroll.js"></script>'
+stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 djwBlueprintCSS ''
-stdout LF,'</head>',LF,'<body>'
-stdout LF,'<div class="container">'
-NB. Error page - No such team
-if. 0<#err do.
-stdout LF,TAB,'<div class="span-24">'
-stdout, LF,TAB,TAB,'<h1>',err,'</h1>'
-stdout, '<div class="error">No such team name : ',y
-stdout  ,2$,: '</div>'
-stdout LF,'<br><a href="/jw/rating/team/v">Back to team list</a>'
-stdout, '</div></body>'
-exit ''
-end.
-NB. Print teams and participants
-stdout LF, '<div class="span-24">'
-user=.getenv 'REMOTE_USER'
-if. 0 -: user do. user=. '' end.
-stdout LF,TAB,'<h2>Team List : ',(":,>tbl_comp_name),'</h2>', user
-stdout LF,TAB, '<div class="span-15">'
 
-NB. Table to loop round the teams
-stdout LF,'<table>'
-stdout LF,'<thead><tr>'
-stdout LF,'<th> </th><th>Team</th><th>Participants</th>'
-for_rr. i. tbl_comp_rounds do.
-	stdout '<th>Round ', (":rr+1),'</th>'
+NB. Add the header stuff for the map
+if. showmap do.
+    BuildMap i. 18
 end.
-stdout '</tr></thead><tbody>'
-NB. Loop round the teams
-for_cc. i. #tbl_plan_name do.
-	ct=. 1 >.  +/(tbl_partic_planid=cc{tbl_plan_id)
-	stdout LF,'<tr><td rowspan=',(":ct),' align="center"><img src="',glDbRoot,'/',(>cc{tbl_plan_logopath),'" height="',(":17*ct),'px" width="auto" align="center" VALIGN="Middle"></td>'
-	stdout LF,'<td rowspan=',(":ct),' style="border-bottom: 2px solid lightgrey"><a href="http://',(,getenv 'SERVER_NAME'),'/jw/rating/team/v/',(,>cc{tbl_plan_name),'">',(>cc{tbl_plan_name),'</td>'
-	for_pp. I. (tbl_partic_planid=cc{tbl_plan_id) do.
-		stdout LF,'<td>',(,>pp{tbl_partic_name),'</td>'
-		for_rr. i. tbl_comp_rounds do.
-			stdout LF,'<td>',(,>(<pp,rr){tbl_partic_tee)
-			stdout ': ',(,>(<pp,rr){tbl_partic_starttime)
-			stdout '</td>'
-		end.
-		stdout LF,'</tr>'
-	end.
-	if. -. (+./ (tbl_partic_planid=cc{tbl_plan_id)) do. stdout LF,'<td>&lt;No participants&gt;</td></tr>' end.
+
+stdout LF,'</head>',LF,'<body>'
+NB. Control map display
+if. showmap do.
+	stdout LT1,'  <div id="map-canvas"></div>'
 end.
-stdout LF,'</table><hr></div>'
-NB. Add the Edit Option
-stdout LF,'<div class="span-4 prepend-1 last">'
-stdout LF,'<a href="https://',(,getenv 'SERVER_NAME'),'/jw/rating/team/a">Add new team</a></br>'
-stdout LF,'<a href="https://',(,getenv 'SERVER_NAME'),'/jw/rating/partic/a">Add new participant</a><div>'
-NB. stdout LF,'<input type="button" value="eDit" onClick="redirect(''http://',(getenv 'SERVER_NAME'),'/jw/rating/course/e/',(,>tbl_plan_name),''')">edit<div>'
+stdout LF,'<div class="container">'
+
+NB. Error page - No such course
+if. 0<#err do.
+    djwErrorPage err ; ('No such course name : ',glFilename) ; '/jw/rating/plan/v' ; 'Back to course list'
+end.
+
+NB. Print tees and yardages
+stdout LF,'<h2>Course : ', glCourseName,'</h2><h3>All holes</h3>'
+stdout LF,'<a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/rating/plan',(showmap#'nomap'),'/v/',glFilename,'">',(>showmap{'/' cut 'Show Map/Suppress map'),'</a>'
+stdout LF,TAB,'<div class="span-10 last">'
+
+stdout LT1,'<table><thead>'
+stdout LT2,'<tr><th></th>'
+for_t. glTees do.
+    stdout LT3,'<th colspan="3">',(>t_index{glTeesName),'</th>'
+end.
+stdout LT2,'</tr>',LT2,'<tr><th>Hole</th>'
+for_t. glTees do.
+    stdout LT3,'<th>Yards</th><th>Mn</th><th>Wn</th>'
+end.
+stdout LT2,'</tr>'
+
+stdout LT1,'</thead><tbody>'
+for_hole. i. 18 do.
+    stdout LT2,'<tr>',LT3,'<td><a href="/jw/rating/plan',((-. showmap)#'nomap'),'/v/',glFilename,'/',(": 1+hole),'">',(":1+hole),'</a></td>'
+    for_t.  i. #glTees do.
+	    stdout LT3,'<td>',(": <. 0.5 + (<t,hole){glTeesYards),'</td>'
+	    utKeyRead glFilepath,'_tee'
+	    ww=. (glTeHole=hole) *. glTeTee=t{glTees
+	    (ww # glTeID) utKeyRead glFilepath,'_tee'
+	    stdout LT3,'<td>', ((0{,glTeMeasured){'-y' ),'</td>'
+	    stdout LT3,'<td>', ((1{,glTeMeasured){'-y' ),'</td>'
+    end.
+	    stdout LT2,'</tr>'
+end.
+stdout LT1,'</tbody></table>'
+
+
 stdout LF,'</div>' NB. main span
+stdout LF,'        '
+for_h. i. 18 do.
+		stdout '    <a href="/jw/rating/plan',((-. showmap)#'nomap'),'/v/',glFilename,'/',(": 1+h),'">',(":1+h),'</a>'
+end.
+	
 stdout LF,'</div>' NB. container
 stdout '</body></html>'
 exit ''
+
+
+
 )
 
 NB. =========================================================
@@ -172,6 +148,7 @@ glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 if. fexist glFilepath,'.ijf' do.
 	xx=. utFileGet glFilepath
 	xx=. utKeyRead glFilepath,'_plan'
+	xx=. utKeyRead glFilepath,'_tee'
 	err=. ''
 else.
 	err=. 'No such course'
@@ -183,93 +160,9 @@ stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 djwBlueprintCSS ''
 
 NB. Add the header stuff for the map
-stdout LF,'<style>'
-stdout LF,'  html, body, #map-canvas {'
-stdout LF,'  height: 480px;'
-stdout LF,'  width: 640px;'
-stdout LF,'  }'
-stdout LF,'</style>'
-stdout LF,'<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>'
-stdout LF,'<script>',LF,'var map;'
-NB. Work out map centre
-path=. glGPSName i. ('r<0>2.0' 8!:0 (1+hole)),each (' ' cut 'TW GC')
-path=. LatLontoFullOS path { glGPSLatLon
-path=. 0.5 * +/path
-path=.;  +. FullOStoLatLon path
-ww=. 9!:11 (9) 
-stdout LF,'var myCenter=new google.maps.LatLng(',(>'' 8!:0  (0{path)),',',(>'' 8!:0 (1{path)),');'
-NB. stdout LF,'var myCenter=new google.maps.LatLng(51.5,-0.57);'
-
-stdout LF,'function dyncircle(inner, outer) {'
-stdout LF,'   var circ={'
-stdout LF,'      path: google.maps.SymbolPath.CIRCLE,'
-stdout LF,'      fillColor: inner,'
-stdout LF,'      fillOpacity: 1,'
-stdout LF,'      scale: 3.5,'
-stdout LF,'      strokeColor: outer,'
-stdout LF,'      strokeWeight: 3'
-stdout LF,'      };'
-stdout LF,'   return circ;'
-stdout LF,'}'
-
-stdout LF,'function initialize() {'
-stdout LF,'   var mapOptions = {'
-stdout LF,'     zoom: 17,'
-stdout LF,'     center: myCenter,'
-stdout LF,'     mapTypeId: google.maps.MapTypeId.SATELLITE,'
-stdout LF,'     mapTypeControl: false'
-stdout LF,'     };'
-stdout LF,'  map = new google.maps.Map(document.getElementById(''map-canvas''),mapOptions);'
-
-NB. Add the various points here, starting with tees
-for_t. i.#glTees  do.
-	stdout LF,'   var markerT',(t{glTees),'=new google.maps.Marker({'
-	path=. glGPSName i. <(>'r<0>2.0' 8!:0 (1+hole)),'T',t{glTees
-	path=. +. path { glGPSLatLon
-	stdout LF,'      position: new google.maps.LatLng(',(>'' 8!:0  (0{path)),',',(>'' 8!:0 (1{path)),'),'
-	rgb=. t{glTeesRGB
-	rgb=. (0{"1 glRGB) i. rgb
-	rgb=. >(<rgb,1) { glRGB
-	rgb=. '#',rgb
-NB.	stdout LF,'      icon: dyncircle( ''white'', ''white''),'
-	stdout LF,'      icon: dyncircle( ''',rgb,''', ''',rgb,'''),'
-	stdout LF,'      title: ''Tee ',(>t{glTeesName),''''
-	stdout LF,'      });'
-	stdout LF,'   markerT',(t{glTees),'.setMap(map);'
-end. 
-
-NB. Green marker 
-stdout LF,'   var markerGC=new google.maps.Marker({'
-path=. glGPSName i. <(>'r<0>2.0' 8!:0 (1+hole)),'GC'
-path=. +. path { glGPSLatLon
-stdout LF,'      position: new google.maps.LatLng(',(>'' 8!:0  (0{path)),',',(>'' 8!:0 (1{path)),'),'
-stdout LF,'      icon: "http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|FF99CC|8|_|',(":1+hole),'"'
-stdout LF,'      });'
-stdout LF,'   markerGC.setMap(map);'
-
-NB. Flightpath
-path=. PathTeeToGreen hole ; 'W'
-stdout LF,'var flightPathCoord = ['
-for_p. path do.
-	pp=. +. p
-	stdout LF,'   new google.maps.LatLng(', (>'' 8!:0  (0{pp)),', ',(>'' 8!:0 (1{pp)),')'
-	if. p_index < _1 + #path do.
-		stdout ','
-	end.
+if. showmap do.
+    BuildMap ,hole
 end.
-	stdout LF,'   ];'
-stdout LF,'var flightPath = new google.maps.Polyline({'
-stdout LF,'       path: flightPathCoord,'
-stdout LF,'       geodesic: true,'
-stdout LF,'       strokeColor: ''#FFFFFF'','
-stdout LF,'       strokeOpacity: 1,'
-stdout LF,'       strokeWeight: 1,'
-stdout LF,'       });'
-stdout LF,'flightPath.setMap(map);'
-
-stdout LF,'}'
-stdout LF,'google.maps.event.addDomListener(window, ''load'', initialize);'
-stdout LF,'</script>'
 
 
 stdout LF,'</head>',LF,'<body>'
@@ -278,29 +171,30 @@ if. showmap do.
 	stdout LT1,'  <div id="map-canvas"></div>'
 end.
 stdout LF,'<div class="container">'
+
 NB. Error page - No such course
 if. 0<#err do.
-stdout LF,TAB,'<div class="span-24">'
-stdout LF,TAB,TAB,'<h1>',err,'</h1>'
-stdout LF,TAB,TAB,'<div class="error">No such course name : ',glFilename
-stdout '</div>'
-stdout LF,TAB,'</div>'
-stdout LF,TAB,'<br><a href="/jw/rating/plan/v">Back to course list</a>'
-stdout LF, '</div>',LF,'</body>'
-exit ''
+    djwErrorPage err ; ('No such course name : ',glFilename) ; '/jw/rating/plan/v' ; 'Back to course list'
 end.
+
 NB. Print course yardage and measurements
-stdout LF,TAB,'<h2>Course : ', glCourseName,'</h2><h3>Hole : ',(":1+ ; hole),'</h3>'
+stdout LF,'<h2>Course : ', glCourseName,'</h2><h3>Hole : ',(":1+ ; hole),'</h3>'
 stdout LF,'<a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/rating/plan',(showmap#'nomap'),'/v/',glFilename,'/',(": 1+hole),'">',(>showmap{'/' cut 'Show Map/Suppress map'),'</a>'
 stdout LF,TAB,'<div class="span-8 last">'
 
-stdout LF,'<table><thead><tr>'
-stdout '<th>Tee</th><th>Card</th><th>Alt</th></tr>'
+stdout LF,'<table><thead>'
+stdout '<tr><th>Tee</th><th>Card</th><th>Alt</th><th>Mn</th><th>Wn</th></tr>'
 stdout '</thead><tbody>'
 for_t.  i. #glTees do.
 	stdout LF,'<tr><td>',(>t{glTeesName),'</td>'
 	stdout '<td>',(": <. 0.5 + (<t,hole){glTeesYards),'</td>'
-	stdout '<td></td></tr>'
+	utKeyRead glFilepath,'_tee'
+	ww=. (glTeHole=hole) *. glTeTee=t{glTees
+	(ww # glTeID) utKeyRead glFilepath,'_tee'
+	stdout '<td>',(": glTeAlt),'</td>' NB. Altitude
+	stdout '<td>', ((0{,glTeMeasured){'-y' ),'</td>'
+	stdout '<td>', ((1{,glTeMeasured){'-y' ),'</td>'
+	stdout '</tr>'
 end.
 stdout '</tbody></table></div>'
 stdout LF,TAB,'<div class="span-24 last">'
@@ -312,7 +206,7 @@ tees=. >hole{glTeesMeasured
 for_t. tees do.
 	stdout '<th>',(>(glTees i. t){glTeesName),'</th>'
 end.
-stdout '<th>Shot</th><th>Hit</th><th>Lay/Roll/Tran</th><th>To Green</th><th>Alt</th><th>F/width</th><th>#Bunk</th><th>Dist OB</th><th>Dist Tr</th><th>F/w slope</th></tr></thead><tbody>'
+stdout '<th>Shot</th><th>Hit</th><th>ToGreen</th><th>Alt</th><th>F/width</th><th>#Bunk</th><th>Dist OB</th><th>Dist Tr</th><th>F/w slope</th></tr></thead><tbody>'
 NB. Sort the records and re-read
 rr=. I. glPlanHole=hole
 rr=. rr /: rr { glPlanShot
@@ -353,7 +247,10 @@ for_rr. i. #glPlanID do.
 		stdout ;": 1+rr{glPlanHole
 		stdout (;rr{glPlanTee),'/'
 		stdout ((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),(": 1+rr{glPlanShot),'">'
-		stdout (": rr{glPlanHitYards),'</a></td><td>',(rr{glPlanLayupType),'</td><td>', (": <. 0.5 + rr{glPlanRemGroundYards),'</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'
+		stdout (": rr{glPlanHitYards),' ',(rr{glPlanLayupType),'</a></td><td>', (": <. 0.5 + rr{glPlanRemGroundYards),'</td>' 
+		stdout '<td>',(":rr{glPlanAlt),'</td>'
+		stdout LT3,'<td>',(":rr{glPlanFWWidth),'</td>'
+		stdout LT3, '<td></td><td></td><td></td><td></td></tr>'
 
 	elseif. 'M' = rr{glPlanRecType do.
 		stdout '<tr>'
@@ -372,7 +269,10 @@ for_rr. i. #glPlanID do.
 			end.
 		end.
 		stdout '<td colspan="2"><i>Measured Point</i></td>'
-		stdout '<td> </td><td> </td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'
+		stdout LT3,'<td>',(": rr{glPlanRemGroundYards),'</td>'
+		stdout LT3,'<td>',(":rr{glPlanAlt),'</td>'
+		stdout LT3,'<td>',(":rr{glPlanFWWidth),'</td>'
+		stdout '<td></td><td></td><td></td><td></td></tr>'
 	end.
 end.
 
@@ -387,7 +287,7 @@ for_h. i. 18 do.
 		stdout '    <a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/rating/plan',((-. showmap)#'nomap'),'/v/',glFilename,'/',(": 1+h),'">',(":1+h),'</a>'
 	end.
 end.
-NB. Switch for map / nomap
+stdout EM,'  <a href="/jw/rating/plan',((-. showmap)#'nomap'),'/v/',glFilename,'">All</a>'
 	
 stdout LF,'</div>' NB. container
 stdout '</body></html>'
@@ -739,4 +639,113 @@ NB. Choose page based on what was pressed
     end.
 stdout LF,'</body></html>'
 exit ''
+)
+
+NB. =======================================================================
+NB. BuildMap
+NB. -----------------------------------------------------------------------
+NB. Builds the script logic for one or more holes
+NB.
+BuildMap=: 3 : 0
+hole=. ,y
+
+stdout LF,'<style>'
+stdout LF,'  html, body, #map-canvas {'
+stdout LF,'  height: 480px;'
+stdout LF,'  width: 640px;'
+stdout LF,'  }'
+stdout LF,'</style>'
+stdout LF,'<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>'
+stdout LF,'<script>',LF,'var map;'
+NB. Work out map centre from tees and greens
+path=. glGPSName i. ('r<0>2.0' 8!:0 (1+hole)),each <'TW'
+path=. path, glGPSName i. ('r<0>2.0' 8!:0 (1+hole)),each <'GC'
+path=. (path < #glGPSName) # path NB. Remove not found
+path=. LatLontoFullOS path { glGPSLatLon
+path=. ( +/path ) % #path
+path=.;  +. FullOStoLatLon path
+ww=. 9!:11 (9) 
+stdout LF,'var myCenter=new google.maps.LatLng(',(>'' 8!:0  (0{path)),',',(>'' 8!:0 (1{path)),');'
+NB. stdout LF,'var myCenter=new google.maps.LatLng(51.5,-0.57);'
+
+stdout LF,'function dyncircle(inner, outer) {'
+stdout LF,'   var circ={'
+stdout LF,'      path: google.maps.SymbolPath.CIRCLE,'
+stdout LF,'      fillColor: inner,'
+stdout LF,'      fillOpacity: 1,'
+stdout LF,'      scale: 3.5,'
+stdout LF,'      strokeColor: outer,'
+stdout LF,'      strokeWeight: 3'
+stdout LF,'      };'
+stdout LF,'   return circ;'
+stdout LF,'}'
+
+stdout LF,'function initialize() {'
+stdout LF,'   var mapOptions = {'
+if. 2 < $hole do.
+    stdout LF,'     zoom: 15,'
+else.
+    stdout LF,'     zoom: 17,' 
+end.
+stdout LF,'     center: myCenter,'
+stdout LF,'     mapTypeId: google.maps.MapTypeId.SATELLITE,'
+stdout LF,'     mapTypeControl: false'
+stdout LF,'     };'
+stdout LF,'  map = new google.maps.Map(document.getElementById(''map-canvas''),mapOptions);'
+
+
+for_hh. hole do.
+    NB. Add the various points here, starting with tees
+    NB. Only do the tees if a single hole
+    if. 1=#hole do.
+	for_t. i.#glTees  do.
+		stdout LF,'   var marker',(":hh),'T',(t{glTees),'=new google.maps.Marker({'
+		path=. glGPSName i. <(>'r<0>2.0' 8!:0 (1+hh)),'T',t{glTees
+		path=. +. path { glGPSLatLon
+		stdout LF,'      position: new google.maps.LatLng(',(>'' 8!:0  (0{path)),',',(>'' 8!:0 (1{path)),'),'
+		rgb=. t{glTeesRGB
+		rgb=. (0{"1 glRGB) i. rgb
+		rgb=. >(<rgb,1) { glRGB
+		rgb=. '#',rgb
+		NB.	stdout LF,'      icon: dyncircle( ''white'', ''white''),'
+		stdout LF,'      icon: dyncircle( ''',rgb,''', ''',rgb,'''),'
+		stdout LF,'      title: ''Hole ',(":hh+1),' Tee ',(>t{glTeesName),''''
+		stdout LF,'      });'
+		stdout LF,'   marker',(":hh),'T',(t{glTees),'.setMap(map);'
+	end. 
+    end.
+
+    NB. Green marker 
+    stdout LF,'   var marker',(":hh),'GC=new google.maps.Marker({'
+    path=. glGPSName i. <(>'r<0>2.0' 8!:0 (1+hh)),'GC'
+    path=. +. path { glGPSLatLon
+    stdout LF,'      position: new google.maps.LatLng(',(>'' 8!:0  (0{path)),',',(>'' 8!:0 (1{path)),'),'
+    stdout LF,'      icon: "http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|FF99CC|8|_|',(":1+hh),'"'
+    stdout LF,'      });'
+    stdout LF,'   marker',(":hh),'GC.setMap(map);'
+
+    NB. Flightpath
+    path=. PathTeeToGreen hh ; 'W'
+    stdout LF,'var flightPathCoord',(":hh),' = ['
+    for_p. path do.
+	    pp=. +. p
+	    stdout LF,'   new google.maps.LatLng(', (>'' 8!:0  (0{pp)),', ',(>'' 8!:0 (1{pp)),')'
+	    if. p_index < _1 + #path do.
+		    stdout ','
+	    end.
+    end.
+    stdout LF,'   ];'
+    stdout LF,'var flightPath',(":hh),' = new google.maps.Polyline({'
+    stdout LF,'       path: flightPathCoord',(":hh),','
+    stdout LF,'       geodesic: true,'
+    stdout LF,'       strokeColor: ''#FFFFFF'','
+    stdout LF,'       strokeOpacity: 1,'
+    stdout LF,'       strokeWeight: 1,'
+    stdout LF,'       });'
+    stdout LF,'flightPath',(":hh),'.setMap(map);'
+end.
+    stdout LF,'}'
+NB. End of hh loop
+    stdout LF,'google.maps.event.addDomListener(window, ''load'', initialize);'
+    stdout LF,'</script>'
 )

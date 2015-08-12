@@ -31,3 +31,35 @@ stdout LF,TAB,'<link rel="stylesheet" href="/css/blueprint/ie.css" type="text/cs
 stdout LF,'<![endif]-->'
 )
 
+NB. ===================================
+NB. Error Page
+NB. djwErrorPage
+NB. ===================================
+djwErrorPage=: 3 : 0
+'errhead errmessage returnloc returnmessage'=. y
+stdout LF,TAB,'<div class="span-24">'
+stdout LF,TAB,TAB,'<h1>',errhead,'</h1>'
+stdout LF,TAB,TAB,'<div class="error">',errmessage
+stdout '</div>'
+stdout LF,TAB,'</div>'
+stdout LF,TAB,'<br><a href="',returnloc,'">',returnmessage
+stdout LF, '</div>',LF,'</body></html>'
+exit ''
+)
+
+NB. ===================================
+NB. Sync Error Page
+NB. djwErrorPage
+NB. ===================================
+djwSyncError=: 3 : 0
+'errhead errmessage returnloc returnmessage'=. y
+stdout LF,TAB,'<div class="span-24">'
+stdout LF,TAB,TAB,'<h1>',errhead,'</h1>'
+stdout LF,TAB,TAB,'<div class="error">',errmessage
+stdout '</div>'
+stdout LF,TAB,'</div>'
+stdout LF,TAB,'<br><a href="',returnloc,'">',returnmessage
+stdout LF, '</div>',LF,'</body></html>'
+exit ''
+)
+
