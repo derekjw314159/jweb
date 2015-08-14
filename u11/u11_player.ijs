@@ -94,10 +94,14 @@ end. NB. End of half
 NB. Add the Edit Option
 stdout LF,'<div class="span-4 last">'
 stdout LF,'<a href="https://',(":,getenv 'SERVER_NAME'),'/jw/u11/player/a/',glFilename,'">Add new player</a><div>'
-NB. stdout LF,'<input type="button" value="eDit" onClick="redirect(''http://',(getenv 'SERVER_NAME'),'/jw/u11/player/e/',(,>tbl_player_name),''')">edit<div>'
+stdout LF,'<br><a href="https://',(":,getenv 'SERVER_NAME'),'/jw/u11/start/v/',glFilename,'">Start sheet</a><div>'
+stdout LF,'<br><a href="https://',(":,getenv 'SERVER_NAME'),'/jw/u11/leader/v/',glFilename,'">Leaderboard</a><div>'
+stdout LF,'<br><a href="https://',(":,getenv 'SERVER_NAME'),'/jw/u11/prize/v/',glFilename,'">Prize Sheet</a><div>'
+stdout LF,'</div>' NB. main span
+stdout LF,'<div class="span-24">'
+stdout LF,'<hr>'
 stdout LF,'</div>' NB. main span
 stdout LF,'</div>' NB. container
-stdout LF,'<hr>'
 stdout '</body></html>'
 exit ''
 )
@@ -344,8 +348,10 @@ stdout '<div class="span-24">'
 
 NB. Submit buttons
 stdout LF,'<input type="submit" name="control_calc" value="Calc" tabindex="28">'
-stdout LF,'     <input type="submit" name="control_done" value="Done" tabindex="29">'
-stdout LF,'     <input type="submit" name="control_delete" value="Delete" tabindex="30"></form></div>'
+stdout LF,'     <input type="submit" name="control_player" value="Player list" tabindex="29">'
+stdout LF,'     <input type="submit" name="control_start" value="Start sheet" tabindex="30">'
+stdout LF,'     <input type="submit" name="control_leader" value="Leaderboard" tabindex="30">'
+stdout LF,'     <input type="submit" name="control_delete" value="Delete" tabindex="31"></form></div>'
 stdout LF,'</div>' NB. end main container
 stdout '</body></html>'
 exit ''
@@ -353,7 +359,6 @@ NB. exit 0
 )
 
 NB. =========================================================
-NB. cgitest v defines html with a timestamp and cgi parameters
 NB. jweb_u11_player_editpost
 NB. =========================================================
 NB. Process entries after edits to player
@@ -415,7 +420,7 @@ glPlStartTime=: ,starttime
 glPlGross=: 1 18$,gross
 glPlGross=: <. 0.5 + glPlGross + _ * 0=glPlGross
 glPlPutt=: <. 0.5 + 1 3$,putt
-glPlPutt=: glPlPutt + _ * _=glPlPutt
+glPlPutt=: glPlPutt + _ * 25<glPlPutt
 
 (key) utKeyPut glFilepath,'_player'
 
@@ -429,8 +434,12 @@ NB. Choose page based on what was pressed
 	elseif. 0= 4!:0 <'control_delete' do.
 		(,key) utKeyDrop glFilepath,'_player'
 		stdout '</head><body onLoad="redirect(''http://',(getenv 'SERVER_NAME'),'/jw/u11/player/v/',glFilename,''')">'
-	elseif. 1 do.
+	elseif. 0= 4!:0 <'control_player' do.
 		stdout '</head><body onLoad="redirect(''http://',(getenv 'SERVER_NAME'),'/jw/u11/player/v/',glFilename,''')">'
+	elseif. 0= 4!:0 <'control_start' do.
+		stdout '</head><body onLoad="redirect(''http://',(getenv 'SERVER_NAME'),'/jw/u11/start/v/',glFilename,''')">'
+	elseif. 0= 4!:0 <'control_leader' do.
+		stdout '</head><body onLoad="redirect(''http://',(getenv 'SERVER_NAME'),'/jw/u11/leader/v/',glFilename,''')">'
     end.
 stdout LF,'</body></html>'
 exit ''
@@ -492,7 +501,7 @@ end.
 NB. Don't take any input, just add a new variable and go back to listing page
 utKeyRead glFilepath,'_player'
 ww=. ; ". each glPlID
-ww=. (i. 3+ >. / ww) -. ww
+ww=. (i. 3+ >. / ww,0) -. ww
 ww=. ; 'r<0>2.0' 8!:0 {.ww
 utKeyClear glFilepath,'_player'
 glPlID=: ,< ww
