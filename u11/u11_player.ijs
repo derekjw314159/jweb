@@ -492,7 +492,7 @@ end.
 NB. Don't take any input, just add a new variable and go back to listing page
 utKeyRead glFilepath,'_player'
 ww=. ; ". each glPlID
-ww=. (i. 3+ >. / ww) -. ww
+ww=. (i. 3+ >. / ww,0) -. ww
 ww=. ; 'r<0>2.0' 8!:0 {.ww
 utKeyClear glFilepath,'_player'
 glPlID=: ,< ww
