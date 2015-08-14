@@ -63,9 +63,6 @@ end.
 stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
-NB. stdout LF,'<script>setTimeout(function(){window.location.href=''http://www.google.com''},5000);</script>'
-
-
 djwBlueprintCSS ''
 
 NB. Add the header stuff for the map
