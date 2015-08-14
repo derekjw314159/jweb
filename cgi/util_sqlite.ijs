@@ -71,7 +71,7 @@ NB.		(>j)=: <"0 ".>j
 NB.     end.
 NB. end.
 xx=.4!:55 <y
-(y)=:  ". 4 }. ; (<' ,. '),each res 
+(y)=:  ". 4 }. ; (<' ,  '),each res 
 NB. Delete first
 xx=.4!:55 res
 )

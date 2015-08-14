@@ -53,8 +53,8 @@ if. 0<#err do.
 end.
 
 NB. Print tees and yardages
-user=. ": getenv 'REMOTE_USER'
-NB. if. 0 -: user do. user=.'' end.
+user=. getenv 'REMOTE_USER'
+if. 0 -: user do. user=.'' end.
 stdout LF,'<h2>BB&O Nike U11 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>All players</h3>'
 
 NB. Order by player
@@ -65,7 +65,12 @@ ww=: ww /: >ww{glPlLastName
 
 NB. Loop round in two halves
 for_hh. 0 1 do.
-    stdout LF,TAB, '<div class="span-11">'
+    
+    if. hh=0 do.
+	stdout LF,'<div class="span-9">'
+    else.
+	stdout LF,'<div class="span-9 prepend-1">'
+    end.
 
     stdout LT1,'<table>'
     stdout LT1,'<thead>',LT2,'<tr>'
@@ -76,7 +81,7 @@ for_hh. 0 1 do.
 	if. cc >: #glPlID do. continue. end. NB. May be odd one at end.
 	stdout LF,'<tr><td><a href="http://',(":getenv 'SERVER_NAME'),'/jw/u11/player/v/',(,glFilename),'/',(>cc{glPlID),'">',(>cc{glPlFirstName),' ',(>cc{glPlLastName),'</td>'
 	NB. stdout LT3,'<td>',(":>cc{glPlClub),'</td>'
-	stdout LT3,'<td>',(": glCompDate CalcAge cc{glPlDoB),'</td>'
+	stdout LT3,'<td>',(;'6.3' 8!:0 glCompDate CalcAge cc{glPlDoB),'</td>'
 	stdout LF,'<td>',(":>cc{glPlHCP),'</td>'
 	stdout LF,'<td>',(":>cc{glPlStartTime),'</td>'
 	gr=. ": +/7<. cc{glPlGross
@@ -87,7 +92,7 @@ for_hh. 0 1 do.
     stdout LF,'</tbody></table></div>'
 end. NB. End of half
 NB. Add the Edit Option
-stdout LF,'<div class="span-2 last">'
+stdout LF,'<div class="span-4 last">'
 stdout LF,'<a href="https://',(":,getenv 'SERVER_NAME'),'/jw/u11/player/a/',glFilename,'">Add new player</a><div>'
 NB. stdout LF,'<input type="button" value="eDit" onClick="redirect(''http://',(getenv 'SERVER_NAME'),'/jw/u11/player/e/',(,>tbl_player_name),''')">edit<div>'
 stdout LF,'</div>' NB. main span
@@ -138,15 +143,20 @@ end.
 
 
 NB. Print tees and yardages
-user=. ": getenv 'REMOTE_USER'
-NB. if. 0 -: user do. user=.'' end.
+user=.  getenv 'REMOTE_USER'
+if. 0 -: user do. user=.'' end.
 stdout LF,'<h2>BB&O Nike U11 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>View details for :',(>glPlFirstName),' ',(>glPlLastName),'</h3>'
 
 NB. Print scorecard and yardage
-stdout LF,'<div class="span-16 last">'
+stdout LF,'<div class="span-24 last">'
 stdout LT1,'Club = ',(>glPlClub),'<br>'
 stdout LT1,'Handicap = ',(": glPlHCP),'<br>'
+stdout LT1,'Start time = ',(>glPlStartTime),'<br>'
 stdout LT1,'Date of Birth = ',(11{. , timestamp 1 tsrep glPlDoB),'<br>'
+
+NB. Flag for not started
+notstarted=. _ * *. / _ = ,glPlGross
+
 NB. Front 9
 for_half. i. 2 do.
     if. 0=half do.
@@ -168,30 +178,36 @@ stdout LF,'<table>'
 	stdout LF,'</tbody><tfoot><tr><td>OUT</td>'
 	stdout LF,'<td>',(": +/9 {. glYards),'</td>'
 	stdout LF,'<td>',(": +/9 {. glPar ),'</td>'
-	stdout LF,'<td>',(": +/9 {. ,glPlGross ),'</td>'
+	stdout LF,'<td>',(": notstarted + +/ 7 <. 9 {. ,glPlGross ),'</td>'
 	stdout LF,'</tr></tfoot></table></div>'
     else.
 	stdout LF,'</tbody><tfoot><tr><td>IN</td>'
 	stdout LF,'<td>',(": +/(9+i.9)  { glYards),'</td>'
 	stdout LF,'<td>',(": +/(9+i.9) {glPar),'</td>'
-	stdout LF,'<td>',(": +/(9+i.9) {,glPlGross),'</td>'
+	stdout LF,'<td>',(": notstarted + +/ 7 <. (9+i.9) {,glPlGross),'</td>'
 	stdout LF,'</tr><tr><td>OUT</td>'
 	stdout LF,'<td>',(": +/9 {. glYards),'</td>'
 	stdout LF,'<td>',(": +/9{. glPar),'</td>'
-	stdout LF,'<td>',(": +/9{. ,glPlGross),'</td>'
+	stdout LF,'<td>',(": notstarted + +/ 7 <. 9{. ,glPlGross),'</td>'
 	stdout LF,'</tr><tr><td><b>TOTAL</b></td>'
 	stdout LF,'<td><b>',(": +/glYards),'</b></td>'
 	stdout LF,'<td><b>',(": +/glPar),'</b></td>'
-	stdout LF,'<td><b>',(": +/,glPlGross),'</b></td>'
+	stdout LF,'<td><b>',(": notstarted + +/ 7 <. ,glPlGross),'</b></td>'
 	stdout LF,'</tr></tfoot></table></div>'
     end.
 
 end.
 NB. Add the Edit Option
-stdout LF,'<div class="span-3 prepend-1 last">'
+stdout LF,'<div class="span-7 prepend-1 last">'
 stdout LF,'<a href="https://',(":,getenv 'SERVER_NAME'),'/jw/u11/player/e/',(glFilename),'/',(>key),'">Edit: ',(;glPlFirstName),' ',(;glPlLastName),'</a></br></br>'
 stdout LF,'<a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/u11/player/v/',glFilename,'">Back to player list</a></div>'
 stdout LF,'<hr></div>' NB. main span
+
+NB. Print the putting scores
+for_rr. glPuttDesc do.
+    stdout '<br>',(>rr),' = ',":rr_index{,glPlPutt
+end.
+
 stdout LF,'</div>' NB. container
 stdout '</body></html>'
 exit ''
@@ -213,81 +229,123 @@ NB. u11_player_edit
 NB. =========================================================
 NB. View scores for participant
 u11_player_edit=: 3 : 0
-NB. Retrieve the details
-xx=.glDbFile djwSqliteR 'select * from tbl_control;'
-xx=.'tbl_control' djwSqliteSplit xx
-xx=.glDbFile djwSqliteR 'select * from tbl_player WHERE name=''',y,''';'
-err=. ''
-if. 0<#xx do.
-    xx=.'tbl_player' djwSqliteSplit xx
-    xx=. djwBuildArray 'tbl_player_yards'
-    xx=. djwBuildArray 'tbl_player_par'
-    xx=. djwBuildArray 'tbl_player_index'
+
+glFilename=: dltb > 0{ y
+glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
+
+if. fexist glFilepath,'.ijf' do.
+	xx=. utFileGet glFilepath
+	xx=. utKeyRead glFilepath,'_player'
+	err=. ''
 else.
-    err=. 'Invalid Course name'
+	err=. 'No such course'
 end.
 
 stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 djwBlueprintCSS ''
-stdout LF,'</head><body>'
+
+stdout LF,'</head>',LF,'<body>'
 stdout LF,'<div class="container">'
-NB. Error page - No such player
+
+NB. Error page - No such course
 if. 0<#err do.
-    stdout LF,TAB,'<div class="span-24">'
-    stdout, LF,TAB,TAB,'<h1>',err,'</h1>'
-    stdout, '<div class="error">No such player name : ',y
-    stdout  ,2$,: '</div>'
-    stdout LF,'<br><a href="/jw/u11/player/v">Back to player list</a>'
-    stdout, '</div></body>'
-    exit ''
+    djwErrorPage err ; ('No such course : ',glFilename) ; '/jw/u11/player/v' ; 'Back to player list'
 end.
+
+key=. 1{y
+ww=. keydir glFilepath,'_player'
+if. -. key e. ww do.
+    djwErrorPage err ; ('No such player : ',glFilename,' - ',>key) ; '/jw/u11/player/v' ; 'Back to player list'
+end.
+
+(,key) utKeyRead glFilepath,'_player'
+
+NB. Print tees and yardages
+user=.  getenv 'REMOTE_USER'
+if. 0 -: user do. user=.'' end.
+stdout LF,'<h2>BB&O Nike U11 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2><h3>Edit details for :',(>glPlFirstName),' ',(>glPlLastName),'</h3>','<i>',user,'</i>'
+
 NB. Print scorecard and yardage
-stdout LF,TAB,TAB,'<h2>Edit Course Details : ', (;tbl_player_name),' : ', ( ; tbl_player_desc),'</h2><i>',(": getenv 'REMOTE_USER'),'</i>'
-stdout LF,TAB,'<div class="span-12">'
-stdout LF, TAB,'<form action="/jw/u11/player/editpost/',y,'" method="post">'
-stdout LF, TAB,'<input type="hidden" name="tbl_player_name" value="',y,'">' NB. Have to pass through this value
-stdout LF, TAB,'<input type="hidden" name="prevname" value="',(":;tbl_player_updatename),'">'
-stdout LF, TAB,'<input type="hidden" name="prevtime" value="',(;tbl_player_updatetime),'">'
-stdout LF,'<span class="span-3">Standard Scratch</span><input name="tbl_player_sss" value="',(":,tbl_player_sss),'" tabindex="1" ',(InputField 3),'>'
-stdout LF,'<br><span class="span-3">Description</span><input name="tbl_player_desc" value="',(;tbl_player_desc),'" tabindex="2" ',(InputField 25),'><hr>'
+stdout LF,'<div class="span-24 last">'
+stdout LF, TAB,'<form action="/jw/u11/player/editpost/',glFilename,'/',(;key),'" method="post">'
+stdout LF, TAB,'<input type="hidden" name="filename" value="',glFilename,'">' NB. Have to pass through this value
+stdout LF, TAB,'<input type="hidden" name="key" value="',(;key),'">'
+stdout LF, TAB,'<input type="hidden" name="prevtime" value="',(,>glPlUpdateTime),'">'
+stdout LF, TAB,'<input type="hidden" name="prevname" value="',(,>glPlUpdateName),'">'
+stdout LF,'<span class="span-3">Name</span><input name="firstname" value="',(,>glPlFirstName),'" tabindex="1" ',(InputField 20),'>'
+stdout LF,EM,'<input name="lastname" value="',(,>glPlLastName),'" tabindex="2" ',(InputField 20),'>'
+stdout LF,'<br><span class="span-3">Club</span><input name="club" value="',(,>glPlClub),'" tabindex="3" ',(InputField 25),'>'
+stdout LF,'<br><span class="span-3">Handicap</span><input value="',(": ,glPlHCP),'" tabindex="4" ',(InputFieldnum 'hcp'; 3),'>'
+stdout LF,'<br><span class="span-3">Start time</span><input name="starttime" value="',(,>glPlStartTime),'" tabindex="5" ',(InputField 6),'>'
+stdout LF,'<br><span class="span-3">Date of birth</span><input name="dob" value="',(11{. , timestamp 1 tsrep glPlDoB),'" tabindex="6" ',(InputField 12),'>'
+stdout '</div>'
+
+NB. Flag for not started
+notstarted=. _ * *. / _ = ,glPlGross
+
+NB. Front 9
 for_half. i. 2 do.
     if. 0=half do.
 	stdout LF,'<div class="span-5">'
     else.
-	stdout LF,'<div class="span-5 prepend-2 last">'
+	stdout LF,'<div class="span-5 prepend-2" last>'
     end.
-    stdout LF,'<table>'
+stdout LF,'<table>'
     stdout LF,'<thead><tr>'
-    stdout LF,'<th>Hole</th><th>Yards</th><th>Par</th><th>Index</th></tr></thead><tbody>'
-    for_x. (9*half)+i. 9 do.
-	hole=. ; 'r<0>2.0' 8!:0 x
-	stdout LF,'<tr>'
-	stdout LF,'<td>',(": 1+x),'</td>'
-	stdout LF,'<td><input  value="',(": x{,tbl_player_yards),'" tabindex="',(":  3+x),'" ',(InputFieldnum ('tbl_player_yards',hole) ; 4),'></td>'
-	stdout LF,'<td><input  value="',(": x{,tbl_player_par),'" tabindex="',(":  21+x),'" ',(InputFieldnum ('tbl_player_par',hole) ; 2),'></td>'
-	stdout LF,'<td><input  value="',(": x{,tbl_player_index),'" tabindex="',(":  39+x),'" ',(InputFieldnum ('tbl_player_index',hole) ; 2),'></td>'
+    stdout LF,'<th>Hole</th><th>Yards</th><th>Par</th><th>Gross</th></tr></thead><tbody>'
+    for_x. (9*half) + i. 9 do.
+	hole=. ;'r<0>2.0' 8!:0 x
+	stdout LF,'<tr><td>',(":1+x),'</td>'
+	stdout LF,'<td>',(": x{glYards),'</td>'
+	stdout LF,'<td>',(": x{glPar),'</td>'
+	val=.; 'd<>0.0' 8!:0 x{,glPlGross NB. Can't display infinity
+	stdout LF,'<td><input value="',val,'" tabindex="',(":7+x),'" ',(InputFieldnum ('gross',hole);3),'"></td></tr>'
     end.
+
     if. half=0 do.
 	stdout LF,'</tbody><tfoot><tr><td>OUT</td>'
-	stdout LF,'<td>',(": +/9 {. ,tbl_player_yards),'</td><td>',(": +/(i.9) {,tbl_player_par),'</td></tr>'
-	stdout LF,'</tfoot></table></div>'
+	stdout LF,'<td>',(": +/9 {. glYards),'</td>'
+	stdout LF,'<td>',(": +/9 {. glPar ),'</td>'
+	stdout LF,'<td>',(": notstarted + +/ 7 <. 9 {. ,glPlGross ),'</td>'
+	stdout LF,'</tr></tfoot></table></div>'
     else.
 	stdout LF,'</tbody><tfoot><tr><td>IN</td>'
-	stdout LF,'<td>',(": +/(9+i.9)  { ,tbl_player_yards),'</td><td>',(": +/(9+i.9) {,tbl_player_par),'</td></tr>'
-	stdout LF,'<tr><td>OUT</td>'
-	stdout LF,'<td>',(": +/9 {. ,tbl_player_yards),'</td><td>',(": +/9{.,tbl_player_par),'</td></tr>'
-	stdout LF,'<span class="loud"><tr><td>TOTAL</td>'
-	stdout LF,'<td>',(": +/18 {. ,tbl_player_yards),'</td><td>',(": +/18 {.,tbl_player_par),'</td></tr></span>'
-	stdout LF,'</tfoot></table></div><hr>'
+	stdout LF,'<td>',(": +/(9+i.9)  { glYards),'</td>'
+	stdout LF,'<td>',(": +/(9+i.9) {glPar),'</td>'
+	stdout LF,'<td>',(": notstarted + +/ 7 <. (9+i.9) {,glPlGross),'</td>'
+	stdout LF,'</tr><tr><td>OUT</td>'
+	stdout LF,'<td>',(": +/9 {. glYards),'</td>'
+	stdout LF,'<td>',(": +/9{. glPar),'</td>'
+	stdout LF,'<td>',(": notstarted + +/ 7 <. 9{. ,glPlGross),'</td>'
+	stdout LF,'</tr><tr><td><b>TOTAL</b></td>'
+	stdout LF,'<td><b>',(": +/glYards),'</b></td>'
+	stdout LF,'<td><b>',(": +/glPar),'</b></td>'
+	stdout LF,'<td><b>',(": notstarted + +/ 7 <. ,glPlGross),'</b></td>'
+	stdout LF,'</tr></tfoot></table></div>'
     end.
 
 end.
+NB. Add the Edit Option
+stdout '<div class="span-5 prepend-2">'
+stdout '<table><thead><tr><th>Putting</th><th></th></tr></thead><tbody>'
+NB. Print the putting scores
+for_rr. glPuttDesc do.
+    hole=. ; 'r<0>2.0' 8!:0 rr_index 
+    val=. ; 'd<>b<>0.0' 8!:0 rr_index{,glPlPutt NB. suppress zero and infinity
+    stdout '<tr><td>',(>rr),'</td><td><input value="',val,'" tabindex="',(":25+rr_index),'" ',(InputFieldnum ('putt',hole) ; 3),'"></td></tr>'
+end.
+stdout LT2,'</tbody></table></div>'
+
+
+NB. Print scorecard and yardage
+stdout '<div class="span-24">'
+
 NB. Submit buttons
-stdout LF,'<input type="submit" name="control_calc" value="Calc" tabindex="57">'
-stdout LF,'     <input type="submit" name="control_done" value="Done" tabindex="58">'
-stdout LF,'     <input type="submit" name="control_delete" value="Delete" tabindex="59"></form></div>'
+stdout LF,'<input type="submit" name="control_calc" value="Calc" tabindex="28">'
+stdout LF,'     <input type="submit" name="control_done" value="Done" tabindex="29">'
+stdout LF,'     <input type="submit" name="control_delete" value="Delete" tabindex="30"></form></div>'
 stdout LF,'</div>' NB. end main container
 stdout '</body></html>'
 exit ''
@@ -305,23 +363,29 @@ y=. cgiparms ''
 y=. }. y NB. Drop the URI GET string
 NB. Perform security checks
 NB. This page can only be accessed by player/e/
+
 httpreferer=. getenv 'HTTP_REFERER'
 https=. getenv 'HTTPS'
 servername=. getenv 'SERVER_NAME'
 httphost=. getenv 'HTTP_HOST'
-if. (-. +. / 'u11/player/e/' E. httpreferer) +. (-. 'on'-: https) +. (-.  servername -: httphost) +. (-. +. / servername E. httpreferer) do.
-    pagenotvalid ''
+if. -. glSimulate do.
+    if. (-. +. / 'u11/player/e/' E. httpreferer) +. (-. 'on'-: https) +. (-.  servername -: httphost) +. (-. +. / servername E. httpreferer) do.
+	pagenotvalid ''
+    end.
 end.
-
 NB. Assign to variables
-xx=. djwCGIPost y ; 'tbl_player_par' ; 'tbl_player_index' ; 'tbl_player_yards' ; 'tbl_player_sss'
+xx=. djwCGIPost y ; 'hcp' ; 'gross' ; 'putt'
+djwBuildArray 'gross'
+djwBuildArray 'putt'
+glFilename=: dltb >filename
+glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
+
+(key) utKeyRead glFilepath,'_player'
 
 NB. Check the time stamp
-yy=.glDbFile djwSqliteR 'select updatename,updatetime from tbl_player WHERE name=''',(;tbl_player_name),''';'
-yy=.'tbl_player' djwSqliteSplit yy
  
 NB. Throw error page if updated
-if. (tbl_player_updatetime) ~: (prevtime) do.
+if.  -. (,>glPlUpdateTime) -: (,>prevtime) do.
 	stdout 'Content-type: text/html',LF,LF,'<html>',LF
  	stdout LF,'<head>'
  	stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
@@ -329,35 +393,31 @@ if. (tbl_player_updatetime) ~: (prevtime) do.
  	stdout LF,'</head><body>'
  	stdout LF,'<div class="container">'
  	stdout LF,TAB,'<div class="span-24">'
- 	stdout LF,TAB,TAB,'<h1>Error updating ',(;tbl_player_name),'</h1>'
- 	stdout LF,'<div class="error">Synch error updating ',(;tbl_player_name)
+ 	stdout LF,TAB,TAB,'<h1>Error updating ',(;glPlFirstName),' ',(;glPlLastName),'</h1>'
+ 	stdout LF,'<div class="error">Synch error updating ',(;glPlFirstName),' ',(;glPlLastName)
  	stdout LF,'</br></br>',(":getenv 'REMOTE_USER'),' started to update record previously saved by ',(;prevname),' at ',;prevtime
- 	stdout LF,'</br><br>It has since been updated by: ',(; tbl_player_updatename),' at ',(;tbl_player_updatetime)
+ 	stdout LF,'</br><br>It has since been updated by: ',(; glPlUpdateName),' at ',(;glPlUpdateTime)
  	stdout LF,'</br><br><b>**Update has been CANCELLED**</b>'
  	stdout  ,2$,: '</div>'
- 	stdout LF,'</br><a href="/jw/u11/player/e/',(;tbl_player_name),'">Restart edit of: ',(;tbl_player_name),'</a>'
+ 	stdout LF,'</br><a href="/jw/u11/player/e/',glFilename,'/',(;key),'">Restart edit of: ',(;glPlFirstName),' ',(;glPlLastName),'</a>'
  	stdout, '</div></body>'
  	exit ''
 end.
 
-tbl_player_updatename=: ,<getenv 'REMOTE_USER'
-tbl_player_updatetime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
+glPlUpdateName=: ,<getenv 'REMOTE_USER'
+glPlUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
+glPlFirstName=: ,firstname
+glPlLastName=: ,lastname
+glPlHCP=: ,hcp 
+glPlClub=: club
+glPlDoB=: ,tsrep 6 {. getdate >dob
+glPlStartTime=: ,starttime
+glPlGross=: 1 18$,gross
+glPlGross=: <. 0.5 + glPlGross + _ * 0=glPlGross
+glPlPutt=: <. 0.5 + 1 3$,putt
+glPlPutt=: glPlPutt + _ * _=glPlPutt
 
-string=. djwSqliteUpdate 'tbl_player' ; 'tbl_player_' ; 'tbl_player_name' ; 'tbl_player_'
-NB. Can't handle too big a file on "echo"
-NB. so write out to random seed
-label_seed.
-seed=. <. 1000 * 5 { 6!:0 ''
-xx=. 9!:1 seed
-rand=. ? 9999999
-rand=. glDbFile,'.',":rand
-if. 8 < # 1!:0 <rand do. goto_seed. end.
-xx=.string 1!:2 <rand
-xx=.glDbFile djwSqliteR '.read ',rand
-xx=. 1!:55 <rand
-
-NB. xx=.glDbFile djwSqliteR string
-
+(key) utKeyPut glFilepath,'_player'
 
 stdout 'Content-type: text/html',LF,LF
 NB. stdout 'Location: "http://',(getenv 'SERVER_NAME'),'/jw/u11/player/v/',(,tbl_player_name),'"'
@@ -365,12 +425,12 @@ stdout LF,'<html><head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 NB. Choose page based on what was pressed
 	if. 0= 4!:0 <'control_calc' do.
-		stdout '</head><body onLoad="redirect(''https://',(getenv 'SERVER_NAME'),'/jw/u11/player/e/',(,>tbl_player_name),''')"'
+		stdout '</head><body onLoad="redirect(''https://',(getenv 'SERVER_NAME'),'/jw/u11/player/e/',glFilename,'/',(;key),''')">'
 	elseif. 0= 4!:0 <'control_delete' do.
-		yy=. glDbFile djwSqliteR 'delete from tbl_player WHERE name=''', (,>tbl_player_name),''';'
-		stdout '</head><body onLoad="redirect(''http://',(getenv 'SERVER_NAME'),'/jw/u11/player/v'')"'
+		(,key) utKeyDrop glFilepath,'_player'
+		stdout '</head><body onLoad="redirect(''http://',(getenv 'SERVER_NAME'),'/jw/u11/player/v/',glFilename,''')">'
 	elseif. 1 do.
-		stdout '</head><body onLoad="redirect(''http://',(getenv 'SERVER_NAME'),'/jw/u11/player/v'')"'
+		stdout '</head><body onLoad="redirect(''http://',(getenv 'SERVER_NAME'),'/jw/u11/player/v/',glFilename,''')">'
     end.
 stdout LF,'</body></html>'
 exit ''
@@ -404,23 +464,20 @@ else.
 	err=. 'No such course'
 end.
 
-stdout 'Content-type: text/html',LF,LF,'<html>',LF
-stdout LF,'<head>'
-stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
-djwBlueprintCSS ''
-
-stdout LF,'</head>',LF,'<body>'
-stdout LF,'<div class="container">'
 
 NB. Error page - No such course
 if. 0<#err do.
+    stdout 'Content-type: text/html',LF,LF,'<html>',LF
+    stdout LF,'<head>'
+    stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
+    djwBlueprintCSS ''
+
+    stdout LF,'</head>',LF,'<body>'
+    stdout LF,'<div class="container">'
     djwErrorPage err ; ('No such course : ',glFilename) ; '/jw/rating/plan/v' ; 'Back to course list'
 end.
 
 NB. Print tees and yardages
-user=. getenv 'REMOTE_USER'
-if. 0 -: user do. user=.'' end.
-stdout LF,'<h2>BB&O Nike U11 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>All players</h3>'
 
 httpreferer=. getenv 'HTTP_REFERER'
 https=. getenv 'HTTPS'
@@ -439,8 +496,8 @@ ww=. (i. 3+ >. / ww) -. ww
 ww=. ; 'r<0>2.0' 8!:0 {.ww
 utKeyClear glFilepath,'_player'
 glPlID=: ,< ww
-glPlFirstName=: ,<' edit name'
-glPlLastName=: ,<''
+glPlFirstName=: ,<''
+glPlLastName=: ,<' New Player'
 glPlClub=: ,a:
 glPlGross=: 1 18$_
 glPlPutt=: 1 3$0 0 _
@@ -449,10 +506,14 @@ glPlUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 glPlDoB=: ,glCompDate
 utKeyPut glFilepath,'_player'
 
-stdout 'Content-type: text/html',LF,LF
-NB. stdout 'Location: "http://',(getenv 'SERVER_NAME'),'/jw/u11/player/v/',(,tbl_player_name),'"'
-stdout LF,'<html><head>' 
-stdout '</head><body onLoad="redirect(''https://',(": getenv 'SERVER_NAME'),'/jw/u11/player/v/',glFilename,''')"'
+NB.stdout 'Content-type: text/html',LF,LF
+NB. stdout '<html><head>' 
+stdout 'Content-type: text/html',LF,LF,'<html>',LF
+stdout LF,'<head>'
+stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
+
+stdout LF,'</head>',LF,'<body>'
+stdout '</head><body onLoad="redirect(''https://',(": getenv 'SERVER_NAME'),'/jw/u11/player/e/',glFilename,'/',(;glPlID),''')">'
 stdout LF,'</body></html>'
 exit ''
 )
