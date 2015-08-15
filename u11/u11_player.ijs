@@ -93,10 +93,10 @@ for_hh. 0 1 do.
 end. NB. End of half
 NB. Add the Edit Option
 stdout LF,'<div class="span-4 last">'
-stdout LF,'<a href="https://',(":,getenv 'SERVER_NAME'),'/jw/u11/player/a/',glFilename,'">Add new player</a><div>'
-stdout LF,'<br><a href="https://',(":,getenv 'SERVER_NAME'),'/jw/u11/start/v/',glFilename,'">Start sheet</a><div>'
-stdout LF,'<br><a href="https://',(":,getenv 'SERVER_NAME'),'/jw/u11/leader/v/',glFilename,'">Leaderboard</a><div>'
-stdout LF,'<br><a href="https://',(":,getenv 'SERVER_NAME'),'/jw/u11/prize/v/',glFilename,'">Prize Sheet</a><div>'
+stdout LF,'<a href="https://',(":,getenv 'SERVER_NAME'),'/jw/u11/player/a/',glFilename,'">Add new player</a>'
+stdout LF,'<br><br><a href="http://',(":,getenv 'SERVER_NAME'),'/jw/u11/start/v/',glFilename,'">Start sheet</a>'
+stdout LF,'<br><br><a href="http://',(":,getenv 'SERVER_NAME'),'/jw/u11/leader/v/',glFilename,'">Leaderboard</a>'
+stdout LF,'<br><br><a href="http://',(":,getenv 'SERVER_NAME'),'/jw/u11/prize/v/',glFilename,'">Prize Leaders</a><div>'
 stdout LF,'</div>' NB. main span
 stdout LF,'<div class="span-24">'
 stdout LF,'<hr>'
@@ -203,8 +203,9 @@ stdout LF,'<table>'
 end.
 NB. Add the Edit Option
 stdout LF,'<div class="span-7 prepend-1 last">'
-stdout LF,'<a href="https://',(":,getenv 'SERVER_NAME'),'/jw/u11/player/e/',(glFilename),'/',(>key),'">Edit: ',(;glPlFirstName),' ',(;glPlLastName),'</a></br></br>'
-stdout LF,'<a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/u11/player/v/',glFilename,'">Back to player list</a></div>'
+stdout LF,'<a href="https://',(":,getenv 'SERVER_NAME'),'/jw/u11/player/e/',(glFilename),'/',(>key),'">Edit: ',(;glPlFirstName),' ',(;glPlLastName),'</a>'
+stdout LF,'<br><br><a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/u11/player/v/',glFilename,'">Back to Player List</a>'
+stdout LF,'<br><br><a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/u11/start/v/',glFilename,'">Back to Start Sheet</a></div>'
 stdout LF,'<hr></div>' NB. main span
 
 NB. Print the putting scores
@@ -502,7 +503,7 @@ NB. Don't take any input, just add a new variable and go back to listing page
 utKeyRead glFilepath,'_player'
 ww=. ; ". each glPlID
 ww=. (i. 3+ >. / ww,0) -. ww
-ww=. ; 'r<0>2.0' 8!:0 {.ww
+ww=. ; 'r<0>4.0' 8!:0 {.ww
 utKeyClear glFilepath,'_player'
 glPlID=: ,< ww
 glPlFirstName=: ,<''
