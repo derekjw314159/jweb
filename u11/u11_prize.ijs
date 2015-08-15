@@ -82,7 +82,7 @@ end.
 NB. Print tees and yardages
 user=. getenv 'REMOTE_USER'
 if. 0 -: user do. user=.'' end.
-stdout LF,'<h2>BB&O Nike U11 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>Prize Sheet</h3>'
+stdout LF,'<h2>BB&O Nike U11 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>Prize Leaders</h3>'
 
 NB. Order by prize time and get unique entries
 ww=.  /: >glPlFirstName
@@ -203,8 +203,8 @@ end.
 NB. Add the Edit Option
 stdout LF,'<div class="span-24 last">'
 stdout (-. scroll) # LF,'<a href="/jw/u11/player/v/',glFilename,'">Player list</a>'
-stdout (-. scroll) # LF,'<a href="/jw/u11/start/v/',glFilename,'">Start Sheet</a>'
-stdout (-. scroll) # LF,'<a href="/jw/u11/leader/v/',glFilename,'">Leaderboard</a>'
+stdout (-. scroll) # LF,EM,'<a href="/jw/u11/start/v/',glFilename,'">Start Sheet</a>'
+stdout (-. scroll) # LF,EM,'<a href="/jw/u11/leader/v/',glFilename,'">Leaderboard</a>'
 stdout LF,'</div>' NB. main span
 stdout LF,'</div>' NB. container
 stdout LF,'<hr>'

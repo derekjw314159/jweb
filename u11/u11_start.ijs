@@ -62,7 +62,9 @@ stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 if. scroll do.
-	stdout LF,'<script>setTimeout(function(){window.location.href=''/jw/u11/leaderscroll/v/',glFilename,'''},10000);</script>'
+	NB. one quarter of a second per player, minimum of 10 seconds
+	tm=. ": <. 0.5+ (250* (10 >. # glPlID))
+	stdout LF,'<script>setTimeout(function(){window.location.href=''/jw/u11/leaderscroll/v/',glFilename,'''},',tm,');</script>'
 end.
 djwBlueprintCSS ''
 
@@ -125,10 +127,10 @@ end. NB. End of start time loop
 stdout LT1,'</tbody></table></div>'
 
 NB. Add the Edit Option
-stdout LF,'<div class="span-4 last">'
+stdout LF,'<div class="span-24 last">'
 stdout (-. scroll) # LF,'<a href="/jw/u11/player/v/',glFilename,'">Player list</a>'
-stdout (-. scroll) # LF,'<a href="/jw/u11/leader/v/',glFilename,'">Leaderboard</a>'
-stdout (-. scroll) # LF,'<a href="/jw/u11/prize/v/',glFilename,'">Prize Sheet</a>'
+stdout (-. scroll) # LF,EM,'<a href="/jw/u11/leader/v/',glFilename,'">Leaderboard</a>'
+stdout (-. scroll) # LF,EM,'<a href="/jw/u11/prize/v/',glFilename,'">Prize Leaders</a>'
 stdout LF,'</div>' NB. main span
 stdout LF,'</div>' NB. container
 stdout LF,'<hr>'
