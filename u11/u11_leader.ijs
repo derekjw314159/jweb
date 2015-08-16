@@ -63,7 +63,7 @@ stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 if. scroll do.
 	NB. three quarters of a second per player, minimum of 10 seconds
-	tm=. ": <. 0.5+ (750* (10 >. # glPlID))
+	tm=. ": <. 0.5+ (10000 >. (750*  # glPlID))
 	stdout LF,'<script>setTimeout(function(){window.location.href=''/jw/u11/prizescroll/v/',glFilename,'''},',tm,');</script>'
 end.
 djwBlueprintCSS ''
