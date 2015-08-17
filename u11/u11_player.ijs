@@ -205,7 +205,8 @@ NB. Add the Edit Option
 stdout LF,'<div class="span-7 prepend-1 last">'
 stdout LF,'<a href="https://',(":,getenv 'SERVER_NAME'),'/jw/u11/player/e/',(glFilename),'/',(>key),'">Edit: ',(;glPlFirstName),' ',(;glPlLastName),'</a>'
 stdout LF,'<br><br><a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/u11/player/v/',glFilename,'">Back to Player List</a>'
-stdout LF,'<br><br><a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/u11/start/v/',glFilename,'">Back to Start Sheet</a></div>'
+stdout LF,'<br><br><a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/u11/start/v/',glFilename,'">Back to Start Sheet</a>'
+stdout LF,'<br><br><a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/u11/leader/v/',glFilename,'">Back to Leaderboard</a></div>'
 stdout LF,'<hr></div>' NB. main span
 
 NB. Print the putting scores
