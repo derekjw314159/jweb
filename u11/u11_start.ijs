@@ -95,8 +95,8 @@ stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 if. stay do.
-	NB. one quarter of a second per player, minimum of 10 seconds
-	tm=. ": <. 0.5+ (10000 >. (250 * # glPlID))
+	NB. one quarter of a second per player, minimum of 30 seconds
+	tm=. ": <. 0.5+ (30000 >. (250 * # glPlID))
 	stdout LF,'<script>setTimeout(function(){window.location.href=''/jw/u11/startsheet/v/',glFilename,'''},',tm,');</script>'
 elseif. scroll do.
 	NB. one quarter of a second per player, minimum of 10 seconds
