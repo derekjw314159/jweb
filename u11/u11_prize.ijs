@@ -109,8 +109,12 @@ for_ll. i. 6 <. #glPlID do. NB. Start of person loop
 	else.
 		stdout LT3,'<td>',(": 1+ll_index),'</td>'
 	end.
-	last=. gr 
-	stdout LT3,'<td><a href="http://',(":getenv 'SERVER_NAME'),'/jw/u11/player/v/',(,glFilename),'/',(>ll{glPlID),'">',(>ll{glPlFirstName),' ',(>ll{glPlLastName),'</a>  ['
+	last=. gr
+	if. scroll do.
+	    stdout LT3,'<td>',(>ll{glPlFirstName),' ',(>ll{glPlLastName),' ['
+	else.
+	    stdout LT3,'<td><a href="http://',(":getenv 'SERVER_NAME'),'/jw/u11/player/v/',(,glFilename),'/',(>ll{glPlID),'">',(>ll{glPlFirstName),' ',(>ll{glPlLastName),'</a>  ['
+	end.
 	stdout (":>ll{glPlHCP),'] '
 	stdout '<i>',(":>ll{glPlClub),'</i></td>'
 	gr=. ": gr
@@ -145,8 +149,13 @@ for_ll. i. 6 <. #glPlID do. NB. Start of person loop
 	else.
 		stdout LT3,'<td>',(": 1+ll_index),'</td>'
 	end.
-	last=. nt 
-	stdout LT3,'<td><a href="http://',(":getenv 'SERVER_NAME'),'/jw/u11/player/v/',(,glFilename),'/',(>ll{glPlID),'">',(>ll{glPlFirstName),' ',(>ll{glPlLastName),'</a>  ['
+	last=. nt
+	if. scroll do.
+	    stdout LT3,'<td>',(>ll{glPlFirstName),' ',(>ll{glPlLastName),'  ['
+	else.
+	    stdout LT3,'<td><a href="http://',(":getenv 'SERVER_NAME'),'/jw/u11/player/v/',(,glFilename),'/',(>ll{glPlID),'">',(>ll{glPlFirstName),' ',(>ll{glPlLastName),'</a>  ['
+	
+	end.
 	stdout (":>ll{glPlHCP),'] '
 	stdout '<i>',(":>ll{glPlClub),'</i></td>'
 	nt=. ": nt
@@ -188,8 +197,12 @@ for_p. i. #glPuttDesc do.
 	else.
 		stdout LT3,'<td>',(": 1+ll_index),'</td>'
 	end.
-	last=. nt 
-	stdout LT3,'<td><a href="http://',(":getenv 'SERVER_NAME'),'/jw/u11/player/v/',(,glFilename),'/',(>ll{glPlID),'">',(>ll{glPlFirstName),' ',(>ll{glPlLastName),'</a> '
+	last=. nt
+	if. scroll do.
+	    stdout LT3,'<td>',(>ll{glPlFirstName),' ',(>ll{glPlLastName),' '
+	else.
+	    stdout LT3,'<td><a href="http://',(":getenv 'SERVER_NAME'),'/jw/u11/player/v/',(,glFilename),'/',(>ll{glPlID),'">',(>ll{glPlFirstName),' ',(>ll{glPlLastName),'</a> '
+	end.
 	stdout '<i>',(":>ll{glPlClub),'</i></td>'
 	nt=. ": nt
 	stdout LT3,'<td>',nt,'</td>'

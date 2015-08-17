@@ -20,6 +20,8 @@ LT5=: LF, 5$TAB
 LT6=: LF, 6$TAB
 LT7=: LF, 7$TAB
 
+EM=: ; 3$,: '&emsp;'
+
 stdin=: 1!:1@3:
 stdout=: 1!:2&4
 stderr=: 1!:2&5

@@ -40,13 +40,46 @@ jweb_u11_startscroll=: 3 : 0
 )
 
 NB. =========================================================
+NB. jweb_u11_startsheet_v
+NB. View scores for participant
+NB. =========================================================
+jweb_u11_startsheet_v=: 3 : 0
+NB. y=.cgiparms ''
+if. 1=#y do.
+    2 u11_start_all y
+elseif. 1 do.
+    pagenotfound ''
+end.
+)
+
+NB. =========================================================
+NB. Synonyms
+NB. jweb_u11_start
+NB. =========================================================
+jweb_u11_startsheet=: 3 : 0
+2 u11_start_all y
+)
+
+NB. =========================================================
 NB. u11_start_all  
 NB. View all starts and summary yards
 NB. =========================================================
 u11_start_all=: 3 : 0
 0 u11_start_all y
 :
-scroll=. x
+NB. If scroll is 1 move to leaderboard next
+NB. else if it is 2, stay here
+if. x=1 do.
+    scroll=. 1
+    stay=. 0
+elseif. x=2 do.
+    scroll=. 1
+    stay=. 1
+elseif. 1 do.
+    scroll=. 0
+    stay=. 0
+end.
+
 glFilename=: dltb > 0{ y
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
@@ -61,11 +94,16 @@ end.
 stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
-if. scroll do.
+if. stay do.
+	NB. one quarter of a second per player, minimum of 10 seconds
+	tm=. ": <. 0.5+ (10000 >. (250 * # glPlID))
+	stdout LF,'<script>setTimeout(function(){window.location.href=''/jw/u11/startsheet/v/',glFilename,'''},',tm,');</script>'
+elseif. scroll do.
 	NB. one quarter of a second per player, minimum of 10 seconds
 	tm=. ": <. 0.5+ (10000 >. (250 * # glPlID))
 	stdout LF,'<script>setTimeout(function(){window.location.href=''/jw/u11/leaderscroll/v/',glFilename,'''},',tm,');</script>'
 end.
+
 djwBlueprintCSS ''
 
 if. scroll do.
@@ -109,8 +147,12 @@ for_u. uniq do.
 			stdout LT2,'</tr>',LT2,'<tr><td style="border-right: 2px solid lightgrey">(cont''d)</td>' NB. new continuation row
 		end.
 
-		stdout LT3,'<td><a href="http://',(":getenv 'SERVER_NAME'),'/jw/u11/player/v/',(,glFilename),'/',(>ll{glPlID),'">',(>ll{glPlFirstName),' ',(>ll{glPlLastName),'</a>  ['
-		stdout (":>ll{glPlHCP),'] '
+	if. scroll do.
+	    stdout LT3,'<td>',(>ll{glPlFirstName),' ',(>ll{glPlLastName),'  ['
+	else.
+	    stdout LT3,'<td><a href="http://',(":getenv 'SERVER_NAME'),'/jw/u11/player/v/',(,glFilename),'/',(>ll{glPlID),'">',(>ll{glPlFirstName),' ',(>ll{glPlLastName),'</a>  ['
+	end.
+	stdout (":>ll{glPlHCP),'] '
 		stdout '<i>',(":>ll{glPlClub),'</i></td>'
 		gr=. ": +/7<. ll{glPlGross
 		if. *. / _ = ll{ glPlGross do. gr=.'-' end.
