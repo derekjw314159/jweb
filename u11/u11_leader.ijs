@@ -117,8 +117,12 @@ for_ll. i. #glPlID do. NB. Start of person loop
 		stdout LT3,'<td>',(": 1+ll_index),'</td>'
 	end.
 	last=. gr 
-	stdout LT3,'<td><a href="http://',(":getenv 'SERVER_NAME'),'/jw/u11/player/v/',(,glFilename),'/',(>ll{glPlID),'">',(>ll{glPlFirstName),' ',(>ll{glPlLastName),'</a>  ['
-	stdout (":>ll{glPlHCP),'] '
+	stdout LT3,'<td>'
+	NB. Only drill if not scrolling
+	stdout (-. scroll) # LT3,'<a href="http://',(":getenv 'SERVER_NAME'),'/jw/u11/player/v/',(,glFilename),'/',(>ll{glPlID),'">'
+	stdout LT3,(>ll{glPlFirstName),' ',(>ll{glPlLastName)
+	stdout (-. scroll) # '</a>'
+	stdout ' [',(":>ll{glPlHCP),'] '
 	stdout '<i>',(":>ll{glPlClub),'</i></td>'
 	gr=. ": gr
 	if. *. / _ = ll{ glPlGross do. gr=.'-' end.
