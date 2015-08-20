@@ -95,6 +95,8 @@ ww=: ww /: (+/"1 (_3{."1 (7 <. ww{glPlGross)))  NB. back one
 ww=: ww /: (+/"1 (_6{."1 (7 <. ww{glPlGross)))  NB. back one
 ww=: ww /: (+/"1 (_9{."1  (7 <. ww{glPlGross)))  NB. back one
 ww=: ww /: (+/"1 (7 <. ww{glPlGross))  NB. Gross
+NB. Finally put withdrawals at the bottom
+ww=: ww /: (<'WD') =  ww{glPlStartTime
 (ww{glPlID) utKeyRead glFilepath,'_player'
 
     
@@ -111,9 +113,11 @@ last=. _1
 for_ll. i. #glPlID do. NB. Start of person loop
 	stdout LT2,'<tr>'
 	gr=. +/(7<. ll{glPlGross)
-	if. gr = last do.
+	if. (<'WD') = ll{glPlStartTime do.
+		stdout LT3,'<td>WD</td>'
+	elseif. gr = last do.
 		stdout LT3,'<td>=</td>'
-	else.
+	elseif. 1 do.
 		stdout LT3,'<td>',(": 1+ll_index),'</td>'
 	end.
 	last=. gr 
@@ -125,7 +129,13 @@ for_ll. i. #glPlID do. NB. Start of person loop
 	stdout ' [',(":>ll{glPlHCP),'] '
 	stdout '<i>',(":>ll{glPlClub),'</i></td>'
 	gr=. ": gr
-	if. *. / _ = ll{ glPlGross do. gr=.'-' end.
+	if. (<'WD') = ll{glPlStartTime do.
+	    stdout LT3,'<td>WD</td><td></td>'
+	    stdout ; (#glPuttDesc)#,: '<td></td>'
+	    continue.
+	elseif. *. / _ = ll{ glPlGross do.
+	    gr=. '-'
+	end.
 	stdout LT3,'<td>',gr,'</td>'
 	nt=. ": (+/(7 <. ll{glPlGross)) - ll{glPlHCP
 
