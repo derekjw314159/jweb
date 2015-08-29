@@ -1,6 +1,5 @@
 NB. J Utilities for Rating Courses
 NB. 
-EM=: ; 3$,: '&emsp;'
 
 NB. =========================================================
 NB. rating_layup_e
@@ -140,7 +139,7 @@ NB.	stdout LF,'<h3>Layup</h3>'
 			stdout ' tee</b></td>'
 			stdout LT3,'<td>',": ((<t_index,hole){glTeesYards) - glPlanRemGroundYards + glPlanHitYards
 			prevhityards=. glPlanHitYards
-			stdout '</td><td><input  value="',(":,prevhityards),'" tabindex="1" ',(InputFieldnum 'hityards'; 4),'>'
+			stdout '</td><td><input value="',(":,prevhityards),'" tabindex="1" ',(InputFieldnum 'hityards'; 4),'>'
 			stdout '<input type="hidden" name="prevhityards" value="',(":,prevhityards),'">'
 
 			prevcumyards=.  ((<t_index,hole){glTeesYards) - glPlanRemGroundYards 

@@ -209,7 +209,7 @@ tees=. >hole{glTeesMeasured
 for_t. tees do.
 	stdout '<th>',(>(glTees i. t){glTeesName),'</th>'
 end.
-stdout '<th>Shot</th><th>Hit</th><th>ToGreen</th><th>Alt</th><th>F/width</th><th>#Bunk</th><th>Dist OB</th><th>Dist Tr</th><th>F/w slope</th></tr></thead><tbody>'
+stdout '<th>Shot</th><th>Hit</th><th>ToGreen</th><th>Edits</th><th>Alt</th><th>F/width</th><th>#Bunk</th><th>Dist OB</th><th>Dist Tr</th><th>F/w slope</th></tr></thead><tbody>'
 NB. Sort the records and re-read
 rr=. I. glPlanHole=hole
 rr=. rr /: rr { glPlanShot
@@ -251,6 +251,7 @@ for_rr. i. #glPlanID do.
 		stdout (;rr{glPlanTee),'/'
 		stdout ((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),(": 1+rr{glPlanShot),'">'
 		stdout (": rr{glPlanHitYards),' ',(rr{glPlanLayupType),'</a></td><td>', (": <. 0.5 + rr{glPlanRemGroundYards),'</td>' 
+		stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">Ed</a> <a href="/jw/rating/landing/e">Cp</a>'
 		stdout '<td>',(":rr{glPlanAlt),'</td>'
 		stdout LT3,'<td>',(":rr{glPlanFWWidth),'</td>'
 		stdout LT3, '<td></td><td></td><td></td><td></td></tr>'
@@ -273,6 +274,7 @@ for_rr. i. #glPlanID do.
 		end.
 		stdout '<td colspan="2"><i>Measured Point</i></td>'
 		stdout LT3,'<td>',(": rr{glPlanRemGroundYards),'</td>'
+		stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">Ed</a> <a href="/jw/rating/landing/e">Cp</a>'
 		stdout LT3,'<td>',(":rr{glPlanAlt),'</td>'
 		stdout LT3,'<td>',(":rr{glPlanFWWidth),'</td>'
 		stdout '<td></td><td></td><td></td><td></td></tr>'
