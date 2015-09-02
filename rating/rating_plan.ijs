@@ -254,7 +254,10 @@ for_rr. i. #glPlanID do.
 		stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">Ed</a> <a href="/jw/rating/landing/e">Cp</a>'
 		stdout '<td>',(":rr{glPlanAlt),'</td>'
 		stdout LT3,'<td>',(":rr{glPlanFWWidth),'</td>'
-		stdout LT3, '<td></td><td></td><td></td><td></td></tr>'
+		stdout LT3,'<td>',(":rr{glPlanBunkNumber),'</td>'
+		stdout LT3,'<td>',(":rr{glPlanOOBDist),'</td>'
+		stdout LT3,'<td>',(":rr{glPlanTreeDist),'</td>'
+		stdout LT3, '<td></td></tr>'
 
 	elseif. 'M' = rr{glPlanRecType do.
 		stdout '<tr>'
@@ -277,7 +280,10 @@ for_rr. i. #glPlanID do.
 		stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">Ed</a> <a href="/jw/rating/landing/e">Cp</a>'
 		stdout LT3,'<td>',(":rr{glPlanAlt),'</td>'
 		stdout LT3,'<td>',(":rr{glPlanFWWidth),'</td>'
-		stdout '<td></td><td></td><td></td><td></td></tr>'
+		stdout LT3,'<td>',(":rr{glPlanBunkNumber),'</td>'
+		stdout LT3,'<td>',(":rr{glPlanOOBDist),'</td>'
+		stdout LT3,'<td>',(":rr{glPlanTreeDist),'</td>'
+		stdout LT3, '<td></td></tr>'
 	end.
 end.
 

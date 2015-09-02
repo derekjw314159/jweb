@@ -19,6 +19,7 @@ if. fexist glFilepath,'.ijf' do.
 	ww=.utFileGet glFilepath
 	utKeyRead glFilepath,'_plan'
 	utKeyRead glFilepath,'_layup'
+	utKeyRead glFilepath,'_tee'
 	err=. ''
 else.
 	err=. 'No such course : ',glFilename
@@ -53,8 +54,13 @@ if. 'P'=glPlanRecType do.
 	stdout LF,'<table><thead><tr><th>Landing Zone</th><th>Value</th></tr></thead><tbody>'
 
 	stdout LF,'<tr><td>Hole:</td><td>',(":1+ ; glPlanHole),'</td></tr>'
+	stdout LF,'<tr><td>Hit distance:</td><td>',(": ; glPlanHitYards),'</td></tr>'
 
-	backtee=. 0{ >glPlanHole{glTeesMeasured
+	NB. Work out the back tee
+	ww=. I. glTeHole = ''$glPlanHole
+	ww=. ww /: glTees i. ww{glTeTee
+	ww=.  +. /"1  ww { glTeMeasured NB. If either measured
+	backtee=. ''${. ww # glTees
 	for_t. (glTees) do.
 		if. (t=glPlanTee)  do.
 			stdout LT3,'<tr>',LT4,'<td><b>Distance from : ',>t_index { glTeesName

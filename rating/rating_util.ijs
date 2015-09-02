@@ -405,6 +405,8 @@ label_shot.
 	glPlanFWWidth=: ,0
 	glPlanOOBDist=: ,0
 	glPlanTreeDist=: ,0
+	glPlanAlt=: ,0
+	glPlanBunkNumber=: ,0
 
 	utKeyPut glFilepath,'_plan'
 	
@@ -428,7 +430,7 @@ end. NB. end of abilities loop
 end. NB. end of genders loop
 end. NB. end of tees loop
 end. NB. end of holes loop
-CleanupPlan holes
+CleanupPlan holes ; tees ; genders ; abilities
 )
 
 
@@ -546,55 +548,6 @@ glPlanRemGroundYards=: glPlanRemGroundYards /:ww
 utFilePut glFilepath
 )
 
-
-NB. =====================================================
-NB. slope_calc
-NB. -----------------------------------------------------
-NB. Calculate the number of tees required for a list of
-NB. yardages
-NB. Usage: gap slope_calc tees
-NB. Return: list of best options
-NB.
-NB. If y is boxed, the first element is the list of given
-NB. yardages, typically after the ladies tees have been
-NB. determined
-NB. -----------------------------------------------------
-slope_calc=: 3 : 0
-25 slope_calc y
-:
-NB. Unbox if necessary
-if. 0 < (L. y) do.
-    'given ww'=. y
-    y=. ww -. given NB. Remove any already given
-else.
-    given=. 0$0
-end.
-
-y=. y /: y
-NB. List all the options
-list=. |. #: i. 2 ^ (#y)
-found=. 0
-gap=. _
-for_ii. i. (1+#y) do. NB. Loop round with 1, 2, 3 elements etc.
-	list2=. (ii= +/"1 list) # list NB. list with 1, 2, 3 elements etc.
-	for_ll. list2 do.
-		diff=. given, ll # y
-		diff=. <./ (|(diff -/ y))
-		diff=. >./diff
-		if. diff <: x do. NB. found an answer
-			found=. 1
-			if. diff < gap do.
-				gap=. diff
-				ans=. given, ll # y
-			end.
-		end.
-	end.
-	if. found do. break. end.
-end.
-ans=. ans /: ans
-)
-
-
 NB. =============================================================
 NB. EnKey
 NB. -------------------------------------------------------------
@@ -615,6 +568,23 @@ res=. res, each <"0 ,shot{'012345'
 if. 0=$$hole do. res=. ''$res end.
 )
 
+NB. =============================================================
+NB. CopyMeasure
+NB. =============================================================
+NB. Copy measurement point information from y to x keys
+NB. -------------------------------------------------------------
+CopyMeasure=: 4 : 0
+to=. x
+from=. y
+(to, from) utKeyRead glFilepath,'_plan'
+glPlanAlt=: 1 1 { glPlanAlt
+glPlanFWWidth=: 1 1 { glPlanFWWidth
+glPlanOOBDist=: 1 1 { glPlanOOBDist
+glPlanTreeDist=: 1 1 { glPlanTreeDist
+glPlanBunkNumber=: 1 1 { glPlanBunkNumber
+utKeyPut glFilepath,'_plan'
+)
+
 
 NB. =============================================================
 NB. CleanupPlan
@@ -623,13 +593,17 @@ NB. Remove dead measurement records
 NB. Usage CleanupPlan holes
 NB. -------------------------------------------------------------
 CleanupPlan=: 3 : 0
-holes=. ,<. 0.5 + y
+'holes tees genders abilities'=. y
+holes=. ,<. 0.5 + holes
 holes=. (holes e. i. 18) # holes
 
 NB. Delete if a measurement record and no recordings
 utKeyRead glFilepath,'_plan'
 ww=. glPlanFWWidth = 0
-ww=. ww *. glPlanNumberBunkers = 0
+ww=. ww *. glPlanBunkNumber = 0
+ww=. ww *. glPlanAlt = 0
+ww=. ww *. glPlanOOBDist = 0
+ww=. ww *. glPlanTreeDist = 0
 ww=. ww *. glPlanHole e. holes
 ww=. ww *. glPlanRecType = 'M'
 ( ww # glPlanID) utKeyDrop glFilepath,'_plan'
@@ -640,4 +614,39 @@ ww=. glPlanRemGroundYards = 0
 ww=. ww *. glPlanHole e. holes
 ww=. ww *. glPlanRecType = 'M'
 ( ww # glPlanID) utKeyDrop glFilepath,'_plan'
+
+NB. Loop round looking for duplicate 'P' and 'M' records
+utKeyRead glFilepath,'_plan'
+ww=. glPlanHole e. holes
+ww=. ww *. glPlanTee e. tees
+ww=. ww *. glPlanGender e. genders
+ww=. ww *. glPlanAbility e. abilities
+ww=. ww *. glPlanRecType = 'P'
+uniq=. ww # glPlanID
+for_u. uniq do.
+	utKeyRead glFilepath,'_plan'
+	ix=. glPlanID i. u
+	if. 0< ix { glPlanAlt + glPlanFWWidth + glPlanBunkNumber + glPlanOOBDist + glPlanTreeDist do. continue. end.
+	NB. Look for measurement point at the same distance
+	ww=. glPlanHole = ix{glPlanHole
+	ww=. ww *. glPlanRecType='M'
+	ww=. ww *. glPlanRemGroundYards = ix{glPlanRemGroundYards
+	NB. Must be non-zero because already compressed out for measurement points
+	cp=. ww # glPlanID
+	if. 0<$cp do.
+		u CopyMeasure 0{cp NB. Only the first one
+		NB. Delete measurement point because no longer needed
+		cp utKeyDrop glFilepath,'_plan'
+		NB. Next element in loop
+		continue.
+	end.
+	NB. Look for ordinary point at the same distance
+	ww=. glPlanHole = ix{glPlanHole
+	ww=. ww *. glPlanRecType='P'
+	ww=. ww *. glPlanRemGroundYards = ix{glPlanRemGroundYards
+	cp=. ww # glPlanID
+	if. 0<$cp do.
+		u CopyMeasure 0{cp NB. Only the first one
+	end.
+end.
 )
