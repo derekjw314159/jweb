@@ -292,17 +292,60 @@ if. 0=#abilities do. abilities=. 0 1 end.
 tees=. , tees
 if. 0=#tees do. tees=. glTees end.
 
+utKeyRead glFilepath,'_tee'
+
 for_h. holes do.
-for_t. (tees e. >h{glTeesMeasured) # tees do. NB. Only relevant tees for the hole
+NB. New logic for tees meaured
+NB. for_t. (tees e. >h{glTeesMeasured) # tees do. NB. Only relevant tees for the hole
+
+NB. Work out the back tee
+ww=. I. glTeHole = h
+ww=. ww /: glTees i. ww{glTeTee
+ww=.  +. /"1  ww { glTeMeasured NB. If either measured - don't need to split by gender
+backtee=. ''${. ww # glTees
+
+for_t. tees do. NB. Only relevant tees for the hole
+    
+
 for_g. genders do.
-if. -. t e. >g{glTeesPlayer do. continue. end. 
+    if. -. t e. >g{glTeesPlayer do. continue. end. 
+    NB. Fish out records for any plan records no longer measured
+    ww=. glTeHole=h
+    ww=. I. ww *. glTeTee=t
+    if. -.  (<ww,g) {glTeMeasured do. NB. Dead tee
+    	NB. Find any plan points pointing at dead tee
+	utKeyRead glFilepath,'_plan'
+	ww=. glPlanRecType='P'
+	ww=. ww *. glPlanHole = h
+	ww=. ww *. glPlanTee = t
+	ww=. I. ww *. glPlanGender = g
+	if. 0<#ww do.
+	    key=. ww{glPlanID
+	    key utKeyRead glFilepath,'_plan'
+	    newkey=. 'r<0>2.0' 8!:0 glPlanHole
+	    newkey=. newkey ,each <'-'
+	    newkey=. newkey ,each 'r<0>3.0' 8!:0 glPlanRemGroundYards
+	    glPlanHitYards=: (#key) $0
+	    glPlanUpdateName=: (#key)$<": getenv 'REMOTE_USER'
+	    glPlanUpdateTime=: (#key)$< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
+	    glPlanLayupType=: (#key)$,' '
+	    glPlanRecType=: (#key)$,'M'
+	    glPlanCarryType=: (#key)$,' '
+	    glPlanID=: newkey
+	    utKeyPut glFilepath,'_plan'
+	    key utKeyDrop glFilepath,'_plan' 
+	end.
+	continue. NB. Loop to next gender
+    end.
+
+
 for_ab. abilities do.
 	shot=. _1
 	cumgroundyards=. 0 
 	path=. LatLontoFullOS PathTeeToGreen h ; t
 	remgroundyards=. <. 0.5 + glMY * +/ |(}.path) - }:path
 	glTeesGroundYards=: <. 0.5+remgroundyards (< (glTees i. t), h)}glTeesGroundYards
-	path=. LatLontoFullOS PathTeeToGreen h ; 0{(>h{glTeesMeasured)
+	path=. LatLontoFullOS PathTeeToGreen h ; backtee
 	rembackyards=. <. 0.5 + glMY * +/ |(}.path) - }:path
 	cumbackyards=. rembackyards - remgroundyards
 	path=. PathTeeToGreen h ; t

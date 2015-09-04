@@ -40,7 +40,7 @@ end.
 NB. file exists if we have got this far
 NB. Need to check this is a valid shot
 if. -. keyy e. keydir (glFilepath,'_plan') do.
-    djwErrorPage err ; ('No such measurement point : ',}. ; (<'/'),each y) ; ('/jw/rating/plan/v/',glFilename,'/',>keyy) ; 'Back to rating plan'
+    djwErrorPage err ; ('No such measurement point : ',}. ; (<'/'),each y) ; ('/jw/rating/plan/v/',glFilename) ; 'Back to rating plan'
 end.
 
 NB. Read the single record
@@ -209,3 +209,123 @@ NB. Choose page based on what was pressed
 stdout LF,'</body></html>'
 exit ''
 )
+
+NB. =========================================================
+NB. rating_landingcopy_e
+NB. =========================================================
+NB. Copy data from nearest point
+jweb_rating_landingcopy_e=: 3 : 0
+NB. Retrieve the details
+
+NB. y has two elements only
+
+'filename keyy'=. y
+glFilename=: dltb filename
+glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
+keyy=. <keyy
+
+if. fexist glFilepath,'.ijf' do.
+	ww=.utFileGet glFilepath
+	utKeyRead glFilepath,'_plan'
+	utKeyRead glFilepath,'_layup'
+	utKeyRead glFilepath,'_tee'
+	err=. ''
+else.
+	err=. 'No such course : ',glFilename
+end.
+
+stdout 'Content-type: text/html',LF,LF,'<html>',LF
+stdout LF,'<head>'
+stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
+djwBlueprintCSS ''
+stdout LF,'</head><body>'
+stdout LF,'<div class="container">'
+
+NB. Error page - No such course
+if. 0<#err do.
+    djwErrorPage err ; ('No such course name : ',glFilename) ; '/jw/rating/plan/v' ; 'Back to rating plan'
+end.
+
+NB. file exists if we have got this far
+NB. Need to check this is a valid shot
+if. -. keyy e. keydir (glFilepath,'_plan') do.
+    djwErrorPage err ; ('No such measurement point : ',}. ; (<'/'),each y) ; ('/jw/rating/plan/v/',glFilename) ; 'Back to rating plan'
+end.
+
+NB. Read all the records
+utKeyRead glFilepath,'_plan'
+ix=. ''$glPlanID i. keyy
+
+NB. Look for measurement point at the nearest distance
+hole=. ix{glPlanHole
+ww=. I. glPlanHole = hole
+ww=. ww -. ix NB. can't be self
+ww=.  ( 0< ww { glPlanAlt + glPlanFWWidth + glPlanBunkNumber + glPlanOOBDist + glPlanTreeDist ) # ww
+
+if. 0<#ww do.
+
+    diff=. |(ww { glPlanRemGroundYards) - ix{glPlanRemGroundYards
+    ww=. (diff i. <. / diff) { ww
+    diff=. <. / diff
+
+    if. diff < 30 do. NB. Must be less than 30 yards
+	(ix{glPlanID) CopyMeasure ww{glPlanID
+    end.
+end.
+
+stdout '</head><body onLoad="redirect(''/jw/rating/plannomap/v/',glFilename,'/',(;":1+hole),''')"'
+stdout LF,'</body></html>'
+exit ''
+)
+
+NB. =========================================================
+NB. rating_landing_d
+NB. =========================================================
+NB. Copy data from nearest point
+jweb_rating_landing_d=: 3 : 0
+NB. Retrieve the details
+
+NB. y has two elements only
+
+'filename keyy'=. y
+glFilename=: dltb filename
+glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
+keyy=. <keyy
+
+if. fexist glFilepath,'.ijf' do.
+	ww=.utFileGet glFilepath
+	utKeyRead glFilepath,'_plan'
+	utKeyRead glFilepath,'_layup'
+	utKeyRead glFilepath,'_tee'
+	err=. ''
+else.
+	err=. 'No such course : ',glFilename
+end.
+
+stdout 'Content-type: text/html',LF,LF,'<html>',LF
+stdout LF,'<head>'
+stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
+djwBlueprintCSS ''
+stdout LF,'</head><body>'
+stdout LF,'<div class="container">'
+
+NB. Error page - No such course
+if. 0<#err do.
+    djwErrorPage err ; ('No such course name : ',glFilename) ; '/jw/rating/plan/v' ; 'Back to rating plan'
+end.
+
+NB. file exists if we have got this far
+NB. Need to check this is a valid shot
+if. -. keyy e. keydir (glFilepath,'_plan') do.
+    djwErrorPage err ; ('No such measurement point : ',}. ; (<'/'),each y) ; ('/jw/rating/plan/v/',glFilename) ; 'Back to rating plan'
+end.
+
+NB. Delete the record
+keyy utKeyRead glFilepath,'_plan'
+(,keyy)utKeyDrop glFilepath,'_plan'
+
+stdout '</head><body onLoad="redirect(''/jw/rating/plannomap/v/',glFilename,'/',(;":1+glPlanHole),''')"'
+stdout LF,'</body></html>'
+exit ''
+)
+

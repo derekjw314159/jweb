@@ -109,8 +109,8 @@ for_hole. i. 18 do.
 	    utKeyRead glFilepath,'_tee'
 	    ww=. (glTeHole=hole) *. glTeTee=t{glTees
 	    (ww # glTeID) utKeyRead glFilepath,'_tee'
-	    stdout LT3,'<td>', ((0{,glTeMeasured){'-y' ),'</td>'
-	    stdout LT3,'<td>', ((1{,glTeMeasured){'-y' ),'</td>'
+	    stdout LT3,'<td><a href="/jw/rating/tee/e/',glFilename,'/',(1 1 0 0 1#5{.>EnKey hole ; '' ; (t{glTees) ; 0 ; 0 ; 0),'">', ((0{,glTeMeasured){'-y' ),'</a></td>'
+	    stdout LT3,'<td><a href="/jw/rating/tee/e/',glFilename,'/',(1 1 0 0 1#5{.>EnKey hole ; '' ; (t{glTees) ; 0 ; 0 ; 0),'">', ((1{,glTeMeasured){'-y' ),'</a></td>'
     end.
 	    stdout LT2,'</tr>'
 end.
@@ -194,9 +194,9 @@ for_t.  i. #glTees do.
 	utKeyRead glFilepath,'_tee'
 	ww=. (glTeHole=hole) *. glTeTee=t{glTees
 	(ww # glTeID) utKeyRead glFilepath,'_tee'
-	stdout '<td>',(": glTeAlt),'</td>' NB. Altitude
-	stdout '<td>', ((0{,glTeMeasured){'-y' ),'</td>'
-	stdout '<td>', ((1{,glTeMeasured){'-y' ),'</td>'
+	stdout LT3,'<td>',(": glTeAlt),'</td>' NB. Altitude
+	stdout LT3,'<td><a href="/jw/rating/tee/e/',glFilename,'/',(1 1 0 0 1#5{.>EnKey hole ; '' ; (t{glTees) ; 0 ; 0 ; 0),'">', ((0{,glTeMeasured){'-y' ),'</a></td>'
+	stdout LT3,'<td><a href="/jw/rating/tee/e/',glFilename,'/',(1 1 0 0 1#5{.>EnKey hole ; '' ; (t{glTees) ; 0 ; 0 ; 0),'">', ((1{,glTeMeasured){'-y' ),'</a></td>'
 	stdout '</tr>'
 end.
 stdout '</tbody></table></div>'
@@ -239,7 +239,7 @@ for_rr. i. #glPlanID do.
 		else.
 			for_t. tees do.
 				stdout '<td>'
-				if. (t_index = 0.) *. (t=rr{glPlanTee) do.
+				if. (t_index = 0) *. (t=rr{glPlanTee) do.
 					stdout '<b>',(": <. 0.5+ (rr{glPlanBackGroundYards)+ (rr{glPlanRemGroundYards) - (rr{glPlanMeasDist) ),'</b>'
 				elseif. t_index = 0. do.
 					stdout '<i>',(": <. 0.5+ (rr{glPlanBackGroundYards) + (rr{glPlanRemGroundYards) - (rr{glPlanMeasDist) ),'</i>'
@@ -257,7 +257,8 @@ for_rr. i. #glPlanID do.
 		stdout ((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),(": 1+rr{glPlanShot),'">'
 		stdout (": rr{glPlanHitYards),' ',(rr{glPlanLayupType),'</a></td><td>', (": <. 0.5 + rr{glPlanRemGroundYards),'</td>' 
 		if. 0<rr{glPlanRemGroundYards do.
-		    stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">Ed</a> <a href="/jw/rating/landing/e">Cp</a>'
+		    stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">Ed</a> <a href="/jw/rating/landingcopy/e/',(glFilename),'/',(;rr{glPlanID),'">Cop</a>'
+
 		    stdout '<td>',(":rr{glPlanAlt),'</td>'
 		    stdout LT3,'<td>',(":rr{glPlanFWWidth),'</td>'
 		    stdout LT3,'<td>',(":rr{glPlanBunkNumber),'</td>'
@@ -280,14 +281,14 @@ for_rr. i. #glPlanID do.
 		else.
 			for_t. tees do.
 				stdout '<td>'
-				holelength=. (<t_index,hole){glTeesYards
+				holelength=. (<(glTees i. t),hole){glTeesYards
 				stdout ": <. 0.5+ holelength - (rr{glPlanMeasDist) 
 				stdout '</td>'
 			end.
 		end.
 		stdout '<td colspan="2"><i>Measured Point</i></td>'
 		stdout LT3,'<td>',(": rr{glPlanRemGroundYards),'</td>'
-		stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">Ed</a> <a href="/jw/rating/landing/e">Cp</a>'
+		stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">Ed</a> <a href="/jw/rating/landing/d/',glFilename,'/',(;rr{glPlanID),'">Del</a>'
 		stdout LT3,'<td>',(":rr{glPlanAlt),'</td>'
 		stdout LT3,'<td>',(":rr{glPlanFWWidth),'</td>'
 		stdout LT3,'<td>',(":rr{glPlanBunkNumber),'</td>'
