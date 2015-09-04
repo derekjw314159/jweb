@@ -48,6 +48,12 @@ keyy utKeyRead glFilepath,'_plan'
 
 stdout LF,'<h2>Course : ', glCourseName,EM,EM,'Landing Zone Measurements</h2>'
 
+NB. Work out the back tee
+ww=. I. glTeHole = ''$glPlanHole
+ww=. ww /: glTees i. ww{glTeTee
+ww=.  +. /"1  ww { glTeMeasured NB. If either measured - don't need to split by gender
+backtee=. ''${. ww # glTees
+
 if. 'P'=glPlanRecType do.
 	NB. Print the table of parameters
 	stdout LF,'<div class="span-12 last">'
@@ -56,11 +62,6 @@ if. 'P'=glPlanRecType do.
 	stdout LF,'<tr><td>Hole:</td><td>',(":1+ ; glPlanHole),'</td></tr>'
 	stdout LF,'<tr><td>Hit distance:</td><td>',(": ; glPlanHitYards),'</td></tr>'
 
-	NB. Work out the back tee
-	ww=. I. glTeHole = ''$glPlanHole
-	ww=. ww /: glTees i. ww{glTeTee
-	ww=.  +. /"1  ww { glTeMeasured NB. If either measured
-	backtee=. ''${. ww # glTees
 	for_t. (glTees) do.
 		if. (t=glPlanTee)  do.
 			stdout LT3,'<tr>',LT4,'<td><b>Distance from : ',>t_index { glTeesName
@@ -88,7 +89,6 @@ elseif. 'M'=glPlanRecType do.
 
 	stdout LF,'<tr><td>Hole:</td><td>',(":1+ ; glPlanHole),'</td></tr>'
 
-	backtee=. 0{ >glPlanHole{glTeesMeasured
 	for_t. (glTees) do.
 			stdout LT3,'<tr>',LT4,'<td>Distance from : ',>t_index { glTeesName
 			stdout '</td>'

@@ -25,6 +25,7 @@ if. fexist glFilepath,'.ijf' do.
 	ww=.utFileGet glFilepath
 	utKeyRead glFilepath,'_plan'
 	utKeyRead glFilepath,'_layup'
+	utKeyRead glFilepath,'_tee'
 	err=. ''
 else.
 	err=. 'No such course : ',glFilename
@@ -125,7 +126,12 @@ NB.	stdout LF,'<h3>Layup</h3>'
 
 	stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
 	stdout LT4,'<th>Layup</th>',LT4,'<th>Previous</th>',LT4,'<th>Hit/Layup</th>',LT4,'<th>Cumulative</th>',LT4,'<th>Remain</th>',LT4,'<th>Total</th>',LT3,'</tr>',LT2,'</thead>',LT2,'<tbody>'
-	backtee=. 0{ >hole{glTeesMeasured
+
+	NB. Work out the back tee
+	ww=. I. glTeHole = hole
+	ww=. ww /: glTees i. ww{glTeTee
+	ww=.  +. /"1  ww { glTeMeasured NB. If either measured - don't need to split by gender
+	backtee=. ''${. ww # glTees
 
 	NB. Layup Table and Tyoe = Layup
 	stdout LT3,'<tr>',LT4,'<td>Default hit</td>',LT4,'<td></td>',LT4,'<td><font color="red">',(": defaulthit),(transition{' T'),'</font></td>',LT4,'<td></td>',LT4,'<td></td>',LT4,'<td></td>'
