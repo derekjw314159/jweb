@@ -292,17 +292,60 @@ if. 0=#abilities do. abilities=. 0 1 end.
 tees=. , tees
 if. 0=#tees do. tees=. glTees end.
 
+utKeyRead glFilepath,'_tee'
+
 for_h. holes do.
-for_t. (tees e. >h{glTeesMeasured) # tees do. NB. Only relevant tees for the hole
+NB. New logic for tees meaured
+NB. for_t. (tees e. >h{glTeesMeasured) # tees do. NB. Only relevant tees for the hole
+
+NB. Work out the back tee
+ww=. I. glTeHole = h
+ww=. ww /: glTees i. ww{glTeTee
+ww=.  +. /"1  ww { glTeMeasured NB. If either measured - don't need to split by gender
+backtee=. ''${. ww # glTees
+
+for_t. tees do. NB. Only relevant tees for the hole
+    
+
 for_g. genders do.
-if. -. t e. >g{glTeesPlayer do. continue. end. 
+    if. -. t e. >g{glTeesPlayer do. continue. end. 
+    NB. Fish out records for any plan records no longer measured
+    ww=. glTeHole=h
+    ww=. I. ww *. glTeTee=t
+    if. -.  (<ww,g) {glTeMeasured do. NB. Dead tee
+    	NB. Find any plan points pointing at dead tee
+	utKeyRead glFilepath,'_plan'
+	ww=. glPlanRecType='P'
+	ww=. ww *. glPlanHole = h
+	ww=. ww *. glPlanTee = t
+	ww=. I. ww *. glPlanGender = g
+	if. 0<#ww do.
+	    key=. ww{glPlanID
+	    key utKeyRead glFilepath,'_plan'
+	    newkey=. 'r<0>2.0' 8!:0 glPlanHole
+	    newkey=. newkey ,each <'-'
+	    newkey=. newkey ,each 'r<0>3.0' 8!:0 glPlanRemGroundYards
+	    glPlanHitYards=: (#key) $0
+	    glPlanUpdateName=: (#key)$<": getenv 'REMOTE_USER'
+	    glPlanUpdateTime=: (#key)$< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
+	    glPlanLayupType=: (#key)$,' '
+	    glPlanRecType=: (#key)$,'M'
+	    glPlanCarryType=: (#key)$,' '
+	    glPlanID=: newkey
+	    utKeyPut glFilepath,'_plan'
+	    key utKeyDrop glFilepath,'_plan' 
+	end.
+	continue. NB. Loop to next gender
+    end.
+
+
 for_ab. abilities do.
 	shot=. _1
 	cumgroundyards=. 0 
 	path=. LatLontoFullOS PathTeeToGreen h ; t
 	remgroundyards=. <. 0.5 + glMY * +/ |(}.path) - }:path
 	glTeesGroundYards=: <. 0.5+remgroundyards (< (glTees i. t), h)}glTeesGroundYards
-	path=. LatLontoFullOS PathTeeToGreen h ; 0{(>h{glTeesMeasured)
+	path=. LatLontoFullOS PathTeeToGreen h ; backtee
 	rembackyards=. <. 0.5 + glMY * +/ |(}.path) - }:path
 	cumbackyards=. rembackyards - remgroundyards
 	path=. PathTeeToGreen h ; t
@@ -372,6 +415,7 @@ label_shot.
 		glPlanLayupType=: ,'T'
 	end.
 
+	NB. glPlanID already exists
 	glPlanTee=: ,t
 	glPlanHole=: ,h
 	glPlanGender=: ,g
@@ -405,6 +449,13 @@ label_shot.
 	glPlanFWWidth=: ,0
 	glPlanOOBDist=: ,0
 	glPlanTreeDist=: ,0
+	glPlanAlt=: ,0
+	glPlanBunkNumber=: ,0
+	glPlanLatWaterDist=: ,0
+	glPlanDefaultHit=: glPlanHitYards
+	glPlanRRMounds=: ,0
+	glPlanRRRiseDrop=: ,0
+	glPlanRRUnpleasant=: ,0
 
 	utKeyPut glFilepath,'_plan'
 	
@@ -428,7 +479,7 @@ end. NB. end of abilities loop
 end. NB. end of genders loop
 end. NB. end of tees loop
 end. NB. end of holes loop
-CleanupPlan holes
+CleanupPlan holes ; tees ; genders ; abilities
 )
 
 
@@ -546,55 +597,6 @@ glPlanRemGroundYards=: glPlanRemGroundYards /:ww
 utFilePut glFilepath
 )
 
-
-NB. =====================================================
-NB. slope_calc
-NB. -----------------------------------------------------
-NB. Calculate the number of tees required for a list of
-NB. yardages
-NB. Usage: gap slope_calc tees
-NB. Return: list of best options
-NB.
-NB. If y is boxed, the first element is the list of given
-NB. yardages, typically after the ladies tees have been
-NB. determined
-NB. -----------------------------------------------------
-slope_calc=: 3 : 0
-25 slope_calc y
-:
-NB. Unbox if necessary
-if. 0 < (L. y) do.
-    'given ww'=. y
-    y=. ww -. given NB. Remove any already given
-else.
-    given=. 0$0
-end.
-
-y=. y /: y
-NB. List all the options
-list=. |. #: i. 2 ^ (#y)
-found=. 0
-gap=. _
-for_ii. i. (1+#y) do. NB. Loop round with 1, 2, 3 elements etc.
-	list2=. (ii= +/"1 list) # list NB. list with 1, 2, 3 elements etc.
-	for_ll. list2 do.
-		diff=. given, ll # y
-		diff=. <./ (|(diff -/ y))
-		diff=. >./diff
-		if. diff <: x do. NB. found an answer
-			found=. 1
-			if. diff < gap do.
-				gap=. diff
-				ans=. given, ll # y
-			end.
-		end.
-	end.
-	if. found do. break. end.
-end.
-ans=. ans /: ans
-)
-
-
 NB. =============================================================
 NB. EnKey
 NB. -------------------------------------------------------------
@@ -615,6 +617,38 @@ res=. res, each <"0 ,shot{'012345'
 if. 0=$$hole do. res=. ''$res end.
 )
 
+NB. =============================================================
+NB. CopyMeasure
+NB. =============================================================
+NB. Copy measurement point information from y to x keys
+NB. -------------------------------------------------------------
+CopyMeasure=: 4 : 0
+to=. x
+from=. y
+(to, from) utKeyRead glFilepath,'_plan'
+glPlanAlt=: 1 1 { glPlanAlt
+glPlanFWWidth=: 1 1 { glPlanFWWidth
+glPlanOOBDist=: 1 1 { glPlanOOBDist
+glPlanTreeDist=: 1 1 { glPlanTreeDist
+glPlanBunkNumber=: 1 1 { glPlanBunkNumber
+glPlanLatWaterDist=: 1 1{glPlanLatWaterDist
+glPlanRRMounds=: 1 1 { glPlanRRMounds
+glPlanRRRiseDrop=: 1 1 { glPlanRRRiseDrop
+glPlanRRUnpleasant=: 1 1 { glPlanRRUnpleasant
+glPlanFWStance=: 1 1 { glPlanFWStance
+glPlanFWWidthAdj=: 1 1 { glPlanFWWidthAdj
+glPlanFWUnpleasant=: 1 1 { glPlanFWUnpleasant
+glPlanFWObstructed=: 1 1 { glPlanFWObstructed
+glPlanRRHeight=: 1 1 { glPlanRRHeight
+glPlanRRInconsistent=: 1 1 { glPlanRRInconsistent
+glPlanRRMounds=: 1 1 { glPlanRRMounds
+glPlanRRRiseDrop=: 1 1 { glPlanRRRiseDrop
+glPlanRRUnpleasant=: 1 1 {glPlanRRUnpleasant
+
+
+utKeyPut glFilepath,'_plan'
+)
+
 
 NB. =============================================================
 NB. CleanupPlan
@@ -623,13 +657,17 @@ NB. Remove dead measurement records
 NB. Usage CleanupPlan holes
 NB. -------------------------------------------------------------
 CleanupPlan=: 3 : 0
-holes=. ,<. 0.5 + y
+'holes tees genders abilities'=. y
+holes=. ,<. 0.5 + holes
 holes=. (holes e. i. 18) # holes
 
 NB. Delete if a measurement record and no recordings
 utKeyRead glFilepath,'_plan'
 ww=. glPlanFWWidth = 0
-ww=. ww *. glPlanNumberBunkers = 0
+ww=. ww *. glPlanBunkNumber = 0
+ww=. ww *. glPlanAlt = 0
+ww=. ww *. glPlanOOBDist = 0
+ww=. ww *. glPlanTreeDist = 0
 ww=. ww *. glPlanHole e. holes
 ww=. ww *. glPlanRecType = 'M'
 ( ww # glPlanID) utKeyDrop glFilepath,'_plan'
@@ -640,4 +678,39 @@ ww=. glPlanRemGroundYards = 0
 ww=. ww *. glPlanHole e. holes
 ww=. ww *. glPlanRecType = 'M'
 ( ww # glPlanID) utKeyDrop glFilepath,'_plan'
+
+NB. Loop round looking for duplicate 'P' and 'M' records
+utKeyRead glFilepath,'_plan'
+ww=. glPlanHole e. holes
+ww=. ww *. glPlanTee e. tees
+ww=. ww *. glPlanGender e. genders
+ww=. ww *. glPlanAbility e. abilities
+ww=. ww *. glPlanRecType = 'P'
+uniq=. ww # glPlanID
+for_u. uniq do.
+	utKeyRead glFilepath,'_plan'
+	ix=. glPlanID i. u
+	if. 0< ix { glPlanAlt + glPlanFWWidth + glPlanBunkNumber + glPlanOOBDist + glPlanTreeDist do. continue. end.
+	NB. Look for measurement point at the same distance
+	ww=. glPlanHole = ix{glPlanHole
+	ww=. ww *. glPlanRecType='M'
+	ww=. ww *. glPlanRemGroundYards = ix{glPlanRemGroundYards
+	NB. Must be non-zero because already compressed out for measurement points
+	cp=. ww # glPlanID
+	if. 0<$cp do.
+		u CopyMeasure 0{cp NB. Only the first one
+		NB. Delete measurement point because no longer needed
+		cp utKeyDrop glFilepath,'_plan'
+		NB. Next element in loop
+		continue.
+	end.
+	NB. Look for ordinary point at the same distance
+	ww=. glPlanHole = ix{glPlanHole
+	ww=. ww *. glPlanRecType='P'
+	ww=. ww *. glPlanRemGroundYards = ix{glPlanRemGroundYards
+	cp=. ww # glPlanID
+	if. 0<$cp do.
+		u CopyMeasure 0{cp NB. Only the first one
+	end.
+end.
 )

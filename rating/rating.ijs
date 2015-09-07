@@ -63,3 +63,22 @@ stdout LF, '</div>',LF,'</body></html>'
 exit ''
 )
 
+NB. ========================================================
+NB. djwSelect
+NB. ========================================================
+NB. Build html for selection control
+NB. Usage djwSelect name ; tabindex ; matdesc; matval ; default
+NB. --------------------------------------------------------
+djwSelect=: 3 : 0
+'name tabindex matdesc matval default'=. y
+stdout LT4,'<select name="',name,'" id="',name,'" tabindex="',(":;tabindex),'" style="font-size: 8pt; height: 16px;">'
+for_ll. matval do.
+	stdout LT5,'<option value="',(>ll)
+	if. ll = default do.
+		stdout '" selected>'
+	else. stdout '">'
+	end.
+	stdout (>ll_index{matdesc),'</option>'
+end. 
+stdout LT4,'</select>'
+)
