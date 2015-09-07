@@ -415,6 +415,7 @@ label_shot.
 		glPlanLayupType=: ,'T'
 	end.
 
+	NB. glPlanID already exists
 	glPlanTee=: ,t
 	glPlanHole=: ,h
 	glPlanGender=: ,g
@@ -450,6 +451,11 @@ label_shot.
 	glPlanTreeDist=: ,0
 	glPlanAlt=: ,0
 	glPlanBunkNumber=: ,0
+	glPlanLatWaterDist=: ,0
+	glPlanDefaultHit=: glPlanHitYards
+	glPlanRRMounds=: ,0
+	glPlanRRRiseDrop=: ,0
+	glPlanRRUnpleasant=: ,0
 
 	utKeyPut glFilepath,'_plan'
 	
@@ -625,6 +631,21 @@ glPlanFWWidth=: 1 1 { glPlanFWWidth
 glPlanOOBDist=: 1 1 { glPlanOOBDist
 glPlanTreeDist=: 1 1 { glPlanTreeDist
 glPlanBunkNumber=: 1 1 { glPlanBunkNumber
+glPlanLatWaterDist=: 1 1{glPlanLatWaterDist
+glPlanRRMounds=: 1 1 { glPlanRRMounds
+glPlanRRRiseDrop=: 1 1 { glPlanRRRiseDrop
+glPlanRRUnpleasant=: 1 1 { glPlanRRUnpleasant
+glPlanFWStance=: 1 1 { glPlanFWStance
+glPlanFWWidthAdj=: 1 1 { glPlanFWWidthAdj
+glPlanFWUnpleasant=: 1 1 { glPlanFWUnpleasant
+glPlanFWObstructed=: 1 1 { glPlanFWObstructed
+glPlanRRHeight=: 1 1 { glPlanRRHeight
+glPlanRRInconsistent=: 1 1 { glPlanRRInconsistent
+glPlanRRMounds=: 1 1 { glPlanRRMounds
+glPlanRRRiseDrop=: 1 1 { glPlanRRRiseDrop
+glPlanRRUnpleasant=: 1 1 {glPlanRRUnpleasant
+
+
 utKeyPut glFilepath,'_plan'
 )
 

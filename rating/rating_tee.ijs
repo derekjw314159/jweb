@@ -18,6 +18,7 @@ keyy=. <keyy
 if. fexist glFilepath,'.ijf' do.
 	ww=.utFileGet glFilepath
 	utKeyRead glFilepath,'_tee'
+	utKeyRead glFilepath,'_green'
 	err=. ''
 else.
 	err=. 'No such course : ',glFilename
@@ -43,13 +44,13 @@ end.
 
 NB. Read the single record
 keyy utKeyRead glFilepath,'_tee'
+hole=. ''$glTeHole
 
 stdout LF,'<h2>Course : ', glCourseName,EM,EM,'Tee Measurements</h2>'
-
 stdout LF,'<div class="span-12 last">'
 stdout LF,'<table><thead><tr><th></th><th>Value</th></tr></thead><tbody>'
 stdout LF,'<tr><td>Hole:</td><td>',(":1+ ; glTeHole),'</td></tr>'
-stdout LF,'<tr><td>Tee:</td><td>',(": ; glTeTee),'</td></tr>'
+stdout LF,'<tr><td>Tee:</td><td>',(": ; (glTees i. glTeTee){glTeesName),'</td></tr>'
 stdout LF,'<tr><td>Yards:</td><td>',(": ; (<(glTees i. glTeTee),glTeHole){glTeesYards),'</td></tr>'
 stdout LT2,'</tbody></table></div>'
 
@@ -62,7 +63,7 @@ stdout LT2,'<input type="hidden" name="prevtime" value="',(;glTeUpdateTime),'">'
 stdout LT2,'<input type="hidden" name="keytee" value="',(;keyy),'">'
 stdout LT2,'<input type="hidden" name="filename" value="',(;glFilename),'">'
 
-NB. Table of values - Fairway
+NB. Table of values - Tee Measurements
 stdout LT1,'<h4>Tee Measurements</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
 stdout LT4,'<th>Alt</th><th>Men Measured</th><th>Women Measured</th></tr>',LT2,'</thead>',LT2,'<tbody>'
@@ -77,6 +78,17 @@ stdout ' tabindex="3"></td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table></div>'
 
+NB. Table of values - Rough Length
+stdout LT1,'<div class="span-15 last">'
+stdout LT1,'<h4>General</h4>'
+stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
+stdout LT4,'<th>RoughLength</th><th>Apply to all Holes?</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT3,'<tr>'
+stdout LT4,'<td><input value="',(":;(hole=glGrHole)#glGrRRRoughLength),'" tabindex="4" ',(InputFieldnum 'rrlength'; 3),'>',LT4,'</td>'
+stdout LT4,'<td><input type="checkbox" name="all" value="1" '
+stdout ' tabindex="5"></td>'
+stdout LT3,'</tr>'
+stdout '</tbody></table></div>'
 
 NB. Submit buttons
 stdout LT1,'<div class="span-15 last">'
@@ -113,13 +125,17 @@ NB. Assign to variables
 NB. Assign default values first
 m0=: 0
 m1=: 0
-xx=. djwCGIPost y ; ' ' cut 'alt m0 m1'
+all=: 0
+xx=. djwCGIPost y ; ' ' cut 'alt m0 m1 rrlength all'
 glFilename=: dltb ;filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
 NB. Read the current values and check the time stamp
 ww=. utFileGet glFilepath
 ww=. keytee utKeyRead glFilepath,'_tee'
+hole=. ''$glTeHole
+utKeyRead glFilepath,'_green'
+((glGrHole=hole)#glGrID) utKeyRead glFilepath,'_green'
 
 NB. Throw error page if updated
 if. (-. glSimulate)  do.
@@ -147,11 +163,17 @@ glTeUpdateName=: ,<": getenv 'REMOTE_USER'
 glTeUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 glTeAlt=: ,alt
 glTeMeasured=: 1 2 $,m0,m1
+glGrRRRoughLength=: ,rrlength
+if. all do.
+    utKeyRead glFilepath,'_green'
+    glGrRRRoughLength=: 18$rrlength
+end.
 
 NB. Write to files
 keytee utKeyPut glFilepath,'_tee'
 BuildPlan glTeHole ; glTeTee ; '' ; '' ; ''
 keytee utKeyRead glFilepath,'_tee'
+utKeyPut glFilepath,'_green'
 
 stdout 'Content-type: text/html',LF,LF
 stdout LF,'<html><head>' 
