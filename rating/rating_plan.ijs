@@ -216,7 +216,6 @@ end.
 stdout '</tbody></table></div>'
 stdout LF,TAB,'<div class="span-24 last">'
 
-
 stdout LF,'<table>'
 stdout LF,'<thead><tr>'
 NB. Work out the tees measured
@@ -253,12 +252,12 @@ for_rr. i. #glPlanID do.
 		else.
 			for_t. tees do.
 				stdout '<td>'
-				if. (t_index = 0) *. (t=rr{glPlanTee) do.
-					stdout '<b>',(": <. 0.5+ (rr{glPlanBackGroundYards)+ (rr{glPlanRemGroundYards) - (rr{glPlanMeasDist) ),'</b>'
+				holelength=. (<(glTees i. t),hole){glTeesYards
+				holelength=. ": <. 0.5+ holelength - (rr{glPlanMeasDist) 
+				if. (t=rr{glPlanTee) do.
+					stdout '<b>',holelength,'</b>'
 				elseif. t_index = 0. do.
-					stdout '<i>',(": <. 0.5+ (rr{glPlanBackGroundYards) + (rr{glPlanRemGroundYards) - (rr{glPlanMeasDist) ),'</i>'
-				elseif. t=rr{glPlanTee do.
-					stdout '<b>',(": <. 0.5 + (rr{glPlanCumGroundYards) + (rr{glPlanRemGroundYards) - (rr{glPlanMeasDist) ),'</b>' 
+					stdout '<i>',holelength,'</i>'
 				elseif. 1 do.
 				end.
 				stdout '</td>'

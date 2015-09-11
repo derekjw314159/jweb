@@ -304,11 +304,13 @@ ww=. ww /: glTees i. ww{glTeTee
 ww=.  +. /"1  ww { glTeMeasured NB. If either measured - don't need to split by gender
 backtee=. ''${. ww # glTees
 
-for_t. tees do. NB. Only relevant tees for the hole
-    
+for_t. tees do. NB. Only relevant tees for the hole was the old logic, now need to do all in case ..
+NB. .. tee has been added or deleted
 
 for_g. genders do.
-    if. -. t e. >g{glTeesPlayer do. continue. end. 
+    NB. Remove condition for women not playing white tees - control is all with <<glTeMeasured>>
+    NB. if. -. t e. >g{glTeesPlayer do. continue. end. 
+    
     NB. Fish out records for any plan records no longer measured
     ww=. glTeHole=h
     ww=. I. ww *. glTeTee=t
@@ -426,7 +428,6 @@ label_shot.
 	remgroundyards=. <. 0.5  + remgroundyards - 1{ww
 	cumbackyards=. <. 0.5 + cumbackyards + 1{ww
 	glPlanCumGroundYards=: ,cumgroundyards
-	glPlanBackGroundYards=: ,cumbackyards
 	glPlanLatLon=: , 0{ww
 	glPlanRemGroundYards=: ,remgroundyards
 	glPlanRecType=: ,'P'
@@ -483,119 +484,6 @@ CleanupPlan holes ; tees ; genders ; abilities
 )
 
 
-NB. =====================================================
-NB. BuildPlanOld
-NB. -----------------------------------------------------
-NB. This is the monster function to loop round and build
-NB. all the measurement distances
-NB. Usage: BuildPlan holes ; genders ; abilities
-BuildPlanOld=: 3 : 0
-if. 0=L. y do. y=. 3{. <y end.
-y=. 3{. y
-(' ' cut 'holes genders abilities')=. y
-holes=. , holes
-if. 0=#holes do. holes=. i. 18 end.
-genders=. ,genders
-if. 0=#genders do. genders=. 0 1 end.
-abilities=. , abilities
-if. 0=#abilities do. abilities=. 0 1 end.
-
-for_h. holes do.
-tees=. >h{glTeesMeasured
-for_t. tees do.
-for_g. genders do.
-if. -. t e. >g{glTeesPlayer do. continue. end. 
-for_ab. abilities do.
-	shot=. _1
-	cumgroundyards=. 0 
-	path=. LatLontoFullOS PathTeeToGreen h ; t
-	remgroundyards=. <. 0.5 + glMY * +/ |(}.path) - }:path
-	glTeesGroundYards=: <. 0.5+remgroundyards (< (glTees i. t), h)}glTeesGroundYards
-	path=. LatLontoFullOS PathTeeToGreen h ; 0{tees
-	rembackyards=. <. 0.5 + glMY * +/ |(}.path) - }:path
-	cumbackyards=. rembackyards - remgroundyards
-	path=. PathTeeToGreen h ; t
-	start=. 0{path
-
-	ww=. glPlanHole ~: h
-	ww=. ww +. glPlanTee ~: t
-	ww=. ww +. glPlanGender ~: g
-	ww=. ww +. glPlanAbility ~: ab
-	glPlanTee=: ww # glPlanTee
-	NB. don't match shots - need to delete all for this
-	NB. player on this tee
-	glPlanHole=: ww # glPlanHole
-	glPlanGender=: ww# glPlanGender
-	glPlanAbility=: ww # glPlanAbility
-	glPlanShot=: ww # glPlanShot
-	glPlanHitYards=: ww # glPlanHitYards
-	glPlanCumGroundYards=: ww # glPlanCumGroundYards
-	glPlanBackGroundYards=: ww # glPlanBackGroundYards
-	glPlanLatLon=: ww # glPlanLatLon
-	glPlanLayup=: ww # glPlanLayup
-	glPlanRemGroundYards=: ww # glPlanRemGroundYards
-
-
-label_shot.
-	NB. Remove this record
-	shot=. shot + 1
-	NB. Pull normal shot distance
-	radius=. (<g,ab,h,shot){glPlayerLayup
-	if. 0=radius do.
-		radius=. (<g,ab, 1<.shot){glPlayerDistances
- 		layup=. 0
-	else.
-		layup=. 1
-	end.
-	NB. If hitting beyond green, no entry	
-NB.	if. radius >: (glMY * |(-/LatLontoFullOS start, _1{path)) do.  continue. end.
-	
-	NB. If here, we can use the intercept logic
-	ww=. InterceptPath path ; start ; radius
-	glPlanTee=: glPlanTee, t
-	glPlanHole=: glPlanHole , h
-	glPlanGender=: glPlanGender, g
-	glPlanAbility=: glPlanAbility, ab
-	glPlanShot=: glPlanShot, shot
-	glPlanHitYards=: glPlanHitYards, 1{ww
-	cumgroundyards=. <. 0.5 + cumgroundyards + 1{ww
-	remgroundyards=. <. 0.5  + remgroundyards - 1{ww
-	cumbackyards=. <. 0.5 + cumbackyards + 1{ww
-	rembackyards=. <. 0.5 + rembackyards - 1{ww
-	glPlanCumGroundYards=: glPlanCumGroundYards, cumgroundyards
-	glPlanBackGroundYards=: glPlanBackGroundYards, cumbackyards
-	glPlanLatLon=: glPlanLatLon, 0 {ww
-	glPlanLayup=: glPlanLayup, layup
-	glPlanRemGroundYards=: glPlanRemGroundYards, remgroundyards
-	start=. 0{ww
-	
-	if. 0=remgroundyards do. continue. end.
-
-	goto_shot.	
-
-end. NB. end of abilities loop
-end. NB. end of genders loop
-end. NB. end of tees loop
-end. NB. end of holes loop
-
-NB. Sort the records
-ww=. <"0 glPlanHole
-ww=. ww,. <"0 glPlanBackGroundYards
-ww=. ww,. <"0 glPlanGender
-glPlanTee=: glPlanTee /:ww
-glPlanHole=: glPlanHole /:ww
-glPlanGender=: glPlanGender /:ww 
-glPlanAbility=: glPlanAbility /: ww
-glPlanShot=: glPlanShot /:ww 
-glPlanHitYards=: glPlanHitYards /:ww 
-glPlanCumGroundYards=: glPlanCumGroundYards /:ww
-glPlanBackGroundYards=: glPlanBackGroundYards /: ww
-glPlanLatLon=: glPlanLatLon /: ww
-glPlanLayup=: glPlanLayup /: ww
-glPlanRemGroundYards=: glPlanRemGroundYards /:ww
-
-utFilePut glFilepath
-)
 
 NB. =============================================================
 NB. EnKey
