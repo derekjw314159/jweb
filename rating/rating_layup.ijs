@@ -24,7 +24,7 @@ glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 if. fexist glFilepath,'.ijf' do.
 	ww=.utFileGet glFilepath
 	utKeyRead glFilepath,'_plan'
-	utKeyRead glFilepath,'_layup'
+NB.	utKeyRead glFilepath,'_layup'
 	utKeyRead glFilepath,'_tee'
 	err=. ''
 else.
@@ -45,7 +45,6 @@ end.
 
 NB. file exists if we have got this far
 
-
 NB. Read the keyed variables
 ww=. utKeyRead glFilepath,'_plan'
 ix=. glPlanHole=hole
@@ -63,25 +62,16 @@ end.
 
 ww=. ix utKeyRead glFilepath,'_plan' NB. Read one record only
 
-key=. EnKey hole ; '' ; tee ; gender ; ability ; shot
 NB. New item check
-ww=. key utKeyRead glFilepath,'_layup'
-if. ( _4 -: >glLayupID ) do.  NB. Not found
-	glLayupID=: ,key
-	glLayupHole=: ,hole
-	glLayupTee=: ,tee
-	glLayupGender=: ,gender
-	glLayupAbility=: ,ability
-	glLayupShot=: ,shot
-	glLayupRemGroundYards=: glPlanRemGroundYards
-	glLayupType=: ,'L'
-	glLayupUpdateName=: ,<": getenv 'REMOTE_USER'
-	glLayupUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
-	glLayupValue=: ,<'forced'
-	glLayupReason=: ,<'Water'
-	glLayupRollLevel=: ,<'level'
-	glLayupRollFirmness=: ,<'average'
-	ww=. utKeyPut glFilepath,'_layup'
+if. ( -. glPlanLayupType e. 'LR' ) do.  NB. Not found, or transition
+	glPlanLayupType=: ,'L'
+	glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
+	glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
+	glPlanLayupCategory=: ,<'forced'
+	glPlanLayupReason=: ,<'Water'
+	glPlanRollLevel=: ,<''
+	glPlanRollFirmness=: ,<''
+	ww=. utKeyPut glFilepath,'_plan'
 end. 
 
 NB. Calculate default yards (reducing if shot to the green)
@@ -98,7 +88,7 @@ end.
 stdout LF,'<h2>Course : ', glCourseName,EM,EM,'Edit Layup or Roll</h2>'
 
 NB. Sequence the entries
-sequence=. (glLayupType='R') |. 'LR'
+sequence=. (glPlanLayupType='R') |. 'LR'
 extraline=. 0
 
 NB. Print the table of parameters
@@ -106,9 +96,9 @@ stdout LF,'<div class="span-12 last">'
 stdout LF,'<table><thead><tr><th></th><th>Value</th></tr></thead><tbody>'
 
 stdout LF,'<tr><td>Hole:</td><td>',(":1+ ; hole),'</td></tr><tr><td>Tee:</td><td>',>(glTees i. tee){glTeesName
-stdout '</td></tr><tr><td>Player:</td><td>',(>gender{' ' cut 'Man Lady ')
+stdout '</td></tr><tr><td>Player:</td><td>',(>gender{' ' cut 'Man Woman ')
 stdout ' ',(>ability{' ' cut 'Scratch Bogey')
-stdout '</td></tr><tr><td>Shot:</td><td>',(":1+shot),'</td></tr><tr><td>Override Type:</td><td>',(;>('LR'i. glLayupType){' ' cut 'Layup Roll'),'</td></tr></tbody></table></div>'
+stdout '</td></tr><tr><td>Shot:</td><td>',(":1+shot),'</td></tr><tr><td>Override Type:</td><td>',(;>('LR'i. glPlanLayupType){' ' cut 'Layup Roll'),'</td></tr></tbody></table></div>'
 stdout LT1,'<form action="/jw/rating/layup/editpost/',(;glFilename),'" method="post">'
 
 NB. type layup or type roll
@@ -117,11 +107,9 @@ for_seq. sequence do.
 if. seq = 'L' do. 
 
 	stdout LT1,'<div class="span-15 last">'
-NB.	stdout LF,'<h3>Layup</h3>'
-	stdout LT2,'<input type="hidden" name="prevname" value="',(":;glLayupUpdateName),'">'
-	stdout LT2,'<input type="hidden" name="prevtime" value="',(;glLayupUpdateTime),'">'
+	stdout LT2,'<input type="hidden" name="prevname" value="',(":;glPlanUpdateName),'">'
+	stdout LT2,'<input type="hidden" name="prevtime" value="',(;glPlanUpdateTime),'">'
 	stdout LT2,'<input type="hidden" name="keyplan" value="',(;ix),'">'
-	stdout LT2,'<input type="hidden" name="keylayup" value="',(;key),'">'
 	stdout LT2,'<input type="hidden" name="filename" value="',(;glFilename),'">'
 
 	stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
@@ -175,17 +163,17 @@ NB.	stdout LF,'<h3>Layup</h3>'
 
 	NB. Add the rows for the Layup Reason
 	stdout LT3,'<tr>',LT4,'<td>Layup type</td><td colspan="4"><select name="layvalue" id="layvalue" tabindex="5" style="font-size: 8pt; height: 16px;">'
-	for_ll. glLayValue do.
+	for_ll. glLayupCategoryVal do.
 		stdout LT5,'<option value="',(>ll)
-		if. ll = glLayupValue do.
+		if. ll = glPlanLayupCategory do.
 			stdout '" selected>'
 		else. stdout '">'
 		end.
-		stdout (>ll_index{glLayDesc),'</option>'
+		stdout (>ll_index{glLayupCategoryDesc),'</option>'
 	end. 
 	stdout LT4,'</select></td</tr>'
 	stdout LT3,'<tr>',LT4,'<td>Layup Reason</td><td colspan="4">'
-	stdout '<input name="layreason" value="',(;glLayupReason),'" tabindex="6" ',(InputField 15),'></td></tr>'
+	stdout '<input name="layreason" value="',(;glPlanLayupReason),'" tabindex="6" ',(InputField 15),'></td></tr>'
 
 	stdout '</tbody></table></div>'
 
@@ -239,30 +227,25 @@ servername=. getenv 'SERVER_NAME'
 httphost=. getenv 'HTTP_HOST'
 if. -. glSimulate do.
 	if. (-. +. / 'rating/layup/e/' E. httpreferer) +. (-. 'on'-: https) +. (-.  servername -: httphost) +. (-. +. / servername E. httpreferer) do.
-		pagenotvalid ''
+		pagenotfound ''
 	end.
 end.
 
 NB. Assign to variables
+NB. cumbackyards may not exist
+cumbackyards=: 0
+prevcumbackyards=: 0
 xx=. djwCGIPost y ; ' ' cut 'defaulthit cumbackyards prevcumbackyards hityards prevhityards cumyards prevcumyards remyards prevremyards roll prevroll'
 keyplan=: ; keyplan
-keylayup=: ; keylayup
 glFilename=: dltb ;filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
-NB. May not have fields for cumbackyards
-if. _1 = 4!:0 <'cumbackyards' do.
-	cumbackyards=: cumyards
-	prevcumbackyards=: cumbackyards NB. No difference
-end.
-
 NB. Read the current values and check the time stamp
 ww=. utFileGet glFilepath
-ww=. (<keyplan) utKeyRead glFilepath,'_plan'
-ww=. (<keylayup) utKeyRead glFilepath,'_layup'
+ww=. (,<keyplan) utKeyRead glFilepath,'_plan'
 
 NB. Throw error page if updated
-if. (-. glSimulate) *. (-. (;glLayupUpdateTime) -: (;prevtime)) do.
+if. (-. glSimulate) *. (-. (;glPlanUpdateTime) -: (;prevtime)) do.
 	stdout 'Content-type: text/html',LF,LF,'<html>',LF
  	stdout LF,'<head>'
  	stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
@@ -270,75 +253,58 @@ if. (-. glSimulate) *. (-. (;glLayupUpdateTime) -: (;prevtime)) do.
  	stdout LF,'</head><body>'
  	stdout LF,'<div class="container">'
  	stdout LF,TAB,'<div class="span-24">'
- 	stdout LF,TAB,TAB,'<h1>Error updating ',(,;glLayupID),'</h1>'
- 	stdout LF,'<div class="error">Synch error updating ',(;glLayupID)
+ 	stdout LF,TAB,TAB,'<h1>Error updating ',(,;glPlanID),'</h1>'
+ 	stdout LF,'<div class="error">Synch error updating ',(;glPlanID)
  	stdout LF,'</br></br>',(":getenv 'REMOTE_USER'),' started to update record previously saved by ',(;prevname),' at ',;prevtime
- 	stdout LF,'</br><br>It has since been updated by: ',(; glLayupUpdateName),' at ',(;glLayupUpdateTime)
+ 	stdout LF,'</br><br>It has since been updated by: ',(; glPlanUpdateName),' at ',(;glPlanUpdateTime)
  	stdout LF,'</br><br><b>**Update has been CANCELLED**</b>'
  	stdout  ,2$,: '</div>'
- 	stdout LF,'</br><a href="/jw/rating/plan/v/',glFilename,'/',(;":1+glLayupHole),'">Restart plan of hole: ',(;":1+glLayupHole),'</a>'
+ 	stdout LF,'</br><a href="/jw/rating/plan/v/',glFilename,'/',(;":1+glPlanHole),'">Restart plan of hole: ',(;":1+glPlanHole),'</a>'
  	stdout, '</div></body>'
  	exit ''
 end.
 
-glLayupUpdateName=: ,<": getenv 'REMOTE_USER'
-glLayupUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
-glPlanUpdateName=: glLayupUpdateName
-glPlanUpdateTime=: glPlanUpdateTime
-glLayupValue=: ,layvalue
-glLayupReason=: ,layreason
+glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
+glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
+glPlanLayupCategory=: ,layvalue
+glPlanLayupReason=: ,layreason
 
 NB. Check for changes
 deletelayup=. 0
 changed=. 0
 if. cumyards ~: prevcumyards do.
-	changed=. 1
-	glLayupType=: ,'L'
-	glPlanLayupType=: ,'L'
-	glPlanHitYards=: glPlanHitYards + cumyards - prevcumyards
-	glLayupRemGroundYards=: glLayupRemGroundYards + prevcumyards - cumyards
-	NB. All the others will be recalculated
+ 	changed=. 1
+ 	glPlanLayupType=: ,'L'
+ 	glPlanHitYards=: glPlanHitYards + cumyards - prevcumyards
+ 	NB. All the others will be recalculated
 elseif. cumbackyards ~: prevcumbackyards do.
-	changed=. 1
-	glLayupType=: ,'L'
-	glPlanLayupType=: ,'L'
-	glPlanHitYards=: glPlanHitYards + cumbackyards - prevcumbackyards
-	glLayupRemGroundYards=: glLayupRemGroundYards + prevcumbackyards - cumbackyards
-	NB. All the others will be recalculated
+ 	changed=. 1
+ 	glPlanLayupType=: ,'L'
+ 	glPlanHitYards=: glPlanHitYards + cumbackyards - prevcumbackyards
+ 	NB. All the others will be recalculated
 elseif. hityards ~: prevhityards do.
-	changed=. 1
-	glLayupType=: ,'L'
-	glPlanLayupType=: ,'L'
-	glPlanHitYards=: ,hityards 
-	glLayupRemGroundYards=: glLayupRemGroundYards + prevhityards - hityards
-	NB. All the others will be recalculated
+ 	changed=. 1
+ 	glPlanLayupType=: ,'L'
+ 	glPlanHitYards=: ,hityards 
+ 	NB. All the others will be recalculated
 elseif. remyards ~: prevremyards do.
-	changed=. 1
-	glLayupType=: ,'L'
-	glPlanLayupType=: ,'L'
-	glPlanHitYards=: glPlanHitYards + prevremyards - remyards
-	glLayupRemGroundYards=: glLayupRemGroundYards - prevremyards - remyards
-	NB. All the others will be recalculated
+ 	changed=. 1
+ 	glPlanLayupType=: ,'L'
+ 	glPlanHitYards=: glPlanHitYards + prevremyards - remyards
+ 	NB. All the others will be recalculated
 elseif. roll ~: prevroll do.
-	changed=. 1
-	glLayupType=: ,'R'
-	glPlanLayupType=: ,'R'
-	glPlanHitYards=: ,roll 
-	glLayupRemGroundYards=: glLayupRemGroundYards + prevhityards - roll
-	NB. All the others will be recalculated
+ 	changed=. 1
+ 	glPlanLayupType=: ,'R'
+ 	glPlanHitYards=: ,roll 
+ 	NB. All the others will be recalculated
 end.
 
 NB. Write to two files
 if. 1 +. changed do.
-	(,<keylayup) utKeyPut glFilepath,'_layup'
 	(,<keyplan) utKeyPut glFilepath,'_plan'
-
 	NB. Calculate Everything
 	BuildPlan glPlanHole ; glPlanTee ; glPlanGender ; glPlanAbility
-	(,<keylayup) utKeyRead glFilepath,'_layup'
 	(,<keyplan) utKeyRead glFilepath,'_plan'
-	
-	NB. Write another measurepoint record based on original readings
 end.
 
 if. defaulthit = glPlanHitYards do.
@@ -351,21 +317,18 @@ stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 NB. Choose page based on what was pressed
 	if. (0= 4!:0 <'control_delete') +. deletelayup do.
 		NB. Delete the layup record
-		(<keylayup) utKeyDrop glFilepath,'_layup'
-		glPlanHitYards=: defaulthit
+		glPlanHitYards=: ,defaulthit
 		glPlanRecType=: ,'P'
 		glPlanLayupType=: ,' '
 		(<keyplan) utKeyPut glFilepath,'_plan'
 		BuildPlan glPlanHole ; glPlanTee ; glPlanGender ; glPlanAbility
 		(,<keyplan) utKeyRead glFilepath,'_plan' NB. Changed above
-		stdout '</head><body onLoad="redirect(''/jw/rating/plannomap/v/',glFilename,'/',(;":1+glPlanHole),''')"'
+		stdout '</head><body onLoad="redirect(''/jw/rating/plannomap/v/',glFilename,'/',(;":1+glPlanHole),''')">'
 	elseif. 0= 4!:0 <'control_calc' do.
-		stdout '</head><body onLoad="redirect(''',(":httpreferer),''')"'
-
+		stdout '</head><body onLoad="redirect(''',(":httpreferer),''')">'
 	elseif. 1 do.
-		stdout '</head><body onLoad="redirect(''/jw/rating/plannomap/v/',glFilename,'/',(;":1+glPlanHole),''')"'
+		stdout '</head><body onLoad="redirect(''/jw/rating/plannomap/v/',glFilename,'/',(;":1+glPlanHole),''')">'
     end.
 stdout LF,'</body></html>'
 exit ''
 )
-

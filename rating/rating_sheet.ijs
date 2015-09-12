@@ -20,7 +20,6 @@ glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 if. fexist glFilepath,'.ijf' do.
 	ww=.utFileGet glFilepath
 	utKeyRead glFilepath,'_plan'
-	utKeyRead glFilepath,'_layup'
 	utKeyRead glFilepath,'_tee'
 	utKeyRead glFilepath,'_green'
 	err=. ''
@@ -182,7 +181,6 @@ keyy=. <keyy
 if. fexist glFilepath,'.ijf' do.
 	ww=.utFileGet glFilepath
 	utKeyRead glFilepath,'_plan'
-	utKeyRead glFilepath,'_layup'
 	utKeyRead glFilepath,'_tee'
 	err=. ''
 else.
@@ -250,7 +248,6 @@ keyy=. <keyy
 if. fexist glFilepath,'.ijf' do.
 	ww=.utFileGet glFilepath
 	utKeyRead glFilepath,'_plan'
-	utKeyRead glFilepath,'_layup'
 	utKeyRead glFilepath,'_tee'
 	err=. ''
 else.

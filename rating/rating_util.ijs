@@ -376,6 +376,7 @@ label_shot.
 		NB. Nothing to do
 		NB. but do need to restore glPlanID
 		glPlanID=: ,EnKey h ; '' ; t ; g ; ab ; shot
+		glPlanLayupType=: ,' '
 	elseif. 1=$ww do.
 		ww utKeyRead glFilepath,'_plan'
 
@@ -399,10 +400,8 @@ label_shot.
 	NB. Pull normal shot distance
 	NB. Check if there is a layup record
 	defaulthit=.  (<g,ab, 1<.shot){glPlayerDistances
-	glPlanID utKeyRead glFilepath,'_layup'
-	if. ( -. _4 -: >glLayupID) do. NB. Found
-		radius2=. ''$ remgroundyards - glLayupRemGroundYards 
-		glPlanLayupType=: glLayupType
+	if. ( glPlanLayupType e. 'LR') do. NB. Found
+		radius2=. ''$ glPlanHitYards
 	else.
 		radius2=. ''$ defaulthit
  		glPlanLayupType=: ,' '
