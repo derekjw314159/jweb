@@ -299,14 +299,31 @@ for_rr. i. #glPlanID do.
 				stdout '</td>'
 			end.
 		end.
-		stdout '<td colspan="2"><i>Measured Point</i></td>'
-		stdout LT3,'<td>',(": rr{glPlanRemGroundYards),'</td>'
+		stdout '<td colspan="3"><i>Measured Point</i></td>'
+		NB. stdout LT3,'<td>',(": rr{glPlanRemGroundYards),'</td>'
 		stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">Ed</a> <a href="/jw/rating/landing/d/',glFilename,'/',(;rr{glPlanID),'">Del</a>'
 		stdout LT3,'<td>',(":rr{glPlanAlt),'</td>'
 		stdout LT3,'<td>',(":rr{glPlanFWWidth),'</td>'
 		stdout LT3,'<td>',(":rr{glPlanBunkNumber),'</td>'
 		stdout LT3,'<td>',(":rr{glPlanOOBDist),'</td>'
 		stdout LT3,'<td>',(":rr{glPlanTreeDist),'</td>'
+		stdout LT3, '<td></td></tr>'
+	elseif. 'C' = rr{glPlanRecType do.
+		stdout '<tr>'
+		for_t. tees do.
+			stdout '<td>'
+			holelength=. (<(glTees i. t),hole){glTeesYards
+			stdout ": <. 0.5+ holelength - (rr{glPlanMeasDist) 
+			stdout '</td>'
+		end.
+		stdout '<td colspan="3"><i>Carry : ',(;('FWBR' i. rr{glPlanCarryType){'/' cut 'Fairway/Water/Bunkers/Extreme Rough'),'</i></td>'
+		NB. stdout LT3,'<td>',(": rr{glPlanRemGroundYards),'</td>'
+		stdout LT4,'<td><a href="/jw/rating/carry/e/',(glFilename),'/',(;rr{glPlanID),'">Ed</a> <a href="/jw/rating/carry/d/',glFilename,'/',(;rr{glPlanID),'">Del</a>'
+		stdout LT3,'<td></td>'
+		stdout LT3,'<td></td>'
+		stdout LT3,'<td></td>'
+		stdout LT3,'<td></td>'
+		stdout LT3,'<td></td>'
 		stdout LT3, '<td></td></tr>'
 	end.
 end.

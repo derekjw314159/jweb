@@ -60,6 +60,7 @@ if. 0=#ix do.
     djwErrorPage err ; ('No such hole combination : ',}. ; (<'/'),each y) ; ('/jw/rating/plan/v/',filename,'/',":1+hole) ; 'Back to rating plan'
 end.
 
+glPlanMeasDist=: ,yards
 ww=. ix utKeyRead glFilepath,'_plan' NB. Read one record only
 
 NB. New item check

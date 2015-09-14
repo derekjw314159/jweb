@@ -2,10 +2,10 @@ NB. J Utilities for recording data at landing zones
 NB. 
 
 NB. =========================================================
-NB. rating_landing_e
+NB. rating_carry_e
 NB. =========================================================
 NB. View scores for participant
-jweb_rating_landing_e=: 3 : 0
+jweb_rating_carry_e=: 3 : 0
 NB. Retrieve the details
 
 NB. y has two elements only
@@ -39,13 +39,13 @@ end.
 NB. file exists if we have got this far
 NB. Need to check this is a valid shot
 if. -. keyy e. keydir (glFilepath,'_plan') do.
-    djwErrorPage err ; ('No such measurement point : ',}. ; (<'/'),each y) ; ('/jw/rating/plan/v/',glFilename) ; 'Back to rating plan'
+    djwErrorPage err ; ('No such carry point : ',}. ; (<'/'),each y) ; ('/jw/rating/plan/v/',glFilename) ; 'Back to rating plan'
 end.
 
 NB. Read the single record
 keyy utKeyRead glFilepath,'_plan'
 
-stdout LF,'<h2>Course : ', glCourseName,EM,EM,'Landing Zone Measurements</h2>'
+stdout LF,'<h2>Course : ', glCourseName,EM,EM,'Carry Point</h2>'
 
 NB. Work out the back tee
 ww=. I. glTeHole = ''$glPlanHole
@@ -53,53 +53,22 @@ ww=. ww /: glTees i. ww{glTeTee
 ww=.  +. /"1  ww { glTeMeasured NB. If either measured - don't need to split by gender
 backtee=. ''${. ww # glTees
 
-if. 'P'=glPlanRecType do.
-	NB. Print the table of parameters
-	stdout LF,'<div class="span-12 last">'
-	stdout LF,'<table><thead><tr><th>Landing Zone</th><th>Value</th></tr></thead><tbody>'
+stdout LF,'<div class="span-12 last">'
+stdout LF,'<table><thead><tr><th>Carry Point</th><th>Value</th></tr></thead><tbody>'
 
-	stdout LF,'<tr><td>Hole:</td><td>',(":1+ ; glPlanHole),'</td></tr>'
-	stdout LF,'<tr><td>Hit distance:</td><td>',(": ; glPlanHitYards),'</td></tr>'
+stdout LF,'<tr><td>Hole:</td><td>',(":1+ ; glPlanHole),'</td></tr>'
 
-	for_t. (glTees) do.
-		if. (t=glPlanTee)  do.
-			stdout LT3,'<tr>',LT4,'<td><b>Distance from : ',>t_index { glTeesName
-			stdout '</b></td>'
-			holelength=. (<t_index,glPlanHole){glTeesYards
-			cumyards=.  <. 0.5+ holelength - (glPlanMeasDist) 
-			stdout '<td>',(":,cumyards),'</td></tr>'
-		NB. Backtee different from tee in question
-		elseif. (t=backtee) do.
-			stdout LT3,'<tr>',LT4,'<td><i>Distance from : ',>t_index { glTeesName
-			stdout '</i></td>'
-			holelength=. (<t_index,glPlanHole){glTeesYards
-			cumyards=.  <. 0.5+ holelength - (glPlanMeasDist) 
-			stdout '<td>',(":,cumyards),'</td></tr>'
-		end.
-	end.
-	stdout LF,'<tr><td>Player:</td><td>',(>glPlanGender{' ' cut 'Man Lady ')
-	stdout ' ',(>glPlanAbility{' ' cut 'Scratch Bogey')
-	stdout LF,'</td></tr>'
-	stdout LT4,'<tr><td>Shot:</td><td>',(":1+glPlanShot),'</td></tr>'
-	stdout LT2,'</tbody></table></div>'
-elseif. 'M'=glPlanRecType do.
-	stdout LF,'<div class="span-12 last">'
-	stdout LF,'<table><thead><tr><th>Measurement Point</th><th>Value</th></tr></thead><tbody>'
-
-	stdout LF,'<tr><td>Hole:</td><td>',(":1+ ; glPlanHole),'</td></tr>'
-
-	for_t. (glTees) do.
-			stdout LT3,'<tr>',LT4,'<td>Distance from : ',>t_index { glTeesName
-			stdout '</td>'
-			holelength=. (<t_index,glPlanHole){glTeesYards
-			cumyards=.  <. 0.5+ holelength - (glPlanMeasDist) 
-			stdout '<td>',(":,cumyards),'</td></tr>'
-		NB. Backtee different from tee in question
-	end.
-	stdout LT2,'</tbody></table></div>'
+for_t. (glTees) do.
+		stdout LT3,'<tr>',LT4,'<td>Distance from : ',>t_index { glTeesName
+		stdout '</td>'
+		holelength=. (<t_index,glPlanHole){glTeesYards
+		cumyards=.  <. 0.5+ holelength - (glPlanMeasDist) 
+		stdout '<td>',(":,cumyards),'</td></tr>'
+	NB. Backtee different from tee in question
 end.
+stdout LT2,'</tbody></table></div>'
 
-stdout LT1,'<form action="/jw/rating/landing/editpost/',(;glFilename),'" method="post">'
+stdout LT1,'<form action="/jw/rating/carry/editpost/',(;glFilename),'" method="post">'
 
 NB. Hidden variables
 stdout LT1,'<div class="span-15 last">'
@@ -109,36 +78,38 @@ stdout LT2,'<input type="hidden" name="keyplan" value="',(;keyy),'">'
 stdout LT2,'<input type="hidden" name="filename" value="',(;glFilename),'">'
 
 NB. Table of values - Fairway
-stdout LT1,'<h4>Fairway & Topology</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>Alt</th><th>FW Width</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>From tee</th><th>Distance</th><th>Carry type</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
-stdout LT4,'<td><input value="',(":;glPlanAlt),'" tabindex="1" ',(InputFieldnum 'alt'; 3),'>',LT4,'</td>'
-stdout LT4,'<td><input value="',(":;glPlanFWWidth),'" tabindex="1" ',(InputFieldnum 'fwwidth'; 3),'>',LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'fromtee' ; 1 ; glTeesName ; (<"0 glTees) ; <<''$glPlanTee
+t_index=. glTees i. glPlanTee
+dist=. (<t_index, glPlanHole){glTeesYards
+stdout LT4,'</td>'
+stdout LT4,'<td><input value="',(":;dist - glPlanRemGroundYards),'" tabindex="2" ',(InputFieldnum 'yards'; 3),'>',LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'type' ; 3 ; ('/' cut 'Fairway/Water/Bunkers/Extreme Rough'); (<"0 'FWBR') ; <<''$glPlanCarryType
+stdout LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table></div>'
-
 
 NB. Submit buttons
 stdout LT1,'<div class="span-15 last">'
 
 stdout LF,'<input type="submit" name="control_calc" value="Calc" tabindex="',(":2),'">'
 stdout LF,'     <input type="submit" name="control_done" value="Done" tabindex="',(,":3),'">'
-if. 'M'=glPlanRecType do. NB. Only delete on measurement point
-	stdout LF,'     <input type="submit" name="control_delete" value="Delete this M/Point" tabindex="',(,":4),'"></form>'
-end.
+stdout LF,'     <input type="submit" name="control_delete" value="Delete this M/Point" tabindex="',(,":4),'"></form>'
 stdout LF,'</div>' NB. end main container
 stdout '</body></html>'
-res=. 1
 exit ''
 )
 
 NB. =========================================================
-NB. jweb_rating_landing_editpost
+NB. jweb_rating_carry_editpost
 NB. =========================================================
 NB. Process entries after edits to landing 
 NB. based on the contents after the "post"
-jweb_rating_landing_editpost=: 3 : 0
+jweb_rating_carry_editpost=: 3 : 0
 y=. cgiparms ''
 y=. }. y NB. Drop the URI GET string
 NB. Perform security checks
@@ -148,13 +119,13 @@ https=. getenv 'HTTPS'
 servername=. getenv 'SERVER_NAME'
 httphost=. getenv 'HTTP_HOST'
 if. -. glSimulate do.
-	if. (-. +. / 'rating/landing/e/' E. httpreferer) +. (-. 'on'-: https) +. (-.  servername -: httphost) +. (-. +. / servername E. httpreferer) do.
+	if. (-. +. / 'rating/carry/e/' E. httpreferer) +. (-. 'on'-: https) +. (-.  servername -: httphost) +. (-. +. / servername E. httpreferer) do.
 		pagenotvalid ''
 	end.
 end.
 
 NB. Assign to variables
-xx=. djwCGIPost y ; ' ' cut 'alt fwwidth'
+xx=. djwCGIPost y ; ' ' cut 'yards'
 glFilename=: dltb ;filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
@@ -186,9 +157,12 @@ end.
 
 glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
 glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
-glPlanAlt=: ,alt
-glPlanFWWidth=: ,fwwidth
-
+glPlanTee=: ,>fromtee
+t_index=. glTees i. glPlanTee
+dist=. (<t_index, glPlanHole){glTeesYards
+glPlanRemGroundYards=: , dist - yards
+glPlanMeasDist=: glPlanRemGroundYards
+glPlanCarryType=: ,>type
 NB. Write to files
 keyplan utKeyPut glFilepath,'_plan'
 
@@ -210,10 +184,10 @@ exit ''
 )
 
 NB. =========================================================
-NB. rating_landingcopy_e
+NB. rating_carrycopy_e
 NB. =========================================================
 NB. Copy data from nearest point
-jweb_rating_landingcopy_e=: 3 : 0
+jweb_rating_carrycopy_e=: 3 : 0
 NB. Retrieve the details
 
 NB. y has two elements only
@@ -267,7 +241,7 @@ if. 0<#ww do.
     diff=. <. / diff
 
     if. diff < 30 do. NB. Must be less than 30 yards
-	(ix{glPlanID) CopyPlanRecord ww{glPlanID
+	(ix{glPlanID) PlanCopyRecord ww{glPlanID
     end.
 end.
 
@@ -277,10 +251,10 @@ exit ''
 )
 
 NB. =========================================================
-NB. rating_landing_d
+NB. rating_carry_d
 NB. =========================================================
 NB. Copy data from nearest point
-jweb_rating_landing_d=: 3 : 0
+jweb_rating_carry_d=: 3 : 0
 NB. Retrieve the details
 
 NB. y has two elements only

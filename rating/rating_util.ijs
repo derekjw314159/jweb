@@ -422,6 +422,7 @@ label_shot.
 	glPlanGender=: ,g
 	glPlanAbility=: ,ab
 	glPlanShot=: ,shot
+	ClearPlanRecord '' NB. Zero numerics
 	glPlanHitYards=: , <. 0.5+ 1{ww
 	cumgroundyards=. <. 0.5 + cumgroundyards + 1{ww
 	remgroundyards=. <. 0.5  + remgroundyards - 1{ww
@@ -505,11 +506,11 @@ if. 0=$$hole do. res=. ''$res end.
 )
 
 NB. =============================================================
-NB. CopyMeasure
+NB. CopyPlanRecord
 NB. =============================================================
 NB. Copy measurement point information from y to x keys
 NB. -------------------------------------------------------------
-CopyMeasure=: 4 : 0
+CopyPlanRecord=: 4 : 0
 to=. x
 from=. y
 (to, from) utKeyRead glFilepath,'_plan'
@@ -531,7 +532,7 @@ glPlanRRInconsistent=: 1 1 { glPlanRRInconsistent
 glPlanRRMounds=: 1 1 { glPlanRRMounds
 glPlanRRRiseDrop=: 1 1 { glPlanRRRiseDrop
 glPlanRRUnpleasant=: 1 1 {glPlanRRUnpleasant
-
+glPlanRollTwice=: 1 1 {glPlanRollTwice
 
 utKeyPut glFilepath,'_plan'
 )
@@ -581,11 +582,11 @@ for_u. uniq do.
 	NB. Look for measurement point at the same distance
 	ww=. glPlanHole = ix{glPlanHole
 	ww=. ww *. glPlanRecType='M'
-	ww=. ww *. glPlanRemGroundYards = ix{glPlanRemGroundYards
+	ww=. ww *. glPlanMeasDist = ix{glPlanMeasDist
 	NB. Must be non-zero because already compressed out for measurement points
 	cp=. ww # glPlanID
 	if. 0<$cp do.
-		u CopyMeasure 0{cp NB. Only the first one
+		u CopyPlanRecord 0{cp NB. Only the first one
 		NB. Delete measurement point because no longer needed
 		cp utKeyDrop glFilepath,'_plan'
 		NB. Next element in loop
@@ -594,10 +595,51 @@ for_u. uniq do.
 	NB. Look for ordinary point at the same distance
 	ww=. glPlanHole = ix{glPlanHole
 	ww=. ww *. glPlanRecType='P'
-	ww=. ww *. glPlanRemGroundYards = ix{glPlanRemGroundYards
+	ww=. ww *. glPlanMeasDist = ix{glPlanMeasDist
 	cp=. ww # glPlanID
 	if. 0<$cp do.
-		u CopyMeasure 0{cp NB. Only the first one
+		u CopyPlanRecord 0{cp NB. Only the first one
 	end.
 end.
+)
+
+NB. ===========================================================
+NB. ClearPlanRecord
+NB. ===========================================================
+ClearPlanRecord=: 3 : 0
+NB. Don't overwrite the key, tee, hole etc
+NB. glPlanID
+NB. glPlanTee=: ,t
+NB. glPlanHole=: ,h
+NB. glPlanGender=: ,g
+NB. glPlanAbility=: ,ab
+NB. glPlanShot=: ,shot
+NB. glPlanRecType
+glPlanHitYards=: , 0
+glPlanCumGroundYards=: ,0
+glPlanLatLon=: , 0
+glPlanRemGroundYards=: ,0
+glPlanCarryType=: ,' '
+glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
+glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
+glPlanMeasDist=: ,0
+glPlanCarryDist=: ,<' '
+glPlanFWWidth=: ,0
+glPlanOOBDist=: ,0
+glPlanTreeDist=: ,0
+glPlanAlt=: ,0
+glPlanBunkNumber=: ,0
+glPlanLatWaterDist=: ,0
+glPlanDefaultHit=: ,0
+glPlanRRHeight=: ,0
+glPlanRRInconsistent=:,0
+glPlanRRMounds=: ,0
+glPlanRRRiseDrop=: ,0
+glPlanRRUnpleasant=: ,0
+glPlanRollTwice=: ,(#glPlanID)$0
+glPlanFWObstructed=: ,(#glPlanID)$0
+glPlanFWSlope=: ,(#glPlanID)$0
+glPlanFWStance=: ,(#glPlanID)$0
+glPlanFWUnpleasant=: ,(#glPlanID)$0
+glPlanFWWidthAdj=: ,(#glPlanID)$0
 )
