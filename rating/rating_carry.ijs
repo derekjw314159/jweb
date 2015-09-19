@@ -2,18 +2,50 @@ NB. J Utilities for recording data at landing zones
 NB. 
 
 NB. =========================================================
+NB. jweb_rating_carry_e
+NB. View scores for participant
+NB. =========================================================
+jweb_rating_carry_e=: 3 : 0
+NB. y=.cgiparms ''
+if. 2=#y do.
+    'e' rating_carry_e  y
+elseif. 1 do.
+    pagenotfound ''
+end.
+)
+
+NB. =========================================================
+NB. jweb_rating_carry_a
+NB. View scores for participant
+NB. =========================================================
+jweb_rating_carry_a=: 3 : 0
+NB. y=.cgiparms ''
+if. 2=#y do.
+    'a' rating_carry_e  y
+elseif. 1 do.
+    pagenotfound ''
+end.
+)
+
+
+
+NB. =========================================================
 NB. rating_carry_e
 NB. =========================================================
 NB. View scores for participant
-jweb_rating_carry_e=: 3 : 0
+rating_carry_e=: 4 : 0
 NB. Retrieve the details
 
 NB. y has two elements only
-
-'filename keyy'=. y
+if. 'a' = x do.
+   'filename hole'=. y
+   hole=. ". hole
+else.
+    'filename keyy'=. y
+    keyy=. <keyy
+end.
 glFilename=: dltb filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
-keyy=. <keyy
 
 if. fexist glFilepath,'.ijf' do.
 	ww=.utFileGet glFilepath
@@ -34,6 +66,36 @@ stdout LF,'<div class="container">'
 NB. Error page - No such course
 if. 0<#err do.
     djwErrorPage err ; ('No such course name : ',glFilename) ; '/jw/rating/plan/v' ; 'Back to rating plan'
+end.
+
+NB. Add a new carry point
+if. 'a' = x do.
+    utKeyRead glFilepath,'_plan'
+    ww=. glPlanHole = hole
+    ww=. ww *. glPlanRecType='C'
+    ww=. I. ww
+    if. 0=#ww do.
+	ind=. 0
+    else.
+	ind=. (<4) }. each ww{glPlanID
+	ind=. >. / (> ". each ind)
+	ind=. 1 + ind
+    end.
+    keyy=. ,< (;'r<0>2.0' 8!:0 hole),'-C',": ind
+    (,'_default') utKeyRead glFilepath,'_plan'
+    glPlanID=: keyy
+    glPlanHole=: hole
+    t_index=. _1 + #glTees
+    dist=. (<t_index,hole){glTeesYards
+    glPlanTee=: ,t_index{glTees
+    glPlanGender=: ,_1
+    glPlanAbility=: ,_1
+    glPlanShot=: ,_1
+    glPlanRemGroundYards=: ,dist
+    glPlanMeasDist=: ,dist
+    glPlanRecType=: ,'C'
+    glPlanCarryType=: ,'F'
+    utKeyPut glFilepath,'_plan'
 end.
 
 NB. file exists if we have got this far
@@ -86,7 +148,7 @@ djwSelect 'fromtee' ; 1 ; glTeesName ; (<"0 glTees) ; <<''$glPlanTee
 t_index=. glTees i. glPlanTee
 dist=. (<t_index, glPlanHole){glTeesYards
 stdout LT4,'</td>'
-stdout LT4,'<td><input value="',(":;dist - glPlanRemGroundYards),'" tabindex="2" ',(InputFieldnum 'yards'; 3),'>',LT4,'</td>'
+stdout LT4,'<td><input value="',(":;dist - glPlanMeasDist),'" tabindex="2" ',(InputFieldnum 'yards'; 3),'>',LT4,'</td>'
 stdout LT4,'<td>'
 djwSelect 'type' ; 3 ; ('/' cut 'Fairway/Water/Bunkers/Extreme Rough'); (<"0 'FWBR') ; <<''$glPlanCarryType
 stdout LT4,'</td>'
@@ -98,7 +160,7 @@ stdout LT1,'<div class="span-15 last">'
 
 stdout LF,'<input type="submit" name="control_calc" value="Calc" tabindex="',(":2),'">'
 stdout LF,'     <input type="submit" name="control_done" value="Done" tabindex="',(,":3),'">'
-stdout LF,'     <input type="submit" name="control_delete" value="Delete this M/Point" tabindex="',(,":4),'"></form>'
+stdout LF,'     <input type="submit" name="control_delete" value="Delete this Carry" tabindex="',(,":4),'"></form>'
 stdout LF,'</div>' NB. end main container
 stdout '</body></html>'
 exit ''
@@ -119,7 +181,7 @@ https=. getenv 'HTTPS'
 servername=. getenv 'SERVER_NAME'
 httphost=. getenv 'HTTP_HOST'
 if. -. glSimulate do.
-	if. (-. +. / 'rating/carry/e/' E. httpreferer) +. (-. 'on'-: https) +. (-.  servername -: httphost) +. (-. +. / servername E. httpreferer) do.
+	if. (-. +. / 'rating/carry/' E. httpreferer) +. (-. 'on'-: https) +. (-.  servername -: httphost) +. (-. +. / servername E. httpreferer) do.
 		pagenotvalid ''
 	end.
 end.
@@ -179,73 +241,6 @@ NB. Choose page based on what was pressed
 	elseif. 1 do.
 		stdout '</head><body onLoad="redirect(''/jw/rating/plannomap/v/',glFilename,'/',(;":1+glPlanHole),''')"'
     end.
-stdout LF,'</body></html>'
-exit ''
-)
-
-NB. =========================================================
-NB. rating_carrycopy_e
-NB. =========================================================
-NB. Copy data from nearest point
-jweb_rating_carrycopy_e=: 3 : 0
-NB. Retrieve the details
-
-NB. y has two elements only
-
-'filename keyy'=. y
-glFilename=: dltb filename
-glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
-keyy=. <keyy
-
-if. fexist glFilepath,'.ijf' do.
-	ww=.utFileGet glFilepath
-	utKeyRead glFilepath,'_plan'
-	utKeyRead glFilepath,'_tee'
-	err=. ''
-else.
-	err=. 'No such course : ',glFilename
-end.
-
-stdout 'Content-type: text/html',LF,LF,'<html>',LF
-stdout LF,'<head>'
-stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
-djwBlueprintCSS ''
-stdout LF,'</head><body>'
-stdout LF,'<div class="container">'
-
-NB. Error page - No such course
-if. 0<#err do.
-    djwErrorPage err ; ('No such course name : ',glFilename) ; '/jw/rating/plan/v' ; 'Back to rating plan'
-end.
-
-NB. file exists if we have got this far
-NB. Need to check this is a valid shot
-if. -. keyy e. keydir (glFilepath,'_plan') do.
-    djwErrorPage err ; ('No such measurement point : ',}. ; (<'/'),each y) ; ('/jw/rating/plan/v/',glFilename) ; 'Back to rating plan'
-end.
-
-NB. Read all the records
-utKeyRead glFilepath,'_plan'
-ix=. ''$glPlanID i. keyy
-
-NB. Look for measurement point at the nearest distance
-hole=. ix{glPlanHole
-ww=. I. glPlanHole = hole
-ww=. ww -. ix NB. can't be self
-ww=.  ( 0< ww { glPlanAlt + glPlanFWWidth + glPlanBunkNumber + glPlanOOBDist + glPlanTreeDist ) # ww
-
-if. 0<#ww do.
-
-    diff=. |(ww { glPlanRemGroundYards) - ix{glPlanRemGroundYards
-    ww=. (diff i. <. / diff) { ww
-    diff=. <. / diff
-
-    if. diff < 30 do. NB. Must be less than 30 yards
-	(ix{glPlanID) PlanCopyRecord ww{glPlanID
-    end.
-end.
-
-stdout '</head><body onLoad="redirect(''/jw/rating/plannomap/v/',glFilename,'/',(;":1+hole),''')"'
 stdout LF,'</body></html>'
 exit ''
 )

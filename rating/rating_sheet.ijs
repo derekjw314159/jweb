@@ -50,13 +50,12 @@ if.  (0=#ww) do.
     djwErrorPage err ; ('No such sheet : ',}. ; (<'/'),each y) ; ('/jw/rating/plannomap/v/',glFilename) ; 'Back to rating plan'
 end.
 
-
 stdout LF,'<h2>', glCourseName,EM,'Hole=',(":1+hole),' Tee=',(;(tee=glTees)#glTeesName),' ',(>gender{' ' cut' Men Women'),EM,'Yards=',(":(<(glTees i. tee),hole){glTeesYards),'</h2>'
 NB. Order by ability, shot
 ww=. ww /: ww{glPlanShot
 ww=. ww /: ww{glPlanAbility
 
-	NB. Print the table of parameters
+NB. Print the table of shot distances
 stdout LF,'<div class="span-6 last">'
 stdout LF,'<table><thead><tr><th>Shots Played</th>'
 for_shot. i. 4 do.
@@ -77,8 +76,9 @@ for_ability. i. 2 do.
     stdout LT3,'</tr>'
 end.
 stdout LT3,'</tbody></table>'
-    
 stdout LF,'</div>' 
+
+
 stdout LF,'<div class="span-20 last">'
 stdout LF,'<a href="/jw/rating/plannomap/v/',(glFilename),'/',(":1+hole),'">Return to plan</a>'
 stdout LF,'</div>' 

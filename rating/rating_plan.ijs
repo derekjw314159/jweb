@@ -204,7 +204,7 @@ for_t.  i. #glTees do.
 	stdout LT3,'<td>',(": glTeAlt),'</td>' NB. Altitude
 	for_gender. 0 1 do.
 	    if. (gender{,glTeMeasured) do.
-		stdout LT3,'<td><a href="/jw/rating/sheet/',glFilename,'/',(":hole),'/',(t{glTees),'/',(":gender),'">y</a></td>'
+		stdout LT3,'<td><a href="/jw/rating/report/',glFilename,'/',(":hole),'/',(": gender),'/',(t{glTees),'" target="_blank" >y</a></td>'
 	    else.
 		stdout LT3,'<td>-</td>'
 	    end.
@@ -218,7 +218,6 @@ stdout LF,TAB,'<div class="span-24 last">'
 
 stdout LF,'<table>'
 stdout LF,'<thead><tr>'
-NB. Work out the tees measured
 utKeyRead glFilepath,'_tee'
 ww=. I. glTeHole = hole
 ww=. (+. /"1 ww{glTeMeasured ) # ww{glTeTee NB. Either gender
@@ -227,7 +226,7 @@ tees=. (glTees e. ww) # glTees
 for_t. tees do.
 	stdout '<th>',(>(glTees i. t){glTeesName),'</th>'
 end.
-stdout '<th>Shot</th><th>Hit</th><th>ToGreen</th><th>Edits</th><th>Alt</th><th>F/width</th><th>#Bunk</th><th>Dist OB</th><th>Dist Tr</th><th>F/w slope</th></tr></thead><tbody>'
+stdout '<th>Shot</th><th>Hit</th><th>ToGreen</th><th>Edits</th><th>Alt</th><th>F/width</th><th>Bunk?</th><th>Dist OB</th><th>Dist Tr</th><th>Dist Wat</th><th>F/w slope</th></tr></thead><tbody>'
 NB. Sort the records and re-read
 rr=. I. glPlanHole=hole
 rr=. rr /: rr { glPlanShot
@@ -237,6 +236,15 @@ rr=. rr /: glTees i. rr { glPlanTee
 rr=. rr /: 'CPM' i. rr { glPlanRecType
 rr=. (rr { glPlanID) \: rr { glPlanMeasDist
 rr utKeyRead glFilepath,'_plan'
+
+NB. Add buttons first
+stdout LT3,'<tr>',LT4,'<td colspan="8">'
+stdout '<a href="/jw/rating/carry/a/',(glFilename),'/'
+stdout ;": 0{glPlanHole
+stdout '">Add carry point</a>',EM
+stdout '<a href="/jw/rating/squeeze/a/',(glFilename),'/'
+stdout ;": 0{glPlanHole
+stdout '">Add squeeze/chute</a></td></tr>'
 
 for_rr. i. #glPlanID do.
 	if. 'P' = rr{glPlanRecType do.
@@ -274,12 +282,13 @@ for_rr. i. #glPlanID do.
 
 		    stdout '<td>',(":rr{glPlanAlt),'</td>'
 		    stdout LT3,'<td>',(":rr{glPlanFWWidth),'</td>'
-		    stdout LT3,'<td>',(":rr{glPlanBunkNumber),'</td>'
+		    stdout LT3,'<td>',((rr{glPlanBunkNumber){'-y'),'</td>'
 		    stdout LT3,'<td>',(":rr{glPlanOOBDist),'</td>'
 		    stdout LT3,'<td>',(":rr{glPlanTreeDist),'</td>'
+		    stdout LT3,'<td>',(":rr{glPlanLatWaterDist),'</td>'
 		    stdout LT3, '<td></td>'
 		else.
-		    stdout LT4,'<td></td><td></td><td></td><td></td><td></td><td></td><td></td>' NB. At green
+		    stdout LT4,'<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>' NB. At green
 		end.
 		    stdout LT3,'</tr>'
 
@@ -304,9 +313,10 @@ for_rr. i. #glPlanID do.
 		stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">Ed</a> <a href="/jw/rating/landing/d/',glFilename,'/',(;rr{glPlanID),'">Del</a>'
 		stdout LT3,'<td>',(":rr{glPlanAlt),'</td>'
 		stdout LT3,'<td>',(":rr{glPlanFWWidth),'</td>'
-		stdout LT3,'<td>',(":rr{glPlanBunkNumber),'</td>'
+		stdout LT3,'<td>',((rr{glPlanBunkNumber){'-y'),'</td>'
 		stdout LT3,'<td>',(":rr{glPlanOOBDist),'</td>'
 		stdout LT3,'<td>',(":rr{glPlanTreeDist),'</td>'
+		stdout LT3,'<td>',(":rr{glPlanLatWaterDist),'</td>'
 		stdout LT3, '<td></td></tr>'
 	elseif. 'C' = rr{glPlanRecType do.
 		stdout '<tr>'
@@ -319,6 +329,25 @@ for_rr. i. #glPlanID do.
 		stdout '<td colspan="3"><i>Carry : ',(;('FWBR' i. rr{glPlanCarryType){'/' cut 'Fairway/Water/Bunkers/Extreme Rough'),'</i></td>'
 		NB. stdout LT3,'<td>',(": rr{glPlanRemGroundYards),'</td>'
 		stdout LT4,'<td><a href="/jw/rating/carry/e/',(glFilename),'/',(;rr{glPlanID),'">Ed</a> <a href="/jw/rating/carry/d/',glFilename,'/',(;rr{glPlanID),'">Del</a>'
+		stdout LT3,'<td></td>'
+		stdout LT3,'<td></td>'
+		stdout LT3,'<td></td>'
+		stdout LT3,'<td></td>'
+		stdout LT3,'<td></td>'
+		stdout LT3,'<td></td>'
+		stdout LT3, '<td></td></tr>'
+	elseif. 'Q' = rr{glPlanRecType do.
+		stdout '<tr>'
+		for_t. tees do.
+			stdout '<td>'
+			holelength=. (<(glTees i. t),hole){glTeesYards
+			stdout ": <. 0.5+ holelength - (rr{glPlanMeasDist) 
+			stdout '</td>'
+		end.
+		stdout '<td colspan="3"><i>Squeeze/Chute : ',(;('TWBR' i. rr{glPlanSqueezeType){'/' cut 'Trees/Water/Bunkers/Extreme Rough'),' width=',(": rr{glPlanSqueezeWidth),'</i></td>'
+		NB. stdout LT3,'<td>',(": rr{glPlanRemGroundYards),'</td>'
+		stdout LT4,'<td><a href="/jw/rating/squeeze/e/',(glFilename),'/',(;rr{glPlanID),'">Ed</a> <a href="/jw/rating/squeeze/d/',glFilename,'/',(;rr{glPlanID),'">Del</a>'
+		stdout LT3,'<td></td>'
 		stdout LT3,'<td></td>'
 		stdout LT3,'<td></td>'
 		stdout LT3,'<td></td>'
