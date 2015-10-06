@@ -82,7 +82,7 @@ if. 'a' = x do.
 	ind=. 1 + ind
     end.
     keyy=. ,< (;'r<0>2.0' 8!:0 hole),'-C',": ind
-    (,'_default') utKeyRead glFilepath,'_plan'
+    (,<'_default') utKeyRead glFilepath,'_plan'
     glPlanID=: keyy
     glPlanHole=: hole
     t_index=. _1 + #glTees

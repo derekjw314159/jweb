@@ -226,7 +226,7 @@ tees=. (glTees e. ww) # glTees
 for_t. tees do.
 	stdout '<th>',(>(glTees i. t){glTeesName),'</th>'
 end.
-stdout '<th>Shot</th><th>Hit</th><th>ToGreen</th><th>Edits</th><th>Alt</th><th>F/width</th><th>Bunk?</th><th>Dist OB</th><th>Dist Tr</th><th>Dist Wat</th><th>F/w slope</th></tr></thead><tbody>'
+stdout '<th>Shot</th><th>Hit</th><th>ToGreen</th><th>Edits</th><th>Alt</th><th>F/width</th><th>Bunk?</th><th>Dist OB</th><th>Dist Tr</th><th>Tree Rec</th><th>Dist Wat</th><th>F/w slope</th><th colspan=3>Other</th></tr></thead><tbody>'
 NB. Sort the records and re-read
 rr=. I. glPlanHole=hole
 rr=. rr /: rr { glPlanShot
@@ -285,10 +285,13 @@ for_rr. i. #glPlanID do.
 		    stdout LT3,'<td>',((rr{glPlanBunkNumber){'-y'),'</td>'
 		    stdout LT3,'<td>',(":rr{glPlanOOBDist),'</td>'
 		    stdout LT3,'<td>',(":rr{glPlanTreeDist),'</td>'
+		    stdout LT3,'<td>',(;(glTreeRecovVal i. rr{glPlanTreeRecov){glTreeRecovDesc),'</td>'
 		    stdout LT3,'<td>',(":rr{glPlanLatWaterDist),'</td>'
 		    stdout LT3, '<td></td>'
+		    stdout LT3,'<td colspan=3>','','</td>'
+		    
 		else.
-		    stdout LT4,'<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>' NB. At green
+		    stdout LT4,'<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td colspan=3></td>' NB. At green
 		end.
 		    stdout LT3,'</tr>'
 
@@ -316,8 +319,10 @@ for_rr. i. #glPlanID do.
 		stdout LT3,'<td>',((rr{glPlanBunkNumber){'-y'),'</td>'
 		stdout LT3,'<td>',(":rr{glPlanOOBDist),'</td>'
 		stdout LT3,'<td>',(":rr{glPlanTreeDist),'</td>'
+		stdout LT3,'<td>',(;(glTreeRecovVal i. rr{glPlanTreeRecov){glTreeRecovDesc),'</td>'
 		stdout LT3,'<td>',(":rr{glPlanLatWaterDist),'</td>'
-		stdout LT3, '<td></td></tr>'
+		stdout LT3, '<td></td>'
+		stdout LT3,'<td colspan=3>','','</td>'
 	elseif. 'C' = rr{glPlanRecType do.
 		stdout '<tr>'
 		for_t. tees do.
@@ -335,7 +340,8 @@ for_rr. i. #glPlanID do.
 		stdout LT3,'<td></td>'
 		stdout LT3,'<td></td>'
 		stdout LT3,'<td></td>'
-		stdout LT3, '<td></td></tr>'
+		stdout LT3,'<td></td>'
+		stdout LT3, '<td colspan=3></td></tr>'
 	elseif. 'Q' = rr{glPlanRecType do.
 		stdout '<tr>'
 		for_t. tees do.
@@ -353,7 +359,8 @@ for_rr. i. #glPlanID do.
 		stdout LT3,'<td></td>'
 		stdout LT3,'<td></td>'
 		stdout LT3,'<td></td>'
-		stdout LT3, '<td></td></tr>'
+		stdout LT3,'<td></td>'
+		stdout LT3, '<td colspan=3></td></tr>'
 	end.
 end.
 
