@@ -93,7 +93,7 @@ if. 'a' = x do.
     glPlanShot=: ,_1
     glPlanRemGroundYards=: ,dist
     glPlanMeasDist=: ,dist
-    glPlanRecType=: ,'C'
+    glPlanRecType=: ,'Q'
     glPlanSqueezeType=: ,'T'
     utKeyPut glFilepath,'_plan'
 end.
@@ -227,7 +227,7 @@ dist=. (<t_index, glPlanHole){glTeesYards
 glPlanRemGroundYards=: , dist - yards
 glPlanMeasDist=: glPlanRemGroundYards
 glPlanSqueezeType=: ,>type
-glPlanSqueezeWIdth=: ,width
+glPlanSqueezeWidth=: ,width
 NB. Write to files
 keyplan utKeyPut glFilepath,'_plan'
 

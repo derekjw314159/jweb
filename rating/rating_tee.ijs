@@ -171,9 +171,11 @@ end.
 
 NB. Write to files
 keytee utKeyPut glFilepath,'_tee'
+utKeyPut glFilepath,'_green'
 BuildPlan glTeHole ; glTeTee ; '' ; '' ; ''
 keytee utKeyRead glFilepath,'_tee'
-utKeyPut glFilepath,'_green'
+utKeyRead glFilepath,'_green'
+((glGrHole=hole)#glGrID) utKeyRead glFilepath,'_green'
 
 stdout 'Content-type: text/html',LF,LF
 stdout LF,'<html><head>' 

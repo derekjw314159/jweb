@@ -346,7 +346,7 @@ for_ab. abilities do.
 	cumgroundyards=. 0 
 	path=. LatLontoFullOS PathTeeToGreen h ; t
 	remgroundyards=. <. 0.5 + glMY * +/ |(}.path) - }:path
-	glTeesGroundYards=: <. 0.5+remgroundyards (< (glTees i. t), h)}glTeesGroundYards
+	NB. glTeesGroundYards=: <. 0.5+remgroundyards (< (glTees i. t), h)}glTeesGroundYards
 	path=. LatLontoFullOS PathTeeToGreen h ; backtee
 	rembackyards=. <. 0.5 + glMY * +/ |(}.path) - }:path
 	cumbackyards=. rembackyards - remgroundyards
