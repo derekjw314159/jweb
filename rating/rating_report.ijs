@@ -11,7 +11,7 @@ pdfMulti=: 3 : 0
 'offset size text border'=. y
 offset=. glPDFoffset + offset * glPDFmult
 size=. size * glPDFmult
-r=. 'MultiCell(',(":0{size),', ',(": 1{size),', ''',text,''', ',(":border),', ''J'', true, 0,',(":0{offset),', ',(":1{offset),', false, 0, true, true, ',(":1{size),',''M'',false);'
+r=. 'MultiCell(',(":0{size),', ',(": 1{size),', ''',text,''', ',(":border),', ''J'', true, 0,',(":0{offset),', ',(":1{offset),', false, 0, true, true, ',(":0 * 1{size),',''M'',false);'
 )
 
 NB. =========================================================

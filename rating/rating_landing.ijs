@@ -111,7 +111,7 @@ stdout LT2,'<input type="hidden" name="filename" value="',(;glFilename),'">'
 NB. Table of values - Common Values
 stdout LT1,'<h4>Common Measurements</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>Alt</th><th>FW Width</th><th>Bunkers?</th><th>Dist OB</th><th>Dist Tr</th><th>Dist Wat</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>Alt</th><th>FW Width</th><th>Bunkers?</th><th>Dist OB</th><th>Dist Tr</th><th>Tree Recov</th><th>Dist Wat</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td><input value="',(":;glPlanAlt),'" tabindex="1" ',(InputFieldnum 'alt'; 3),'>',LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanFWWidth),'" tabindex="2" ',(InputFieldnum 'fwwidth'; 3),'>',LT4,'</td>'
@@ -119,6 +119,9 @@ stdout LT4,'<td><input type="checkbox" id="bunknumber" name="bunknumber" value="
 stdout ((''$glPlanBunkNumber)#'checked'),' tabindex="3">',LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanOOBDist),'" tabindex="4" ',(InputFieldnum 'oobdist'; 3),'>',LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanTreeDist),'" tabindex="5" ',(InputFieldnum 'treedist'; 3),'>',LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'treerecov' ; 6 ; glTreeRecovDesc ; glTreeRecovVal ; <''$glPlanTreeRecov
+stdout LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanLatWaterDist),'" tabindex="7" ',(InputFieldnum 'latwaterdist'; 3),'>',LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table></div>'
@@ -132,6 +135,7 @@ stdout LF,'     <input type="submit" name="control_done" value="Done" tabindex="
 if. 'M'=glPlanRecType do. NB. Only delete on measurement point
 	stdout LF,'     <input type="submit" name="control_delete" value="Delete this M/Point" tabindex="',(,":4),'"></form>'
 end.
+stdout LF,'</div>' NB. end of submit loop
 stdout LF,'</div>' NB. end main container
 stdout '</body></html>'
 res=. 1
@@ -160,7 +164,7 @@ end.
 
 NB. Assign to variables
 bunknumber=: 0
-xx=. djwCGIPost y ; ' ' cut 'alt fwwidth bunknumber'
+xx=. djwCGIPost y ; ' ' cut 'alt fwwidth bunknumber oobdist treedist latwaterdist'
 glFilename=: dltb ;filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
@@ -195,6 +199,10 @@ glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 glPlanAlt=: ,alt
 glPlanFWWidth=: ,fwwidth
 glPlanBunkNumber=: ,bunknumber
+glPlanOOBDist=: ,oobdist
+glPlanTreeDist=: ,treedist
+glPlanTreeRecov=: ,treerecov
+glPlanLatWaterDist=: , latwaterdist
 
 NB. Write to files
 keyplan utKeyPut glFilepath,'_plan'

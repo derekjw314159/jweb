@@ -333,6 +333,7 @@ for_g. genders do.
 	    glPlanLayupType=: (#key)$,' '
 	    glPlanRecType=: (#key)$,'M'
 	    glPlanCarryType=: (#key)$,' '
+	    glPlanSqueezeType=: (#key)$,' '
 	    glPlanID=: newkey
 	    utKeyPut glFilepath,'_plan'
 	    key utKeyDrop glFilepath,'_plan' 
@@ -390,6 +391,7 @@ label_shot.
 		glPlanLayupType=: ,' '
 		glPlanRecType=: ,'M'
 		glPlanCarryType=: ,' '
+		glPlanSqueezeType=: ,' '
 		glPlanID=: ,newkey
 		utKeyPut glFilepath,'_plan'
 		
@@ -432,6 +434,7 @@ label_shot.
 	glPlanRemGroundYards=: ,remgroundyards
 	glPlanRecType=: ,'P'
 	glPlanCarryType=: ,' '
+	glPlanSqueezeType=: ,' '
 	glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
 	glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 	start=. 0{ww
@@ -457,6 +460,7 @@ label_shot.
 	glPlanRRMounds=: ,0
 	glPlanRRRiseDrop=: ,0
 	glPlanRRUnpleasant=: ,0
+	glPlanRollTwice=: ,0
 
 	utKeyPut glFilepath,'_plan'
 	
@@ -518,6 +522,7 @@ glPlanAlt=: 1 1 { glPlanAlt
 glPlanFWWidth=: 1 1 { glPlanFWWidth
 glPlanOOBDist=: 1 1 { glPlanOOBDist
 glPlanTreeDist=: 1 1 { glPlanTreeDist
+glPlanTreeRecov=: 1 1 { glPlanTreeRecov
 glPlanBunkNumber=: 1 1 { glPlanBunkNumber
 glPlanLatWaterDist=: 1 1{glPlanLatWaterDist
 glPlanRRMounds=: 1 1 { glPlanRRMounds
@@ -532,6 +537,8 @@ glPlanRRInconsistent=: 1 1 { glPlanRRInconsistent
 glPlanRRMounds=: 1 1 { glPlanRRMounds
 glPlanRRRiseDrop=: 1 1 { glPlanRRRiseDrop
 glPlanRRUnpleasant=: 1 1 {glPlanRRUnpleasant
+glPlanRollLevel=: 1 1{glPlanRollLevel
+glPlanRollFirmness=: 1 1 {glPlanRollFirmness
 glPlanRollTwice=: 1 1 {glPlanRollTwice
 
 utKeyPut glFilepath,'_plan'
@@ -620,6 +627,7 @@ glPlanCumGroundYards=: ,0
 glPlanLatLon=: , 0
 glPlanRemGroundYards=: ,0
 glPlanCarryType=: ,' '
+glPlanSqueezeType=: ,' '
 glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
 glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 glPlanMeasDist=: ,0
