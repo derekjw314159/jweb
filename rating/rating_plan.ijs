@@ -369,10 +369,12 @@ NB. Green Data
 
 stdout LF,'<div class="span-17 last">'
 stdout LT1,'<table><thead>'
-stdout LT3,'<tr><th>Green</th><th>GrLength</th><th>GrWidth</th><th>Diam</th><th>Alt</th><th>Stimp</th><th>Visibility</th><th>Obstructed</th><th>Tiered</th><th>Firmness</th><th>Contour</th><th>%Bunk</th><th>%Water</th><th>Dist Water</th><th>Unpleasant</th></tr>'
+stdout LT3,'<tr><th>Green</th><th>From tee</th><th>To Front</th><th>GrLength</th><th>GrWidth</th><th>Diam</th><th>Alt</th><th>Stimp</th><th>Visibility</th><th>Obstructed</th><th>Tiered</th><th>Firmness</th><th>Contour</th><th>%Bunk</th><th>%Water</th><th>Dist Water</th><th>Unpleasant</th></tr>'
 stdout LT2,'</thead><tbody><tr>'
 ww=. ''$glGrHole i. hole
-stdout LT4,'<td>Edit</td>'
+stdout LT4,'<td><a href="/jw/rating/green/e/',glFilename,'/',(>ww{glGrID),'">Edit</a></td>'
+stdout LT4,'<td>',(> (glTees i. ww{glGrTee){glTeesName),'</td>'
+stdout LT4,'<td>',(": ww{glGrFrontYards),'</td>'
 stdout LT4,'<td>',(": ww{glGrLength),'</td>'
 stdout LT4,'<td>',(": ww{glGrWidth),'</td>'
 stdout LT4,'<td>',(": ww{glGrDiam),'</td>'
