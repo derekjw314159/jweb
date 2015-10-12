@@ -422,7 +422,7 @@ glPlStartTime=: ,starttime
 glPlGross=: 1 18$,gross
 glPlGross=: <. 0.5 + glPlGross + _ * 0=glPlGross
 glPlPutt=: <. 0.5 + 1 3$,putt
-glPlPutt=: glPlPutt + _ * 25<glPlPutt
+NB. glPlPutt=: glPlPutt + _ * 25<glPlPutt
 
 (key) utKeyPut glFilepath,'_player'
 
