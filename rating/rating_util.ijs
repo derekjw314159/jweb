@@ -334,6 +334,7 @@ for_g. genders do.
 	    glPlanRecType=: (#key)$,'M'
 	    glPlanCarryType=: (#key)$,' '
 	    glPlanSqueezeType=: (#key)$,' '
+	    glPlanSqueezeWidth=: (#key)$0
 	    glPlanID=: newkey
 	    utKeyPut glFilepath,'_plan'
 	    key utKeyDrop glFilepath,'_plan' 
@@ -461,6 +462,9 @@ label_shot.
 	glPlanRRRiseDrop=: ,0
 	glPlanRRUnpleasant=: ,0
 	glPlanRollTwice=: ,0
+	glPlanSqueezeWidth=: ,0
+	glPlanCarryType=: ,' '
+	glPlanSqueezeType=: ,' '
 
 	utKeyPut glFilepath,'_plan'
 	
@@ -628,6 +632,7 @@ glPlanLatLon=: , 0
 glPlanRemGroundYards=: ,0
 glPlanCarryType=: ,' '
 glPlanSqueezeType=: ,' '
+glPlanSqueezeWidth=: ,0
 glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
 glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 glPlanMeasDist=: ,0
