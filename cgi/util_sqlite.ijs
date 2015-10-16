@@ -71,7 +71,7 @@ NB.		(>j)=: <"0 ".>j
 NB.     end.
 NB. end.
 xx=.4!:55 <y
-(y)=:  ". 4 }. ; (<' ,. '),each res 
+(y)=:  ". 4 }. ; (<' ,  '),each res 
 NB. Delete first
 xx=.4!:55 res
 )
@@ -143,7 +143,8 @@ for_rr. }. i. # res do.
 	str=. str,'='
 	val=. (<rr,1+col_index) { res
 	if. 2= (3!:0) >val do.
-	    str=. str, '''', (>val), ''''
+    	    NB. Need to stringreplace single quote
+	    str=. str, '''', ( (''''; '''''' ) stringreplace >val), ''''
 	else.
 	    str=. str, ": >val
 	end.
@@ -254,12 +255,43 @@ columns=. ~. columns
 NB. Correct the chosen items to numbers
 res=.  (<0) ".each columns { vals
 res=. }. each (<2) {.each (<0),each res
+NB. reset to scalar
+res=. (<'') $each res
 vals=. (res)  (columns)}vals 
 NB. and box the others
 columns=. (i. # vals) -. columns
 res=. <each columns { vals
-res=. ,each res
+NB. res=. ,each res this was killing the assigments
 vals=. (res) (columns)}vals
 NB. finally do the assignment
 (names)=: vals
+)
+
+NB. =============================================================
+NB. utKeyPut
+NB. =============================================================
+NB. Put variables to the keyfile <y>
+NB. x holds a subset of the keys, but if it is not present
+NB. then update all the items in the dictionary
+
+NB. Assumes the dictionary starts with the key as the first entry
+NB. Usage:  subset utKeyPut filename
+NB. =============================================================
+utKeyPut=: 3 : 0
+key=. >keyread y ; '_dictionary'
+key=. >0{ key
+if. -. 0 -: 4!:0 <key do.
+	stderr 'No key data : ',key,' to write to ',y
+	return.
+end.
+(". key) utKeyPut y NB. Write them all
+: 
+res=. ((#x),0)$a:
+for_col. (>keyread y ; '_dictionary') do.
+	val=. ". >col
+	NB. If not boxed, box now
+	if. 0=L. val do. val=. <val end.
+	res=. res,. val
+end. 
+NB. returns the matrix of values
 )
