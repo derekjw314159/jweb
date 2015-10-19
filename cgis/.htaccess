@@ -1,6 +1,0 @@
-Options +ExecCGI
-AddHandler cgi-script .cgi
-AuthType Basic
-AuthName "Authentication Required"
-AuthUserFile "/etc/htpasswd/.htpasswd"
-Require valid-user
