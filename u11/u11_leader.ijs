@@ -89,16 +89,15 @@ stdout LF,'<h2>BB&O Nike U11 Boys'' Competition : ', glCourseName,' : ',(11{.,ti
 NB. Order by leader time and get unique entries
 ww=:  /: >glPlFirstName
 ww=: ww /: >ww{glPlLastName
-ww=: ww /: (+/"1 (7 <. ww{glPlGross)) - ww{glPlHCP NB. Nett
-ww=: ww /: (+/"1 (_1{."1 (7 <. ww{glPlGross)))  NB. back one
-ww=: ww /: (+/"1 (_3{."1 (7 <. ww{glPlGross)))  NB. back one
-ww=: ww /: (+/"1 (_6{."1 (7 <. ww{glPlGross)))  NB. back one
-ww=: ww /: (+/"1 (_9{."1  (7 <. ww{glPlGross)))  NB. back one
-ww=: ww /: (+/"1 (7 <. ww{glPlGross))  NB. Gross
+ww=: ww /: (+/"1 (glMax <. ww{glPlGross)) - ww{glPlHCP NB. Nett
+ww=: ww /: (+/"1 (_1{."1 (glMax <. ww{glPlGross)))  NB. back one
+ww=: ww /: (+/"1 (_3{."1 (glMax <. ww{glPlGross)))  NB. back one
+ww=: ww /: (+/"1 (_6{."1 (glMax <. ww{glPlGross)))  NB. back one
+ww=: ww /: (+/"1 (_9{."1 (glMax <. ww{glPlGross)))  NB. back one
+ww=: ww /: (+/"1 (glMax <. ww{glPlGross))  NB. Gross
 NB. Finally put withdrawals at the bottom
 ww=: ww /: (<'WD') =  ww{glPlStartTime
 (ww{glPlID) utKeyRead glFilepath,'_player'
-
     
 stdout LF,'<div class="span-24 large">'
 stdout LT1,'<table>'
@@ -112,7 +111,7 @@ NB. Loop round the leader times
 last=. _1
 for_ll. i. #glPlID do. NB. Start of person loop
 	stdout LT2,'<tr>'
-	gr=. +/(7<. ll{glPlGross)
+	gr=. +/(glMax<. ll{glPlGross)
 	if. (<'WD') = ll{glPlStartTime do.
 		stdout LT3,'<td>WD</td>'
 	elseif. gr = last do.
@@ -137,7 +136,7 @@ for_ll. i. #glPlID do. NB. Start of person loop
 	    gr=. '-'
 	end.
 	stdout LT3,'<td>',gr,'</td>'
-	nt=. ": (+/(7 <. ll{glPlGross)) - ll{glPlHCP
+	nt=. ": (+/(glMax <. ll{glPlGross)) - ll{glPlHCP
 
 	if. *. / _ = ll{ glPlGross do. nt=.'-' end.
 	stdout LT3,'<td>',nt,'</td>'
