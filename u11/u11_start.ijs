@@ -154,7 +154,7 @@ for_u. uniq do.
 	end.
 	stdout (":>ll{glPlHCP),'] '
 		stdout '<i>',(":>ll{glPlClub),'</i></td>'
-		gr=. ": +/7<. ll{glPlGross
+		gr=. ": +/glMax <. ll{glPlGross
 		if. *. / _ = ll{ glPlGross do. gr=.'-' end.
 		stdout LT3,'<td style="border-right: 2px solid lightgrey">',gr,'</td>'
 	end. NB. End of person loop

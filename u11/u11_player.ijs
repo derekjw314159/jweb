@@ -1,4 +1,3 @@
-
 NB. =========================================================
 NB. jweb_u11_player_v
 NB. View scores for participant
@@ -62,7 +61,6 @@ ww=:  /: >glPlFirstName
 ww=: ww /: >ww{glPlLastName
 (ww{glPlID) utKeyRead glFilepath,'_player'
 
-
 NB. Loop round in two halves
 for_hh. 0 1 do.
     
@@ -84,7 +82,7 @@ for_hh. 0 1 do.
 	stdout LT3,'<td>',(;'6.3' 8!:0 glCompDate CalcAge cc{glPlDoB),'</td>'
 	stdout LF,'<td>',(":>cc{glPlHCP),'</td>'
 	stdout LF,'<td>',(":>cc{glPlStartTime),'</td>'
-	gr=. ": +/7<. cc{glPlGross
+	gr=. ": +/glMax <. cc{glPlGross
 	if. *. / _ = cc{ glPlGross do. gr=.'-' end.
 	stdout LF,'<td>',gr,'</td>'
 	stdout LT2,'</tr>'
@@ -182,21 +180,21 @@ stdout LF,'<table>'
 	stdout LF,'</tbody><tfoot><tr><td>OUT</td>'
 	stdout LF,'<td>',(": +/9 {. glYards),'</td>'
 	stdout LF,'<td>',(": +/9 {. glPar ),'</td>'
-	stdout LF,'<td>',(": notstarted + +/ 7 <. 9 {. ,glPlGross ),'</td>'
+	stdout LF,'<td>',(": notstarted + +/ glMax <. 9 {. ,glPlGross ),'</td>'
 	stdout LF,'</tr></tfoot></table></div>'
     else.
 	stdout LF,'</tbody><tfoot><tr><td>IN</td>'
 	stdout LF,'<td>',(": +/(9+i.9)  { glYards),'</td>'
 	stdout LF,'<td>',(": +/(9+i.9) {glPar),'</td>'
-	stdout LF,'<td>',(": notstarted + +/ 7 <. (9+i.9) {,glPlGross),'</td>'
+	stdout LF,'<td>',(": notstarted + +/ glMax <. (9+i.9) {,glPlGross),'</td>'
 	stdout LF,'</tr><tr><td>OUT</td>'
 	stdout LF,'<td>',(": +/9 {. glYards),'</td>'
 	stdout LF,'<td>',(": +/9{. glPar),'</td>'
-	stdout LF,'<td>',(": notstarted + +/ 7 <. 9{. ,glPlGross),'</td>'
+	stdout LF,'<td>',(": notstarted + +/ glMax <. 9{. ,glPlGross),'</td>'
 	stdout LF,'</tr><tr><td><b>TOTAL</b></td>'
 	stdout LF,'<td><b>',(": +/glYards),'</b></td>'
 	stdout LF,'<td><b>',(": +/glPar),'</b></td>'
-	stdout LF,'<td><b>',(": notstarted + +/ 7 <. ,glPlGross),'</b></td>'
+	stdout LF,'<td><b>',(": notstarted + +/ glMax <. ,glPlGross),'</b></td>'
 	stdout LF,'</tr></tfoot></table></div>'
     end.
 
@@ -314,21 +312,21 @@ stdout LF,'<table>'
 	stdout LF,'</tbody><tfoot><tr><td>OUT</td>'
 	stdout LF,'<td>',(": +/9 {. glYards),'</td>'
 	stdout LF,'<td>',(": +/9 {. glPar ),'</td>'
-	stdout LF,'<td>',(": notstarted + +/ 7 <. 9 {. ,glPlGross ),'</td>'
+	stdout LF,'<td>',(": notstarted + +/ glMax <. 9 {. ,glPlGross ),'</td>'
 	stdout LF,'</tr></tfoot></table></div>'
     else.
 	stdout LF,'</tbody><tfoot><tr><td>IN</td>'
 	stdout LF,'<td>',(": +/(9+i.9)  { glYards),'</td>'
 	stdout LF,'<td>',(": +/(9+i.9) {glPar),'</td>'
-	stdout LF,'<td>',(": notstarted + +/ 7 <. (9+i.9) {,glPlGross),'</td>'
+	stdout LF,'<td>',(": notstarted + +/ glMax <. (9+i.9) {,glPlGross),'</td>'
 	stdout LF,'</tr><tr><td>OUT</td>'
 	stdout LF,'<td>',(": +/9 {. glYards),'</td>'
 	stdout LF,'<td>',(": +/9{. glPar),'</td>'
-	stdout LF,'<td>',(": notstarted + +/ 7 <. 9{. ,glPlGross),'</td>'
+	stdout LF,'<td>',(": notstarted + +/ glMax <. 9{. ,glPlGross),'</td>'
 	stdout LF,'</tr><tr><td><b>TOTAL</b></td>'
 	stdout LF,'<td><b>',(": +/glYards),'</b></td>'
 	stdout LF,'<td><b>',(": +/glPar),'</b></td>'
-	stdout LF,'<td><b>',(": notstarted + +/ 7 <. ,glPlGross),'</b></td>'
+	stdout LF,'<td><b>',(": notstarted + +/ glMax <. ,glPlGross),'</b></td>'
 	stdout LF,'</tr></tfoot></table></div>'
     end.
 
@@ -339,7 +337,11 @@ stdout '<table><thead><tr><th>Putting</th><th></th></tr></thead><tbody>'
 NB. Print the putting scores
 for_rr. glPuttDesc do.
     hole=. ; 'r<0>2.0' 8!:0 rr_index 
-    val=. ; 'd<>b<>0.0' 8!:0 rr_index{,glPlPutt NB. suppress zero and infinity
+    if. rr_index < (#glPuttDesc) -1 do.
+	val=. ; 'd<>b<>0.0' 8!:0 rr_index{,glPlPutt NB. suppress zero and infinity
+    else.
+	val=. ; '0.1' 8!:0 rr_index{,glPlPutt NB. suppress zero and infinity
+    end.
     stdout '<tr><td>',(>rr),'</td><td><input value="',val,'" tabindex="',(":25+rr_index),'" ',(InputFieldnum ('putt',hole) ; 3),'"></td></tr>'
 end.
 stdout LT2,'</tbody></table></div>'
@@ -377,7 +379,6 @@ servername=. getenv 'SERVER_NAME'
 httphost=. getenv 'HTTP_HOST'
 if. -. glSimulate do.
     if. (-. +. / 'u11/player/e/' E. httpreferer) +. (-. 'on'-: https) +. (-.  servername -: httphost) +. (-. +. / servername E. httpreferer) do.
-	pagenotvalid ''
     end.
 end.
 NB. Assign to variables
@@ -387,6 +388,7 @@ djwBuildArray 'putt'
 glFilename=: dltb >filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
+utFileGet glFilepath
 (key) utKeyRead glFilepath,'_player'
 
 NB. Check the time stamp
@@ -421,7 +423,7 @@ glPlDoB=: ,tsrep 6 {. getdate >dob
 glPlStartTime=: ,starttime
 glPlGross=: 1 18$,gross
 glPlGross=: <. 0.5 + glPlGross + _ * 0=glPlGross
-glPlPutt=: <. 0.5 + 1 3$,putt
+glPlPutt=:  (1,#glPuttDesc) $,putt
 NB. glPlPutt=: glPlPutt + _ * 25<glPlPutt
 
 (key) utKeyPut glFilepath,'_player'
@@ -511,7 +513,7 @@ glPlFirstName=: ,<''
 glPlLastName=: ,<' New Player'
 glPlClub=: ,a:
 glPlGross=: 1 18$_
-glPlPutt=: 1 3$0 0 _
+glPlPutt=: 1 3$0 0 50
 glPlUpdateName=: ,<": getenv 'REMOTE_USER'
 glPlUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 glPlDoB=: ,glCompDate

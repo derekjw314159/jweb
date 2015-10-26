@@ -87,11 +87,11 @@ stdout LF,'<h2>BB&O Nike U11 Boys'' Competition : ', glCourseName,' : ',(11{.,ti
 NB. Order by prize time and get unique entries
 ww=.  /: >glPlFirstName
 ww=. ww /: >ww{glPlLastName
-ww=. ww /: (+/"1 (_1{."1 (7 <. ww{glPlGross)))  NB. back one
-ww=. ww /: (+/"1 (_3{."1 (7 <. ww{glPlGross)))  NB. back one
-ww=. ww /: (+/"1 (_6{."1 (7 <. ww{glPlGross)))  NB. back one
-ww=. ww /: (+/"1 (_9{."1  (7 <. ww{glPlGross)))  NB. back one
-ww=. ww /: (+/"1 (7 <. ww{glPlGross))  NB. Gross
+ww=. ww /: (+/"1 (_1{."1 (glMax <. ww{glPlGross)))  NB. back one
+ww=. ww /: (+/"1 (_3{."1 (glMax <. ww{glPlGross)))  NB. back one
+ww=. ww /: (+/"1 (_6{."1 (glMax <. ww{glPlGross)))  NB. back one
+ww=. ww /: (+/"1 (_9{."1 (glMax <. ww{glPlGross)))  NB. back one
+ww=. ww /: (+/"1 (glMax <. ww{glPlGross))  NB. Gross
 (ww{glPlID) utKeyRead glFilepath,'_player'
     
 stdout LF,'<div class="span-10">'
@@ -103,7 +103,7 @@ NB. Loop round the prize times
 last=. _1
 for_ll. i. 6 <. #glPlID do. NB. Start of person loop
 	stdout LT2,'<tr>'
-	gr=. +/(7<. ll{glPlGross)
+	gr=. +/(glMax <. ll{glPlGross)
 	if. gr = last do.
 		stdout LT3,'<td>=</td>'
 	else.
@@ -127,11 +127,11 @@ stdout LT1,'</tbody></table></div>'
 NB. Order by prize time and get unique entries
 ww=.  /: >glPlFirstName
 ww=. ww /: >ww{glPlLastName
-ww=. ww /: (+/"1 (_1{."1 (7 <. ww{glPlGross))) - (ww{glPlHCP)%18 NB. back one
-ww=. ww /: (+/"1 (_3{."1 (7 <. ww{glPlGross))) - (ww{glPlHCP)%6  NB. back one
-ww=. ww /: (+/"1 (_6{."1 (7 <. ww{glPlGross))) - (ww{glPlHCP)%3 NB. back one
-ww=. ww /: (+/"1 (_9{."1  (7 <. ww{glPlGross))) - (ww{glPlHCP)%2 NB. back one
-ww=. ww /: (+/"1 (7 <. ww{glPlGross)) - ww{glPlHCP  NB. Gross
+ww=. ww /: (+/"1 (_1{."1 (glMax <. ww{glPlGross))) - (ww{glPlHCP)%18 NB. back one
+ww=. ww /: (+/"1 (_3{."1 (glMax <. ww{glPlGross))) - (ww{glPlHCP)%6  NB. back one
+ww=. ww /: (+/"1 (_6{."1 (glMax <. ww{glPlGross))) - (ww{glPlHCP)%3 NB. back one
+ww=. ww /: (+/"1 (_9{."1  (glMax <. ww{glPlGross))) - (ww{glPlHCP)%2 NB. back one
+ww=. ww /: (+/"1 (glMax <. ww{glPlGross)) - ww{glPlHCP  NB. Gross
 (ww{glPlID) utKeyRead glFilepath,'_player'
     
 stdout LF,'<div class="span-10 prepend-1 last">'
@@ -143,7 +143,7 @@ NB. Loop round the prize times
 last=. _1
 for_ll. i. 6 <. #glPlID do. NB. Start of person loop
 	stdout LT2,'<tr>'
-	nt=. ( +/(7<. ll{glPlGross)) - ll{glPlHCP
+	nt=. ( +/(glMax <. ll{glPlGross)) - ll{glPlHCP
 	if. nt = last do.
 		stdout LT3,'<td>=</td>'
 	else.
@@ -170,7 +170,7 @@ for_p. i. #glPuttDesc do.
 	NB. Order by prize time and get unique entries
 	ww=.  /: >glPlFirstName
 	ww=. ww /: >ww{glPlLastName
-	ww=. ww /: (+/"1 (7 <. ww{glPlGross))  NB. Gross
+	ww=. ww /: (+/"1 (glMax <. ww{glPlGross))  NB. Gross
 	if. p< _1+#glPuttDesc do. NB. High to Low
 		ww=. ww \: p{"1 (ww{glPlPutt)
 	else. NB. Low to High
