@@ -152,6 +152,7 @@ stdout LF,'<h2>BB&O Nike U11 Boys'' Competition : ', glCourseName,' : ',(11{.,ti
 NB. Print scorecard and yardage
 stdout LF,'<div class="span-24 last">'
 stdout LT1,'Club = ',(>glPlClub),'<br>'
+stdout LT1,'Full Handicap = ',(": glPlHCPFull),'<br>'
 stdout LT1,'Handicap = ',(": glPlHCP),'<br>'
 stdout LT1,'Start time = ',(>glPlStartTime),'<br>'
 stdout LT1,'Date of Birth = ',(11{. , timestamp 1 tsrep glPlDoB),'<br>'
@@ -281,7 +282,8 @@ stdout LF, TAB,'<input type="hidden" name="prevname" value="',(,>glPlUpdateName)
 stdout LF,'<span class="span-3">Name</span><input name="firstname" value="',(,>glPlFirstName),'" tabindex="1" ',(InputField 20),'>'
 stdout LF,EM,'<input name="lastname" value="',(,>glPlLastName),'" tabindex="2" ',(InputField 20),'>'
 stdout LF,'<br><span class="span-3">Club</span><input name="club" value="',(,>glPlClub),'" tabindex="3" ',(InputField 25),'>'
-stdout LF,'<br><span class="span-3">Handicap</span><input value="',(": ,glPlHCP),'" tabindex="4" ',(InputFieldnum 'hcp'; 3),'>'
+stdout LF,'<br><span class="span-3">Full Handicap</span><input value="',(": ,glPlHCPFull),'" tabindex="4" ',(InputFieldnum 'hcpfull'; 3),'>'
+stdout LF,'<br><span class="span-3">Handicap</span>',(": ,glPlHCP)
 stdout LF,'<br><span class="span-3">Start time</span><input name="starttime" value="',(,>glPlStartTime),'" tabindex="5" ',(InputField 6),'>'
 stdout LF,'<br><span class="span-3">Date of birth</span><input name="dob" value="',(11{. , timestamp 1 tsrep glPlDoB),'" tabindex="6" ',(InputField 12),'>'
 stdout '</div>'
@@ -382,7 +384,7 @@ if. -. glSimulate do.
     end.
 end.
 NB. Assign to variables
-xx=. djwCGIPost y ; 'hcp' ; 'gross' ; 'putt'
+xx=. djwCGIPost y ; 'hcpfull' ; 'hcp' ; 'gross' ; 'putt'
 djwBuildArray 'gross'
 djwBuildArray 'putt'
 glFilename=: dltb >filename
@@ -417,6 +419,10 @@ glPlUpdateName=: ,<getenv 'REMOTE_USER'
 glPlUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 glPlFirstName=: ,firstname
 glPlLastName=: ,lastname
+glPlHCPFull=: ,hcpfull
+hcp=: glHCPMax <. hcpfull
+hcp=: glHCPAllow * hcp
+if. glHCPRound do. hcp=: <. 0.5 + hcp end.
 glPlHCP=: ,hcp 
 glPlClub=: club
 glPlDoB=: ,tsrep 6 {. getdate >dob
@@ -517,6 +523,9 @@ glPlPutt=: 1 3$0 0 50
 glPlUpdateName=: ,<": getenv 'REMOTE_USER'
 glPlUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 glPlDoB=: ,glCompDate
+glPlHCPFull=: ,36
+glPlHCP=: ,glHCPAllow * (36 <. glHCPMax) 
+if. glHCPRound do. glPlHCP=: <. 0.5 + glPlHCP end.
 utKeyPut glFilepath,'_player'
 
 NB.stdout 'Content-type: text/html',LF,LF
