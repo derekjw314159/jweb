@@ -125,7 +125,8 @@ for_ll. i. #glPlID do. NB. Start of person loop
 	stdout (-. scroll) # LT3,'<a href="http://',(":getenv 'SERVER_NAME'),'/jw/u11/player/v/',(,glFilename),'/',(>ll{glPlID),'">'
 	stdout LT3,(>ll{glPlFirstName),' ',(>ll{glPlLastName)
 	stdout (-. scroll) # '</a>'
-	stdout ' [',(":>ll{glPlHCP),'] '
+	stdout ' [',(":>ll{glPlHCPFull),'/'
+	stdout (":>ll{glPlHCP),'] '
 	stdout '<i>',(":>ll{glPlClub),'</i></td>'
 	gr=. ": gr
 	if. (<'WD') = ll{glPlStartTime do.
