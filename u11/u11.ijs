@@ -31,3 +31,11 @@ stdout LF,TAB,'<link rel="stylesheet" href="/css/blueprint/ie.css" type="text/cs
 stdout LF,'<![endif]-->'
 )
 
+NB. ====================================
+NB. FixDatabase
+NB. ====================================
+FixDatabase=: 3 : 0
+res=. ''
+)
+
+FixDatabase ''

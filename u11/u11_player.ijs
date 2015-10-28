@@ -72,7 +72,7 @@ for_hh. 0 1 do.
 
     stdout LT1,'<table>'
     stdout LT1,'<thead>',LT2,'<tr>'
-    stdout LT3,'<th>Name</th><th>Age</th><th>HCP</th><th>Start</th><th>Gross</th></tr></thead><tbody>'
+    stdout LT3,'<th>Name</th><th>Age</th><th>Full</th><th>HCP</th><th>Start</th><th>Gross</th></tr></thead><tbody>'
     NB. Loop round the players
     chunk=. >. 0.5 * #glPlID
     for_cc. (hh *chunk ) + i. chunk do.
@@ -80,6 +80,7 @@ for_hh. 0 1 do.
 	stdout LF,'<tr><td><a href="http://',(":getenv 'SERVER_NAME'),'/jw/u11/player/v/',(,glFilename),'/',(>cc{glPlID),'">',(>cc{glPlFirstName),' ',(>cc{glPlLastName),'</td>'
 	NB. stdout LT3,'<td>',(":>cc{glPlClub),'</td>'
 	stdout LT3,'<td>',(;'6.3' 8!:0 glCompDate CalcAge cc{glPlDoB),'</td>'
+	stdout LF,'<td>',(":>cc{glPlHCPFull),'</td>'
 	stdout LF,'<td>',(":>cc{glPlHCP),'</td>'
 	stdout LF,'<td>',(":>cc{glPlStartTime),'</td>'
 	gr=. ": +/glMax <. cc{glPlGross

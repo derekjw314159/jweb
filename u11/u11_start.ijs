@@ -152,6 +152,7 @@ for_u. uniq do.
 	else.
 	    stdout LT3,'<td><a href="http://',(":getenv 'SERVER_NAME'),'/jw/u11/player/v/',(,glFilename),'/',(>ll{glPlID),'">',(>ll{glPlFirstName),' ',(>ll{glPlLastName),'</a>  ['
 	end.
+	stdout (":>ll{glPlHCPFull),'/'
 	stdout (":>ll{glPlHCP),'] '
 		stdout '<i>',(":>ll{glPlClub),'</i></td>'
 		gr=. ": +/glMax <. ll{glPlGross
