@@ -50,13 +50,7 @@ scroll=. x
 glFilename=: dltb > 0{ y
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
-if. fexist glFilepath,'.ijf' do.
-	xx=. utFileGet glFilepath
-	xx=. utKeyRead glFilepath,'_player'
-	err=. ''
-else.
-	err=. 'No such course'
-end.
+err=. ReadAll glFilepath
 
 stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
@@ -87,14 +81,18 @@ if. 0 -: user do. user=.'' end.
 stdout LF,'<h2>BB&O Nike U11 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>Leaderboard</h3>'
 
 NB. Order by leader time and get unique entries
+NB. Need to drop the last nine if a nine-hole competition
+drop=. _9 * gl9Hole
+hcp=. (1 - 0.5*gl9Hole) * glPlHCP NB. do not round if halved
+
 ww=:  /: >glPlFirstName
 ww=: ww /: >ww{glPlLastName
-ww=: ww /: (+/"1 (glMax <. ww{glPlGross)) - ww{glPlHCP NB. Nett
-ww=: ww /: (+/"1 (_1{."1 (glMax <. ww{glPlGross)))  NB. back one
-ww=: ww /: (+/"1 (_3{."1 (glMax <. ww{glPlGross)))  NB. back one
-ww=: ww /: (+/"1 (_6{."1 (glMax <. ww{glPlGross)))  NB. back one
-ww=: ww /: (+/"1 (_9{."1 (glMax <. ww{glPlGross)))  NB. back one
-ww=: ww /: (+/"1 (glMax <. ww{glPlGross))  NB. Gross
+ww=: ww /: (+/"1 (drop }."1 (glMax <. ww{glPlGross))) - ww{glPlHCP NB. Nett
+ww=: ww /: (+/"1 (_1{."1 (drop }."1 (glMax <. ww{glPlGross))))  NB. back one
+ww=: ww /: (+/"1 (_3{."1 (drop }."1 (glMax <. ww{glPlGross))))  NB. back three
+ww=: ww /: (+/"1 (_6{."1 (drop }."1 (glMax <. ww{glPlGross))))  NB. back six
+ww=: ww /: (+/"1 (_9{."1 (drop }."1 (glMax <. ww{glPlGross))))  NB. back nine
+ww=: ww /: (+/"1 (drop }."1 (glMax <. ww{glPlGross)))  NB. Gross
 NB. Finally put withdrawals at the bottom
 ww=: ww /: (<'WD') =  ww{glPlStartTime
 (ww{glPlID) utKeyRead glFilepath,'_player'
@@ -111,7 +109,7 @@ NB. Loop round the leader times
 last=. _1
 for_ll. i. #glPlID do. NB. Start of person loop
 	stdout LT2,'<tr>'
-	gr=. +/(glMax<. ll{glPlGross)
+	gr=. +/ drop }. (glMax<. ll{glPlGross)
 	if. (<'WD') = ll{glPlStartTime do.
 		stdout LT3,'<td>WD</td>'
 	elseif. gr = last do.
@@ -133,11 +131,11 @@ for_ll. i. #glPlID do. NB. Start of person loop
 	    stdout LT3,'<td>WD</td><td></td>'
 	    stdout ; (#glPuttDesc)#,: '<td></td>'
 	    continue.
-	elseif. *. / _ = ll{ glPlGross do.
+	elseif. *. / _ = drop }. ll{ glPlGross do.
 	    gr=. '-'
 	end.
 	stdout LT3,'<td>',gr,'</td>'
-	nt=. ": (+/(glMax <. ll{glPlGross)) - ll{glPlHCP
+	nt=. ": (+/ drop }. (glMax <. ll{glPlGross)) - (1 - 0.5 * gl9Hole) * ll{glPlHCP
 
 	if. *. / _ = ll{ glPlGross do. nt=.'-' end.
 	stdout LT3,'<td>',nt,'</td>'

@@ -30,13 +30,7 @@ NB. Retrieve the details
 glFilename=: dltb > 0{ y
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
-if. fexist glFilepath,'.ijf' do.
-	xx=. utFileGet glFilepath
-	xx=. utKeyRead glFilepath,'_player'
-	err=. ''
-else.
-	err=. 'No such course'
-end.
+err=. ReadAll glFilepath
 
 stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
@@ -115,13 +109,7 @@ NB. Retrieve the details
 glFilename=: dltb > 0{ y
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
-if. fexist glFilepath,'.ijf' do.
-	xx=. utFileGet glFilepath
-	xx=. utKeyRead glFilepath,'_player'
-	err=. ''
-else.
-	err=. 'No such course'
-end.
+err=. ReadAll glFilepath
 
 stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
@@ -159,10 +147,11 @@ stdout LT1,'Start time = ',(>glPlStartTime),'<br>'
 stdout LT1,'Date of Birth = ',(11{. , timestamp 1 tsrep glPlDoB),'<br>'
 
 NB. Flag for not started
-notstarted=. _ * *. / _ = ,glPlGross
+drop=. _9 * gl9Hole
+notstarted=. _ * *. / _ = drop }. ,glPlGross
 
 NB. Front 9
-for_half. i. 2 do.
+for_half. i. (2 - gl9Hole) do.
     if. 0=half do.
 	stdout LF,'<div class="span-5">'
     else.
@@ -239,13 +228,7 @@ u11_player_edit=: 3 : 0
 glFilename=: dltb > 0{ y
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
-if. fexist glFilepath,'.ijf' do.
-	xx=. utFileGet glFilepath
-	xx=. utKeyRead glFilepath,'_player'
-	err=. ''
-else.
-	err=. 'No such course'
-end.
+err=. ReadAll glFilepath
 
 stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
@@ -290,7 +273,8 @@ stdout LF,'<br><span class="span-3">Date of birth</span><input name="dob" value=
 stdout '</div>'
 
 NB. Flag for not started
-notstarted=. _ * *. / _ = ,glPlGross
+drop=. _9 * gl9Hole
+notstarted=. _ * *. / _ = drop }. ,glPlGross
 
 NB. Front 9
 for_half. i. 2 do.
@@ -299,7 +283,7 @@ for_half. i. 2 do.
     else.
 	stdout LF,'<div class="span-5 prepend-2" last>'
     end.
-stdout LF,'<table>'
+    stdout LF,'<table>'
     stdout LF,'<thead><tr>'
     stdout LF,'<th>Hole</th><th>Yards</th><th>Par</th><th>Gross</th></tr></thead><tbody>'
     for_x. (9*half) + i. 9 do.
@@ -308,7 +292,8 @@ stdout LF,'<table>'
 	stdout LF,'<td>',(": x{glYards),'</td>'
 	stdout LF,'<td>',(": x{glPar),'</td>'
 	val=.; 'd<>0.0' 8!:0 x{,glPlGross NB. Can't display infinity
-	stdout LF,'<td><input value="',val,'" tabindex="',(":7+x),'" ',(InputFieldnum ('gross',hole);3),'"></td></tr>'
+	hidden=. (half *. gl9Hole) # 'type = hidden'
+	stdout LF,'<td><input ',hidden,' value="',val,'" tabindex="',(":7+x),'" ',(InputFieldnum ('gross',hole);3),'"></td></tr>'
     end.
 
     if. half=0 do.
@@ -317,7 +302,7 @@ stdout LF,'<table>'
 	stdout LF,'<td>',(": +/9 {. glPar ),'</td>'
 	stdout LF,'<td>',(": notstarted + +/ glMax <. 9 {. ,glPlGross ),'</td>'
 	stdout LF,'</tr></tfoot></table></div>'
-    else.
+    elseif. -. gl9Hole do.
 	stdout LF,'</tbody><tfoot><tr><td>IN</td>'
 	stdout LF,'<td>',(": +/(9+i.9)  { glYards),'</td>'
 	stdout LF,'<td>',(": +/(9+i.9) {glPar),'</td>'
@@ -476,14 +461,7 @@ NB. Retrieve the details
 glFilename=: dltb > 0{ y
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
-if. fexist glFilepath,'.ijf' do.
-	xx=. utFileGet glFilepath
-	xx=. utKeyRead glFilepath,'_player'
-	err=. ''
-else.
-	err=. 'No such course'
-end.
-
+err=. ReadAll glFilepath
 
 NB. Error page - No such course
 if. 0<#err do.

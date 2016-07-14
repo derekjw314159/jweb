@@ -57,3 +57,22 @@ days=. (tsrep x) - tsrep y NB. miliseconds
 days=. <. 0.5 + days % (24 * 60 * 60 * 1000)
 res=. res + 0.001 * days
 )
+
+NB. ================================================
+NB. ReadAll
+NB. ------------------------------------------------
+NB. Read the file and check for missing variables
+NB. Usage: err=. ReadAll filename
+ReadAll=: 3 : 0
+if. fexist y,'.ijf' do.
+	xx=. utFileGet y
+	xx=. utKeyRead y,'_player'
+	if. 0 ~: 4!:0 <'gl9Hole' do.
+	    gl9Hole=: 0
+	    ww=. (<'gl9Hole') utFilePut y
+	end.
+	err=. ''
+else.
+	err=. 'No such course'
+end.
+NB. ================================================

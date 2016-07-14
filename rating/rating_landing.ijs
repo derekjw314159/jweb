@@ -124,8 +124,23 @@ djwSelect 'treerecov' ; 6 ; glTreeRecovDesc ; glTreeRecovVal ; <''$glPlanTreeRec
 stdout LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanLatWaterDist),'" tabindex="7" ',(InputFieldnum 'latwaterdist'; 3),'>',LT4,'</td>'
 stdout LT3,'</tr>'
-stdout '</tbody></table></div>'
+stdout '</tbody></table>'
 
+NB. Table of values - Roll
+stdout LT1,'<h4>Roll</h4>'
+stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
+stdout LT4,'<th>Level</th><th>Firmness</th><th>Twice</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT3,'<tr>'
+stdout LT4,'<td>'
+djwSelect 'rolllevel' ; 7 ; glRollLevelDesc ; glRollLevelVal ; <''$glPlanRollLevel
+stdout LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'rollfirmness' ; 8 ; glRollFirmnessDesc ; glRollFirmnessVal ; <''$glPlanRollFirmness
+stdout LT4,'</td>'
+stdout LT4,'<td><input type="checkbox" id="rolltwice" name="rolltwice" value="1" '
+stdout ((''$glPlanRollTwice)#'checked'),' tabindex="9">',LT4,'</td>'
+stdout LT3,'</tr>'
+stdout '</tbody></table></div>'
 
 NB. Submit buttons
 stdout LT1,'<div class="span-15 last">'
@@ -164,7 +179,8 @@ end.
 
 NB. Assign to variables
 bunknumber=: 0
-xx=. djwCGIPost y ; ' ' cut 'alt fwwidth bunknumber oobdist treedist latwaterdist'
+rolltwice=: 0
+xx=. djwCGIPost y ; ' ' cut 'alt fwwidth bunknumber oobdist treedist latwaterdist rolltwice'
 glFilename=: dltb ;filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
@@ -203,6 +219,9 @@ glPlanOOBDist=: ,oobdist
 glPlanTreeDist=: ,treedist
 glPlanTreeRecov=: ,treerecov
 glPlanLatWaterDist=: , latwaterdist
+glPlanRollLevel=: ,rolllevel
+glPlanRollFirmness=: ,rollfirmness
+glPlanRollTwice=: ,rolltwice
 
 NB. Write to files
 keyplan utKeyPut glFilepath,'_plan'
