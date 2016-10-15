@@ -455,7 +455,8 @@ label_shot.
 	glPlanOOBDist=: ,0
 	glPlanTreeDist=: ,0
 	glPlanAlt=: ,0
-	glPlanBunkNumber=: ,0
+	glPlanBunkLZ=: ,0
+	glPlanBunkLine=: ,0
 	glPlanLatWaterDist=: ,0
 	glPlanDefaultHit=: glPlanHitYards
 	glPlanRRMounds=: ,0
@@ -465,6 +466,9 @@ label_shot.
 	glPlanSqueezeWidth=: ,0
 	glPlanCarryType=: ,' '
 	glPlanSqueezeType=: ,' '
+	NB. Don't reset the layup stuff as it has just been entered
+	NB.	glPlanLayupCategory=: ,<''
+	NB.	glPlanLayupReason=: ,<''
 
 	utKeyPut glFilepath,'_plan'
 	
@@ -527,7 +531,8 @@ glPlanFWWidth=: 1 1 { glPlanFWWidth
 glPlanOOBDist=: 1 1 { glPlanOOBDist
 glPlanTreeDist=: 1 1 { glPlanTreeDist
 glPlanTreeRecov=: 1 1 { glPlanTreeRecov
-glPlanBunkNumber=: 1 1 { glPlanBunkNumber
+glPlanBunkLZ=: 1 1 { glPlanBunkLZ
+glPlanBunkLine=: 1 1 { glPlanBunkLine
 glPlanLatWaterDist=: 1 1{glPlanLatWaterDist
 glPlanRRMounds=: 1 1 { glPlanRRMounds
 glPlanRRRiseDrop=: 1 1 { glPlanRRRiseDrop
@@ -563,7 +568,8 @@ holes=. (holes e. i. 18) # holes
 NB. Delete if a measurement record and no recordings
 utKeyRead glFilepath,'_plan'
 ww=. glPlanFWWidth = 0
-ww=. ww *. glPlanBunkNumber = 0
+ww=. ww *. glPlanBunkLZ = 0
+ww=. ww *. glPlanBunkLine = 0
 ww=. ww *. glPlanAlt = 0
 ww=. ww *. glPlanOOBDist = 0
 ww=. ww *. glPlanTreeDist = 0
@@ -589,7 +595,7 @@ uniq=. ww # glPlanID
 for_u. uniq do.
 	utKeyRead glFilepath,'_plan'
 	ix=. glPlanID i. u
-	if. 0< ix { glPlanAlt + glPlanFWWidth + glPlanBunkNumber + glPlanOOBDist + glPlanTreeDist do. continue. end.
+	if. 0< ix { glPlanAlt + glPlanFWWidth + glPlanBunkLZ + glPlanBunkLine + glPlanOOBDist + glPlanTreeDist do. continue. end.
 	NB. Look for measurement point at the same distance
 	ww=. glPlanHole = ix{glPlanHole
 	ww=. ww *. glPlanRecType='M'
@@ -612,6 +618,35 @@ for_u. uniq do.
 		u CopyPlanRecord 0{cp NB. Only the first one
 	end.
 end.
+
+NB. Add carry to fairway if not already there
+for_h. holes do.
+    utKeyRead glFilepath,'_plan'
+    ww=. glPlanHole = h
+    ww=. ww *. glPlanRecType='C'
+    ww=. I. ww
+    if. 0=#ww do.
+	ind=. 0
+    else.
+	continue.
+    end.
+    keyy=. ,< (;'r<0>2.0' 8!:0 h),'-C',": ind
+    (,<'_default') utKeyRead glFilepath,'_plan'
+    glPlanID=: keyy
+    glPlanHole=: h
+    t_index=. _1 + #glTees
+    dist=. (<t_index,h){glTeesYards
+    glPlanTee=: ,t_index{glTees
+    glPlanGender=: ,_1
+    glPlanAbility=: ,_1
+    glPlanShot=: ,_1
+    glPlanRemGroundYards=: ,dist
+    glPlanMeasDist=: ,dist
+    glPlanRecType=: ,'C'
+    glPlanCarryType=: ,'F'
+    utKeyPut glFilepath,'_plan'
+end.
+
 )
 
 NB. ===========================================================
@@ -641,7 +676,8 @@ glPlanFWWidth=: ,0
 glPlanOOBDist=: ,0
 glPlanTreeDist=: ,0
 glPlanAlt=: ,0
-glPlanBunkNumber=: ,0
+glPlanBunkLZ=: ,0
+glPlanBunkLine=: ,0
 glPlanLatWaterDist=: ,0
 glPlanDefaultHit=: ,0
 glPlanRRHeight=: ,0

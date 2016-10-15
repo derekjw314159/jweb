@@ -192,7 +192,7 @@ stdout LF,'<a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/rating/plan',(showm
 stdout LF,TAB,'<div class="span-8 last">'
 
 stdout LF,'<table><thead>'
-stdout '<tr><th>Tee</th><th>Card</th><th>Alt</th><th>Mn</th><th>Wn</th><th>RoughLength</th></tr>'
+stdout '<tr><th>Tee</th><th>Card</th><th>Par M/W</th><th>Alt</th><th>Mn</th><th>Wn</th><th>Rough Length</th></tr>'
 stdout '</thead><tbody>'
 utKeyRead glFilepath,'_green'
 for_t.  i. #glTees do.
@@ -201,6 +201,7 @@ for_t.  i. #glTees do.
 	utKeyRead glFilepath,'_tee'
 	ww=. (glTeHole=hole) *. glTeTee=t{glTees
 	(ww # glTeID) utKeyRead glFilepath,'_tee'
+	stdout LT3,'<td>',(2 1 0 1 4{'/',;'2.0' 8!:0 glTePar),'</td>'
 	stdout LT3,'<td>',(": glTeAlt),'</td>' NB. Altitude
 	for_gender. 0 1 do.
 	    if. (gender{,glTeMeasured) do.
@@ -226,7 +227,7 @@ tees=. (glTees e. ww) # glTees
 for_t. tees do.
 	stdout '<th>',(>(glTees i. t){glTeesName),'</th>'
 end.
-stdout '<th>Shot</th><th>Hit</th><th>ToGreen</th><th>Edits</th><th>Alt</th><th>F/width</th><th>Bunk?</th><th>Dist OB</th><th>Dist Tr</th><th>Tree Rec</th><th>Dist Wat</th><th>F/w slope</th><th colspan=3>Other</th></tr></thead><tbody>'
+stdout '<th colspan=1>Player Shot</th><th>Hit / Layup</th><th>ToGreen</th><th>Edits</th><th>Alt</th><th>F/width</th><th>Bunk in LZ</th><th>Bunk in Line</th><th>Dist OB</th><th>Dist Tr</th><th>Dist Wat</th><th>F/w U/L/D</th><th>F/w So/Av/Fi</th><th>Toplgy</th><th>F/w width</th><th colspan=1>Other</th></tr></thead><tbody>'
 NB. Sort the records and re-read
 rr=. I. glPlanHole=hole
 rr=. rr /: rr { glPlanShot
@@ -271,27 +272,32 @@ for_rr. i. #glPlanID do.
 				stdout '</td>'
 			end.
 		end.
-		stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr{glPlanShot),'</td>'
+		stdout '<td colspan=1>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr{glPlanShot),({.>(glTees i. rr{glPlanTee){glTeesName),'</td>'
 		stdout '<td><a href="/jw/rating/layup/e/',(glFilename),'/'
 		stdout ;": 1+rr{glPlanHole
 		stdout (;rr{glPlanTee),'/'
 		stdout ((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),(": 1+rr{glPlanShot),'">'
-		stdout (": rr{glPlanHitYards),' ',(rr{glPlanLayupType),'</a></td><td>', (": <. 0.5 + rr{glPlanRemGroundYards),'</td>' 
+		stdout (": rr{glPlanHitYards),' ',(rr{glPlanLayupType),' '
+		stdout (('L'=rr{glPlanLayupType)#(3{.": >rr{glPlanLayupCategory)),'</a></td><td>', (": <. 0.5 + rr{glPlanRemGroundYards),'</td>' 
 		if. 0<rr{glPlanRemGroundYards do.
-		    stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">Ed</a> <a href="/jw/rating/landingcopy/e/',(glFilename),'/',(;rr{glPlanID),'">Cop</a>'
+		    stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">E</a> <a href="/jw/rating/landingcopy/e/',(glFilename),'/',(;rr{glPlanID),'">C</a>'
 
-		    stdout '<td>',(":rr{glPlanAlt),'</td>'
-		    stdout LT3,'<td>',(":rr{glPlanFWWidth),'</td>'
-		    stdout LT3,'<td>',((rr{glPlanBunkNumber){'-y'),'</td>'
-		    stdout LT3,'<td>',(":rr{glPlanOOBDist),'</td>'
-		    stdout LT3,'<td>',(":rr{glPlanTreeDist),'</td>'
-		    stdout LT3,'<td>',(;(glTreeRecovVal i. rr{glPlanTreeRecov){glTreeRecovDesc),'</td>'
-		    stdout LT3,'<td>',(":rr{glPlanLatWaterDist),'</td>'
-		    stdout LT3, '<td></td>'
-		    stdout LT3,'<td colspan=3>','','</td>'
+		    stdout '<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanAlt),'</td>'
+		    stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanFWWidth),'</td>'
+		    stdout LT3,'<td style="border-right: 1px solid lightgray">',((rr{glPlanBunkLZ){'-y'),'</td>'
+		    stdout LT3,'<td style="border-right: 1px solid lightgray">',((rr{glPlanBunkLine){'-y'),'</td>'
+		    stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanOOBDist),'</td>'
+		    stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanTreeDist),'</td>'
+		    NB.	stdout LT3,'<td>',(;(glTreeRecovVal i. rr{glPlanTreeRecov){glTreeRecovDesc),'</td>'
+		    stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanLatWaterDist),'</td>'
+		    stdout LT3, '<td>', (2{. ":  ,>rr{glPlanRollLevel),'</td>'
+		    stdout LT3, '<td>', (2{. ":  ,>rr{glPlanRollFirmness),'</td>'
+		    stdout LT3, '<td> </td>'
+		    stdout LT3, '<td> </td>'
+		    stdout LT3,'<td colspan=1>','','</td>'
 		    
 		else.
-		    stdout LT4,'<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td colspan=3></td>' NB. At green
+		    stdout LT4,'<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td colspan=3></td>' NB. At green
 		end.
 		    stdout LT3,'</tr>'
 
@@ -313,16 +319,21 @@ for_rr. i. #glPlanID do.
 		end.
 		stdout '<td colspan="3"><i>Measured Point</i></td>'
 		NB. stdout LT3,'<td>',(": rr{glPlanRemGroundYards),'</td>'
-		stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">Ed</a> <a href="/jw/rating/landing/d/',glFilename,'/',(;rr{glPlanID),'">Del</a>'
-		stdout LT3,'<td>',(":rr{glPlanAlt),'</td>'
-		stdout LT3,'<td>',(":rr{glPlanFWWidth),'</td>'
-		stdout LT3,'<td>',((rr{glPlanBunkNumber){'-y'),'</td>'
-		stdout LT3,'<td>',(":rr{glPlanOOBDist),'</td>'
-		stdout LT3,'<td>',(":rr{glPlanTreeDist),'</td>'
-		stdout LT3,'<td>',(;(glTreeRecovVal i. rr{glPlanTreeRecov){glTreeRecovDesc),'</td>'
-		stdout LT3,'<td>',(":rr{glPlanLatWaterDist),'</td>'
-		stdout LT3, '<td></td>'
-		stdout LT3,'<td colspan=3>','','</td>'
+		stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">E</a> <a href="/jw/rating/landing/d/',glFilename,'/',(;rr{glPlanID),'">D</a>'
+		stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanAlt),'</td>'
+		stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanFWWidth),'</td>'
+		stdout LT3,'<td style="border-right: 1px solid lightgray">',((rr{glPlanBunkLZ){'-y'),'</td>'
+		stdout LT3,'<td style="border-right: 1px solid lightgray">',((rr{glPlanBunkLine){'-y'),'</td>'
+		stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanOOBDist),'</td>'
+		stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanTreeDist),'</td>'
+		NB. stdout LT3,'<td>',(;(glTreeRecovVal i. rr{glPlanTreeRecov){glTreeRecovDesc),'</td>'
+		stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanLatWaterDist),'</td>'
+		stdout LT3, '<td>', (2{. ":  ,>rr{glPlanRollLevel),'</td>'
+		stdout LT3, '<td>', (2{. ":  ,>rr{glPlanRollFirmness),'</td>'
+	        stdout LT3, '<td> </td>'
+		stdout LT3, '<td> </td>'
+		
+		stdout LT3,'<td colspan=1>','','</td>'
 	elseif. 'C' = rr{glPlanRecType do.
 		stdout '<tr>'
 		for_t. tees do.
@@ -333,7 +344,7 @@ for_rr. i. #glPlanID do.
 		end.
 		stdout '<td colspan="3"><i>Carry : ',(;('FWBR' i. rr{glPlanCarryType){'/' cut 'Fairway/Water/Bunkers/Extreme Rough'),'</i></td>'
 		NB. stdout LT3,'<td>',(": rr{glPlanRemGroundYards),'</td>'
-		stdout LT4,'<td><a href="/jw/rating/carry/e/',(glFilename),'/',(;rr{glPlanID),'">Ed</a> <a href="/jw/rating/carry/d/',glFilename,'/',(;rr{glPlanID),'">Del</a>'
+		stdout LT4,'<td><a href="/jw/rating/carry/e/',(glFilename),'/',(;rr{glPlanID),'">E</a> <a href="/jw/rating/carry/d/',glFilename,'/',(;rr{glPlanID),'">D</a>'
 		stdout LT3,'<td></td>'
 		stdout LT3,'<td></td>'
 		stdout LT3,'<td></td>'
@@ -341,7 +352,11 @@ for_rr. i. #glPlanID do.
 		stdout LT3,'<td></td>'
 		stdout LT3,'<td></td>'
 		stdout LT3,'<td></td>'
-		stdout LT3, '<td colspan=3></td></tr>'
+		stdout LT3,'<td></td>'
+		stdout LT3,'<td></td>'
+		stdout LT3,'<td></td>'
+		stdout LT3,'<td></td>'
+		stdout LT3, '<td colspan=1></td></tr>'
 	elseif. 'Q' = rr{glPlanRecType do.
 		stdout '<tr>'
 		for_t. tees do.
@@ -360,7 +375,10 @@ for_rr. i. #glPlanID do.
 		stdout LT3,'<td></td>'
 		stdout LT3,'<td></td>'
 		stdout LT3,'<td></td>'
-		stdout LT3, '<td colspan=3></td></tr>'
+		stdout LT3,'<td></td>'
+		stdout LT3,'<td></td>'
+		stdout LT3,'<td></td>'
+		stdout LT3, '<td colspan=1></td></tr>'
 	end.
 end.
 

@@ -111,18 +111,20 @@ stdout LT2,'<input type="hidden" name="filename" value="',(;glFilename),'">'
 NB. Table of values - Common Values
 stdout LT1,'<h4>Common Measurements</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>Alt</th><th>FW Width</th><th>Bunkers?</th><th>Dist OB</th><th>Dist Tr</th><th>Tree Recov</th><th>Dist Wat</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>Alt</th><th>FW Width</th><th>Bunk LZ</th><th>Bunk in Line</th><th>Dist OB</th><th>Dist Tr</th><th>Dist Wat</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td><input value="',(":;glPlanAlt),'" tabindex="1" ',(InputFieldnum 'alt'; 3),'>',LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanFWWidth),'" tabindex="2" ',(InputFieldnum 'fwwidth'; 3),'>',LT4,'</td>'
-stdout LT4,'<td><input type="checkbox" id="bunknumber" name="bunknumber" value="1" '
-stdout ((''$glPlanBunkNumber)#'checked'),' tabindex="3">',LT4,'</td>'
-stdout LT4,'<td><input value="',(":;glPlanOOBDist),'" tabindex="4" ',(InputFieldnum 'oobdist'; 3),'>',LT4,'</td>'
-stdout LT4,'<td><input value="',(":;glPlanTreeDist),'" tabindex="5" ',(InputFieldnum 'treedist'; 3),'>',LT4,'</td>'
-stdout LT4,'<td>'
-djwSelect 'treerecov' ; 6 ; glTreeRecovDesc ; glTreeRecovVal ; <''$glPlanTreeRecov
-stdout LT4,'</td>'
-stdout LT4,'<td><input value="',(":;glPlanLatWaterDist),'" tabindex="7" ',(InputFieldnum 'latwaterdist'; 3),'>',LT4,'</td>'
+stdout LT4,'<td><input type="checkbox" id="bunklz" name="bunklz" value="1" '
+stdout ((''$glPlanBunkLZ)#'checked'),' tabindex="3">',LT4,'</td>'
+stdout LT4,'<td><input type="checkbox" id="bunkline" name="bunkline" value="1" '
+stdout ((''$glPlanBunkLine)#'checked'),' tabindex="4">',LT4,'</td>'
+stdout LT4,'<td><input value="',(":;glPlanOOBDist),'" tabindex="5" ',(InputFieldnum 'oobdist'; 3),'>',LT4,'</td>'
+stdout LT4,'<td><input value="',(":;glPlanTreeDist),'" tabindex="6" ',(InputFieldnum 'treedist'; 3),'>',LT4,'</td>'
+NB. stdout LT4,'<td>'
+NB. djwSelect 'treerecov' ; 7 ; glTreeRecovDesc ; glTreeRecovVal ; <''$glPlanTreeRecov
+NB. stdout LT4,'</td>'
+stdout LT4,'<td><input value="',(":;glPlanLatWaterDist),'" tabindex="8" ',(InputFieldnum 'latwaterdist'; 3),'>',LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table>'
 
@@ -178,9 +180,10 @@ if. -. glSimulate do.
 end.
 
 NB. Assign to variables
-bunknumber=: 0
+bunklz=: 0
+bunkline=: 0
 rolltwice=: 0
-xx=. djwCGIPost y ; ' ' cut 'alt fwwidth bunknumber oobdist treedist latwaterdist rolltwice'
+xx=. djwCGIPost y ; ' ' cut 'alt fwwidth bunklz bunkline oobdist treedist latwaterdist rolltwice'
 glFilename=: dltb ;filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
@@ -214,10 +217,11 @@ glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
 glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 glPlanAlt=: ,alt
 glPlanFWWidth=: ,fwwidth
-glPlanBunkNumber=: ,bunknumber
+glPlanBunkLZ=: ,bunklz
+glPlanBunkLine=: ,bunkline
 glPlanOOBDist=: ,oobdist
 glPlanTreeDist=: ,treedist
-glPlanTreeRecov=: ,treerecov
+NB. glPlanTreeRecov=: ,treerecov
 glPlanLatWaterDist=: , latwaterdist
 glPlanRollLevel=: ,rolllevel
 glPlanRollFirmness=: ,rollfirmness
@@ -292,7 +296,7 @@ NB. Look for measurement point at the nearest distance
 hole=. ix{glPlanHole
 ww=. I. glPlanHole = hole
 ww=. ww -. ix NB. can't be self
-ww=.  ( 0< ww { glPlanAlt + glPlanFWWidth + glPlanBunkNumber + glPlanOOBDist + glPlanTreeDist ) # ww
+ww=.  ( 0< ww { glPlanAlt + glPlanFWWidth + glPlanBunkLZ - glPlanBunkLine + glPlanOOBDist + glPlanTreeDist ) # ww
 
 if. 0<#ww do.
 
