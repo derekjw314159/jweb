@@ -130,7 +130,7 @@ for_ab. i. 2 do.
 	    fname fappend~ LF,'$pdf->',pdfMulti ((3+sh*1.25) ,2+ab) ; 1.25 1 ; ' '; 1
 	else.
 	    fname fappend~ LF,'$pdf->SetFillColor(255,255,255);'
-	    fname fappend~ LF,'$pdf->',pdfMulti ((3+sh*1.25) ,2+ab) ; 1.25 1 ; ((": ww1{glPlanHitYards),(''$'T'=ww1{glPlanLayupType)#'T') ; 1
+	    fname fappend~ LF,'$pdf->',pdfMulti ((3+sh*1.25) ,2+ab) ; 1.25 1 ; ('<span style="text-align:center">',((": ww1{glPlanHitYards),(''$'T'=ww1{glPlanLayupType)#'T'),'</span>') ; 1
 	end.
     end.
 end.
@@ -144,6 +144,16 @@ for_ab. i. 2 do.
     fname fappend~ LF,'$pdf->',pdfMulti ((3+ab*2.5) ,4) ; 2.5 1 ; txt ; 1
 end.
 
+NB. Roll
+fname fappend~ LF,'// -------- Roll -------------'
+fname fappend~ LF,'$pdf->SetFillColor(0,0,0);'
+fname fappend~ LF,'$pdf->SetTextColor(255, 255, 255);'
+fname fappend~ LF,'$pdf->',pdfMulti 0 5 ; 3 1 ; '<b>ROLL</b>'; 1
+fname fappend~ LF,'$pdf->SetFillColor(255,255,255);'
+fname fappend~ LF,'$pdf->SetTextColor(0,0,0);'
+fname fappend~ LF,'$pdf->',pdfMulti 3 5 ; 2.5 1 ; '<span style="text-align:center"><b>S1</b></span>'; 1
+fname fappend~ LF,'$pdf->',pdfMulti 5.5 5 ; 2.5 1 ; '<span style="text-align:center"><b>S2</b></span>'; 1
+fname fappend~ LF,'$pdf->',pdfMulti 0 6 ; 3 1 ; '<i>Downhill/Level/Uphill</i>'; 1
 
 NB. fname fappend~ LF,'$pdf->SetXY(100,100);'
 NB. fname fappend~ LF,'$pdf->Write(10,''Return to plan'',''http://jw/rating/plannomap/',glFilename,'/',(":1+hole),''')'

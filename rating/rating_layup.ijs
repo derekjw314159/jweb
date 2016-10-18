@@ -80,8 +80,9 @@ defaulthit=. (< gender, ability, 1<. shot){glPlayerDistances
 remain=. glPlanHitYards + glPlanRemGroundYards
 defaulthit=. defaulthit <. remain
 transition=. 0
-NB. Transitional distance check if within 10 yards
-if. (defaulthit < remain) *. (defaulthit + 10) >: remain do.
+trans_dist=. shot { 10 20 20 20 20 20 
+NB. Transitional distance check if within 10 yards of par 3 or 20 yards of par 4/5
+if. (defaulthit < remain) *. (defaulthit + trans_dist) >: remain do.
 	defaulthit=. remain
 	transition=. 1
 end.
