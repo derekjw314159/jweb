@@ -226,7 +226,7 @@ tees=. (glTees e. ww) # glTees
 for_t. tees do.
 	stdout '<th>',(>(glTees i. t){glTeesName),'</th>'
 end.
-stdout '<th>Shot</th><th>Hit</th><th>ToGreen</th><th>Edits</th><th>Alt</th><th>F/width</th><th>Bunk?</th><th>Dist OB</th><th>Dist Tr</th><th>Tree Rec</th><th>Dist Wat</th><th>F/w slope</th><th colspan=3>Other</th></tr></thead><tbody>'
+stdout '<th>Shot</th><th>Hit</th><th>ToGreen</th><th>Edits</th><th>Alt</th><th>F/wid</th><th>Bunk?</th><th>Dist OB</th><th>Dist Tr</th><th>Tree Rec</th><th>Dist Wat</th><th>F/w slope</th><th colspan=3>Other</th></tr></thead><tbody>'
 NB. Sort the records and re-read
 rr=. I. glPlanHole=hole
 rr=. rr /: rr { glPlanShot
@@ -280,9 +280,9 @@ for_rr. i. #glPlanID do.
 		if. 0<rr{glPlanRemGroundYards do.
 		    stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">Ed</a> <a href="/jw/rating/landingcopy/e/',(glFilename),'/',(;rr{glPlanID),'">Cop</a>'
 
-		    stdout '<td>',(":rr{glPlanAlt),'</td>'
-		    stdout LT3,'<td>',(":rr{glPlanFWWidth),'</td>'
-		    stdout LT3,'<td>',((rr{glPlanBunkNumber){'-y'),'</td>'
+		    stdout '<td style="border-right: 1px solid lightgray">',(":rr{glPlanAlt),'</td>'
+		    stdout LT3,'<td style="border-right: 1px solid gray">',(; 'b<.>' 8!:0 rr{glPlanFWWidth),'</td>'
+		    stdout LT3,'<td style="border-right: 1px solid gray">',((rr{glPlanBunkNumber){'-y'),'</td>'
 		    stdout LT3,'<td>',(":rr{glPlanOOBDist),'</td>'
 		    stdout LT3,'<td>',(":rr{glPlanTreeDist),'</td>'
 		    stdout LT3,'<td>',(;(glTreeRecovVal i. rr{glPlanTreeRecov){glTreeRecovDesc),'</td>'
