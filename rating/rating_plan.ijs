@@ -398,7 +398,7 @@ NB. Green Data
 
 stdout LF,'<div class="span-24 last">'
 stdout LT1,'<table><thead>'
-stdout LT3,'<tr><th>Green</th><th>From tee</th><th>To Front</th><th>Alt</th><th>Len</th><th>Wid</th><th>Diam</th><th>Tier</th><th>Firm</th><th>Contour</th><th>Stimp</th><th>Tree</th><th>Tree +1</th><th>Mounds</th><th>Bunk Frac</th><th>Visibility</th><th>Obstructed</th><th>Contour</th><th>%Water</th><th>Dist Water</th><th colspan="5">Other Variables</th></tr>'
+stdout LT3,'<tr><th>Green</th><th>From tee</th><th>To Front</th><th>Alt</th><th>Len</th><th>Wid</th><th>Diam</th><th>Tier</th><th>Firm</th><th>Contour</th><th>Stimp</th><th>Tree</th><th>Tree +1</th><th>Mounds</th><th>Bunk Frac</th><th>Bunk Dep</th><th>OOB Dist</th><th>Water Dist</th><th>Water Frac</th><th>Water SurrDist</th><th colspan="5">Other Variables</th></tr>'
 stdout LT2,'</thead><tbody><tr>'
 ww=. ''$glGrHole i. hole
 other=. ''
@@ -406,6 +406,13 @@ other=. other, (ww{glGrSurfaceUnpleasant)#' Surf:U'
 other=. other, (0<#>ww{glGrRRInconsistent)#' Inc:',>ww{glGrRRInconsistent
 other=. other, (0<#>ww{glGrRRRiseDrop)#' R/D:',>ww{glGrRRRiseDrop
 other=. other, (ww{glGrRRUnpleasant)#' RR:U'
+other=. other, (0<#>ww{glGrBunkExtreme)#' BuEx:',>ww{glGrBunkExtreme
+other=. other, (ww{glGrOOBBehind)#' OOB:Behind'
+other=. other, (0<#>ww{glGrOOBCart)#' OOBCart:',>ww{glGrOOBCart
+other=. other, (0<#>ww{glGrOOBPercent)#' OOB%:',>ww{glGrOOBPercent
+other=. other, (ww{glGrWaterBehind)#' Wat:Behind'
+other=. other, (0<#>ww{glGrWaterCart)#' WatCart:',>ww{glGrWaterCart
+other=. other, (0<#>ww{glGrWaterPercent)#' Wat%:',>ww{glGrWaterPercent
 stdout LT4,'<td><a href="/jw/rating/green/e/',glFilename,'/',(>ww{glGrID),'">Edit</a></td>'
 stdout LT4,'<td>',(> (glTees i. ww{glGrTee){glTeesName),'</td>'
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 ww{glGrFrontYards),'</td>'
@@ -421,8 +428,11 @@ stdout LT4,'<td style="border-right: 1px solid lightgray">',(>ww{glGrTree),'</td
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(>(ww{glGrTreeTween){' ' cut '. +1'),'</td>'
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(>(ww{glGrRRMounds){' ' cut '. y'),'</td>'
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(>ww{glGrBunkFraction),'</td>'
-stdout LT4,'<td style="border-right: 1px solid lightgray">',(>(glGrVisibilityVal i. ww{glGrVisibility){glGrVisibilityDesc),'</td>'
-stdout LT4,'<td style="border-right: 1px solid lightgray">',(>(ww{glGrObstructed){' ' cut '- y'),'</td>'
+stdout LT4,'<td style="border-right: 1px solid lightgray">',(>ww{glGrBunkDepth),'</td>'
+stdout LT4,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 ww{glGrOOBDist),'</td>'
+stdout LT4,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 ww{glGrWaterDist),'</td>'
+stdout LT4,'<td style="border-right: 1px solid lightgray">',(>ww{glGrWaterFraction),'</td>'
+stdout LT4,'<td style="border-right: 1px solid lightgray">',(>ww{glGrWaterSurrDist),'</td>'
 stdout LT4,'<td colspan="5">',(}.other),'</td>'
 stdout LT2,'</tr></tbody></table>'
 stdout LF,'</div>' NB. main span

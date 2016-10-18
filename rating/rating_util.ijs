@@ -5,6 +5,37 @@ NB. and offline updates
 glMY=: 1.0936133
 
 NB. ==============================================
+NB. Global values and descriptions
+NB. ==============================================
+glTreeVal=: (<''),':' cut 'MP:Mod:Sig:Ext'
+glTreeDesc=: ':' cut 'Zero:Min Pr:Mod Pr:Sig Pr:Ext Pr'
+glRRRiseDropVal=: (<''),':' cut '>5'':>10'''
+glRRRiseDropDesc=: ':' cut 'None:+1 >5'':+2 >10'''
+glTopogStanceVal=: (<''),':' cut 'MA:SA:EA'
+glTopogStanceDesc=: ':' cut 'Minor Problem:Moderately Awkward:Signif Awkward:Extremely Awkward'
+glBunkFractionVal=: (<''),':' cut '<1/4:<1/2:<3/4:>3/4'
+glBunkFractionDesc=: ':' cut 'Zero:0 - 1/4:1/4 - 1/2:1/2 - 3/4:>3/4'
+glBunkDepthVal=: (<''),':' cut '2-3:3-5:5-6:6-8:8-10:10-12:12-15:>15'
+glBunkDepthDesc=: ':' cut '<2'':2'' - 3'':3'' - 5'':5'' - 6'':6'' - 8'':8'' - 10'':10'' - 12'':12'' - 15'':>15'''
+glBunkExtremeVal=: (<''),':' cut '+1:+2'
+glBunkExtremeDesc=: ':' cut 'Zero:+1:+2'
+glOOBCartVal=: (<''),':' cut '+1:-1'
+glOOBCartDesc=: ':' cut 'None:+1 Bounce away:-1 Bounce towards'
+glOOBPercentVal=: (<''),':' cut '20%:40%:60%:80%'
+glOOBPercentDesc=: ':' cut '100%:20%:40%:60%:80%'
+glRRInconsistentVal=: (<''),':' cut '+1:-1'
+glRRInconsistentDesc=: ':' cut 'None:+1 Harder:-1 Easier'
+glWaterFractionVal=: (<''),':' cut '1/4-<1/2:>1/2'
+glWaterFractionDesc=: ':' cut '0 - 1/4:1/4 - 1/2:>1/2'
+glWaterSurrDistVal=: (<''),':' cut '1-5:6-10:11-20:>20'
+glWaterSurrDistDesc=: ':' cut 'None:1 - 5:6 - 10:11 - 20:>20'
+glWaterCartVal=: (<''),':' cut '+1:-1'
+glWaterCartDesc=: ':' cut 'None:+1 Bounce away:-1 Bounce towards'
+glWaterPercentVal=: (<''),':' cut '20%:40%:60%:80%'
+glWaterPercentDesc=: ':' cut '100%:20%:40%:60%:80%'
+
+
+NB. ==============================================
 NB. setglobalsfromcurrent
 NB. ----------------------------------------------
 NB. Sets the global variables for paths etc.
@@ -103,20 +134,20 @@ path=.((| path - _1{path) < (|start - _1{path)) # path
 
 NB. If first point of path is further than radius, simple calc
 if. radius < (|start - 0{path) do.
-	prop=. radius % (|start -0{path)
-	res=. start + prop * (0{path) - start
-	res=. FullOStoLatLon res
-	res=. res, radius * glMY
-	return.
+    prop=. radius % (|start -0{path)
+    res=. start + prop * (0{path) - start
+    res=. FullOStoLatLon res
+    res=. res, radius * glMY
+    return.
 end.
 
 NB. If last point of path is less than radius, zoom there
 if. radius >: (|start - _1{path) do.
-	res=. FullOStoLatLon _1{path
-	NB. Truncate path to startpoint
-	path=. start, path
-	res=. res, glMY * +/|(}.path) - (}:path)
-	return.
+    res=. FullOStoLatLon _1{path
+    NB. Truncate path to startpoint
+    path=. start, path
+    res=. res, glMY * +/|(}.path) - (}:path)
+    return.
 end.
 NB. Need to find out which chunk of the path is crossed by radius
 dist=.( (| path - start) > radius) i. 1
@@ -173,11 +204,11 @@ path=.((| path - _1{path) < (|start - _1{path)) # path
 
 NB. If first point of path is further than radius, simple calc
 if. radius < (|start - 0{path) do.
-	prop=. radius % (|start -0{path)
-	res=. start + prop * (0{path) - start
-	res=. FullOStoLatLon res
-	res=. res, <. 0.5 + radius * glMY
-	return.
+    prop=. radius % (|start -0{path)
+    res=. start + prop * (0{path) - start
+    res=. FullOStoLatLon res
+    res=. res, <. 0.5 + radius * glMY
+    return.
 end.
 
 NB. Else add the start point to the path
@@ -186,10 +217,10 @@ length=. 0, +/ \ (|(}. path) - }:path)
 
 NB. If last point of path is less than radius, zoom there
 if. radius >: ({:length) do.
-	res=. FullOStoLatLon _1{path
-	NB. Truncate path to startpoint
-	res=. res, <. 0.5 + glMY *  _1{length
-	return.
+    res=. FullOStoLatLon _1{path
+    NB. Truncate path to startpoint
+    res=. res, <. 0.5 + glMY *  _1{length
+    return.
 end.
 
 NB. Need to find out which chunk of the path is crossed by radius
@@ -217,56 +248,56 @@ AugmentGPS=: 3 : 0
 y=. ,y
 y=. (y e. i.18 ) # y NB. Limit to valid holes
 for_h. y do. NB. Start of hole loop <h>
-	NB. Green centres
-	xx=. ('r<0>2.0' 8!:0 (1+h)),each(' ' cut 'GC GF GB')
-	xx=. glGPSName i. xx
-	if. (0{xx) < #glGPSName do. continue. end. NB. already exists
-	latlon=. LatLontoFullOS (1 2{xx)  { glGPSLatLon
-	latlon=. 0.5 * +/ latlon NB. average of two positions
-	latlon=. FullOStoLatLon latlon
-	glGPSLatLon=: glGPSLatLon, latlon
-	glGPSAlt=: glGPSAlt, 0.5 * +/ 1 2 {glGPSAlt
-	glGPSName=: glGPSName, <(>'r<0>2.0' 8!:0 (1+h)),'GC'
-	glGPSMeasured=: glGPSMeasured, 0
+    NB. Green centres
+    xx=. ('r<0>2.0' 8!:0 (1+h)),each(' ' cut 'GC GF GB')
+    xx=. glGPSName i. xx
+    if. (0{xx) < #glGPSName do. continue. end. NB. already exists
+    latlon=. LatLontoFullOS (1 2{xx)  { glGPSLatLon
+    latlon=. 0.5 * +/ latlon NB. average of two positions
+    latlon=. FullOStoLatLon latlon
+    glGPSLatLon=: glGPSLatLon, latlon
+    glGPSAlt=: glGPSAlt, 0.5 * +/ 1 2 {glGPSAlt
+    glGPSName=: glGPSName, <(>'r<0>2.0' 8!:0 (1+h)),'GC'
+    glGPSMeasured=: glGPSMeasured, 0
 end.  NB. end of first hole loop
 
 for_h. y do. NB. Start of hole loop <h>
 
-	NB. Other tees
-	for_t. }. glTees do. NB. start of tee loop
-		xx=. (>'r<0>2.0' 8!:0 (1+h)),'T',t
-		xx=. glGPSName i. xx
-		if. xx < #glGPSName do. continue. end. NB. already exists
-		path=. PathTeeToGreen h ; 0{glTees
-		NB. Difference between card values
-		radius=. -/(<(0,glTees i. t) ; h) { glTeesYards
-		latlon=. 0{ InterceptPath path ; (0{path) ; radius		
-		glGPSLatLon=: glGPSLatLon, latlon
-		glGPSAlt=: glGPSAlt, (glGPSLatLon i. 0{path){glGPSAlt
-		glGPSName=: glGPSName, <(>'r<0>2.0' 8!:0 (1+h)),'T',t
-		glGPSMeasured=: glGPSMeasured, 0
-	end. NB. End of tee loop	
+    NB. Other tees
+    for_t. }. glTees do. NB. start of tee loop
+	    xx=. (>'r<0>2.0' 8!:0 (1+h)),'T',t
+	    xx=. glGPSName i. xx
+	    if. xx < #glGPSName do. continue. end. NB. already exists
+	    path=. PathTeeToGreen h ; 0{glTees
+	    NB. Difference between card values
+	    radius=. -/(<(0,glTees i. t) ; h) { glTeesYards
+	    latlon=. 0{ InterceptPath path ; (0{path) ; radius		
+	    glGPSLatLon=: glGPSLatLon, latlon
+	    glGPSAlt=: glGPSAlt, (glGPSLatLon i. 0{path){glGPSAlt
+	    glGPSName=: glGPSName, <(>'r<0>2.0' 8!:0 (1+h)),'T',t
+	    glGPSMeasured=: glGPSMeasured, 0
+    end. NB. End of tee loop	
 
 end. NB. End of hole loop <h>	
 
 NB. Finally, adjust tee position to be the same as the card
 for_h. y do. NB. Start of hole loop <h>
 
-	NB. Other tees
-	for_t. glTees do. NB. start of tee loop
-		path=. PathTeeToGreen h ; t
-		NB. Difference between card values
-		card=. -/(<(t_index) ; h) { glTeesYards
-		path=. LatLontoFullOS path
-		length=. glMY * +/ | (}. path) - (}:path) 
-		NB. Move first point
-		latlon=. (0{path) + ((length-card) % glMY * |-/2{.path) * (-/1 0 { path)
-		latlon=. FullOStoLatLon latlon
-		xx=. <(>'r<0>2.0' 8!:0 (1+h)),'T',t
-		xx=. glGPSName i. xx
-		glGPSLatLon=: latlon (xx)} glGPSLatLon
-	
-	end. NB. End of tee loop	
+    NB. Other tees
+    for_t. glTees do. NB. start of tee loop
+	    path=. PathTeeToGreen h ; t
+	    NB. Difference between card values
+	    card=. -/(<(t_index) ; h) { glTeesYards
+	    path=. LatLontoFullOS path
+	    length=. glMY * +/ | (}. path) - (}:path) 
+	    NB. Move first point
+	    latlon=. (0{path) + ((length-card) % glMY * |-/2{.path) * (-/1 0 { path)
+	    latlon=. FullOStoLatLon latlon
+	    xx=. <(>'r<0>2.0' 8!:0 (1+h)),'T',t
+	    xx=. glGPSName i. xx
+	    glGPSLatLon=: latlon (xx)} glGPSLatLon
+    
+    end. NB. End of tee loop	
 
 end. NB. End of hole loop <h>	
 
@@ -308,111 +339,111 @@ for_t. tees do. NB. Only relevant tees for the hole was the old logic, now need 
 NB. .. tee has been added or deleted
 
 for_g. genders do.
-    NB. Remove condition for women not playing white tees - control is all with <<glTeMeasured>>
-    NB. if. -. t e. >g{glTeesPlayer do. continue. end. 
-    
-    NB. Fish out records for any plan records no longer measured
-    ww=. glTeHole=h
-    ww=. I. ww *. glTeTee=t
-    if. -.  (<ww,g) {glTeMeasured do. NB. Dead tee
-    	NB. Find any plan points pointing at dead tee
-	utKeyRead glFilepath,'_plan'
-	ww=. glPlanRecType='P'
-	ww=. ww *. glPlanHole = h
-	ww=. ww *. glPlanTee = t
-	ww=. I. ww *. glPlanGender = g
-	if. 0<#ww do.
-	    NB. Write out measurement points with existing values
-	    key=. ww{glPlanID
-	    key utKeyRead glFilepath,'_plan'
-	    newkey=. 'r<0>2.0' 8!:0 glPlanHole
-	    newkey=. newkey ,each <'-'
-	    newkey=. newkey ,each 'r<0>3.0' 8!:0 glPlanRemGroundYards
-	    glPlanHitYards=: (#key) $0
-	    glPlanUpdateName=: (#key)$<": getenv 'REMOTE_USER'
-	    glPlanUpdateTime=: (#key)$< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
-	    glPlanLayupType=: (#key)$,' '
-	    glPlanRecType=: (#key)$,'M'
-	    glPlanCarryType=: (#key)$,' '
-	    glPlanSqueezeType=: (#key)$,' '
-	    glPlanSqueezeWidth=: (#key)$0
-	    glPlanID=: newkey
-	    utKeyPut glFilepath,'_plan'
-	    key utKeyDrop glFilepath,'_plan' 
-	end.
-	continue. NB. Loop to next gender
+NB. Remove condition for women not playing white tees - control is all with <<glTeMeasured>>
+NB. if. -. t e. >g{glTeesPlayer do. continue. end. 
+
+NB. Fish out records for any plan records no longer measured
+ww=. glTeHole=h
+ww=. I. ww *. glTeTee=t
+if. -.  (<ww,g) {glTeMeasured do. NB. Dead tee
+    NB. Find any plan points pointing at dead tee
+    utKeyRead glFilepath,'_plan'
+    ww=. glPlanRecType='P'
+    ww=. ww *. glPlanHole = h
+    ww=. ww *. glPlanTee = t
+    ww=. I. ww *. glPlanGender = g
+    if. 0<#ww do.
+	NB. Write out measurement points with existing values
+	key=. ww{glPlanID
+	key utKeyRead glFilepath,'_plan'
+	newkey=. 'r<0>2.0' 8!:0 glPlanHole
+	newkey=. newkey ,each <'-'
+	newkey=. newkey ,each 'r<0>3.0' 8!:0 glPlanRemGroundYards
+	glPlanHitYards=: (#key) $0
+	glPlanUpdateName=: (#key)$<": getenv 'REMOTE_USER'
+	glPlanUpdateTime=: (#key)$< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
+	glPlanLayupType=: (#key)$,' '
+	glPlanRecType=: (#key)$,'M'
+	glPlanCarryType=: (#key)$,' '
+	glPlanSqueezeType=: (#key)$,' '
+	glPlanSqueezeWidth=: (#key)$0
+	glPlanID=: newkey
+	utKeyPut glFilepath,'_plan'
+	key utKeyDrop glFilepath,'_plan' 
     end.
+    continue. NB. Loop to next gender
+end.
 
 
 for_ab. abilities do.
-	shot=. _1
-	cumgroundyards=. 0 
-	path=. LatLontoFullOS PathTeeToGreen h ; t
-	remgroundyards=. <. 0.5 + glMY * +/ |(}.path) - }:path
-	NB. glTeesGroundYards=: <. 0.5+remgroundyards (< (glTees i. t), h)}glTeesGroundYards
-	path=. LatLontoFullOS PathTeeToGreen h ; backtee
-	rembackyards=. <. 0.5 + glMY * +/ |(}.path) - }:path
-	cumbackyards=. rembackyards - remgroundyards
-	path=. PathTeeToGreen h ; t
-	start=. 0{path
+    shot=. _1
+    cumgroundyards=. 0 
+    path=. LatLontoFullOS PathTeeToGreen h ; t
+    remgroundyards=. <. 0.5 + glMY * +/ |(}.path) - }:path
+    NB. glTeesGroundYards=: <. 0.5+remgroundyards (< (glTees i. t), h)}glTeesGroundYards
+    path=. LatLontoFullOS PathTeeToGreen h ; backtee
+    rembackyards=. <. 0.5 + glMY * +/ |(}.path) - }:path
+    cumbackyards=. rembackyards - remgroundyards
+    path=. PathTeeToGreen h ; t
+    start=. 0{path
 
 label_shot.
-	NB. Remove this record by pushing out a measurement-only
-	NB. record.
-	shot=. shot + 1
+    NB. Remove this record by pushing out a measurement-only
+    NB. record.
+    shot=. shot + 1
 
-	NB. Find the matching records and shift to measurement records
-	NB. Logic is to find the keys
-	utKeyRead glFilepath,'_plan'
-	ww=. glPlanHole =  h
-	ww=. ww *. glPlanTee =  t
-	ww=. ww *. glPlanGender =  g
-	ww=. ww *. glPlanAbility =  ab
-	ww=. ww *. glPlanShot = shot
-	ww=. ww *. glPlanRecType = 'P'
-	ww=. ww # glPlanID
-	if. 1 < $ww do.
-		NB. No should not happen
-		stderr 'Too many records in plan file'
-		return.
-	elseif. 0=$ww do.
-		NB. Nothing to do
-		NB. but do need to restore glPlanID
-		glPlanID=: ,EnKey h ; '' ; t ; g ; ab ; shot
-		glPlanLayupType=: ,' '
-	elseif. 1=$ww do.
-		ww utKeyRead glFilepath,'_plan'
+    NB. Find the matching records and shift to measurement records
+    NB. Logic is to find the keys
+    utKeyRead glFilepath,'_plan'
+    ww=. glPlanHole =  h
+    ww=. ww *. glPlanTee =  t
+    ww=. ww *. glPlanGender =  g
+    ww=. ww *. glPlanAbility =  ab
+    ww=. ww *. glPlanShot = shot
+    ww=. ww *. glPlanRecType = 'P'
+    ww=. ww # glPlanID
+    if. 1 < $ww do.
+	    NB. No should not happen
+	    stderr 'Too many records in plan file'
+	    return.
+    elseif. 0=$ww do.
+	    NB. Nothing to do
+	    NB. but do need to restore glPlanID
+	    glPlanID=: ,EnKey h ; '' ; t ; g ; ab ; shot
+	    glPlanLayupType=: ,' '
+    elseif. 1=$ww do.
+	    ww utKeyRead glFilepath,'_plan'
 
-		NB. player on this tee
-		NB. Should only be one record
-		NB. Write out a Measurement Point
-		newkey=. EnKey h ; glPlanMeasDist ; t ; g ;ab ; shot
-		newkey=. <6 {. >newkey NB. Just need first six characters
-		glPlanHitYards=: ,0
-		glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
-		glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
-		glPlanLayupType=: ,' '
-		glPlanRecType=: ,'M'
-		glPlanCarryType=: ,' '
-		glPlanSqueezeType=: ,' '
-		glPlanID=: ,newkey
-		utKeyPut glFilepath,'_plan'
-		
-		NB. Read it back again
-		ww utKeyRead glFilepath,'_plan'
-	end.
+	    NB. player on this tee
+	    NB. Should only be one record
+	    NB. Write out a Measurement Point
+	    newkey=. EnKey h ; glPlanMeasDist ; t ; g ;ab ; shot
+	    newkey=. <6 {. >newkey NB. Just need first six characters
+	    glPlanHitYards=: ,0
+	    glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
+	    glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
+	    glPlanLayupType=: ,' '
+	    glPlanRecType=: ,'M'
+	    glPlanCarryType=: ,' '
+	    glPlanSqueezeType=: ,' '
+	    glPlanID=: ,newkey
+	    utKeyPut glFilepath,'_plan'
+	    
+	    NB. Read it back again
+	    ww utKeyRead glFilepath,'_plan'
+    end.
 
-	NB. Pull normal shot distance
-	NB. Check if there is a layup record
-	defaulthit=.  (<g,ab, 1<.shot){glPlayerDistances
-	if. ( glPlanLayupType e. 'LR') do. NB. Found
-		radius2=. ''$ glPlanHitYards
-	else.
-		radius2=. ''$ defaulthit
- 		glPlanLayupType=: ,' '
-	end.
-	ww=. InterceptPath path ; start ; radius2
-	NB. New logic for transition within 10 yards of 
+    NB. Pull normal shot distance
+    NB. Check if there is a layup record
+    defaulthit=.  (<g,ab, 1<.shot){glPlayerDistances
+    if. ( glPlanLayupType e. 'LR') do. NB. Found
+	    radius2=. ''$ glPlanHitYards
+    else.
+	    radius2=. ''$ defaulthit
+	    glPlanLayupType=: ,' '
+    end.
+    ww=. InterceptPath path ; start ; radius2
+    NB. New logic for transition within 10 yards of 
 	NB. of the green for a Par 3 or 20 for Par 4/5
 	trans_dist=. shot { 10 20 20 20 20 20 
 	rem=. remgroundyards - <. 0.5 + 1{ww
