@@ -74,43 +74,85 @@ stdout LT2,'</tbody></table></div>'
 stdout LT1,'<form action="/jw/rating/green/editpost/',(;glFilename),'" method="post">'
 
 NB. Hidden variables
-stdout LT1,'<div class="span-15 last">'
+stdout LT1,'<div class="span-20 last">'
 stdout LT2,'<input type="hidden" name="prevname" value="',(":;glGrUpdateName),'">'
 stdout LT2,'<input type="hidden" name="prevtime" value="',(;glGrUpdateTime),'">'
 stdout LT2,'<input type="hidden" name="keyplan" value="',(;keyy),'">'
 stdout LT2,'<input type="hidden" name="filename" value="',(;glFilename),'">'
 
 NB. Measurements
-stdout LT1,'<h4>Distances</h4>'
+stdout LT1,'<h4>Distances and Green Target</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>From Tee</th><th>Green Front</th><th>Length</th><th>Width</th><th>Diam</th><th>Circle Concept</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>From Tee</th><th>Green Front</th><th>Alt</th><th>Length</th><th>Width</th><th>Diam</th><th>Circle Concept</th><th>Tiered</th><th>Firmness</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td>'
 djwSelect 'fromtee' ; 1 ; glTeesName ; (<"0 glTees) ; <<''$glGrTee
 stdout LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glGrFrontYards),'" tabindex="2" ',(InputFieldnum 'frontyards'; 3),'>',LT4,'</td>'
-stdout LT4,'<td><input value="',(":;glGrLength),'" tabindex="3',(InputFieldnum 'length'; 3),'>',LT4,'</td>'
-stdout LT4,'<td><input value="',(":;glGrWidth),'" tabindex="4',(InputFieldnum 'width'; 3),'>',LT4,'</td>'
-stdout LT4,'<td>',(":;glGrDiam),LT4,'</td>'
+stdout LT4,'<td><input value="',(":;glGrAlt),'" tabindex="3" ',(InputFieldnum 'alt'; 3),'>',LT4,'</td>'
+stdout LT4,'<td><input value="',(":;glGrLength),'" tabindex="4',(InputFieldnum 'length'; 3),'>',LT4,'</td>'
+stdout LT4,'<td><input value="',(":;glGrWidth),'" tabindex="5',(InputFieldnum 'width'; 3),'>',LT4,'</td>'
+stdout LT4,'<td><input value="',(":;glGrDiam),'" tabindex="6',(InputFieldnum 'diam'; 3),'>',LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="circleconcept" name="circleconcept" value="1" '
-stdout ((''$glGrCircleConcept)#'checked'),' tabindex="5">',LT4,'</td>'
+stdout ((''$glGrCircleConcept)#'checked'),' tabindex="7">',LT4,'</td>'
+stdout LT4,'<td><input type="checkbox" id="tiered" name="tiered" value="1" '
+stdout ((''$glGrTiered)#'checked'),' tabindex="8">',LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'firmness' ; 9 ; glGrFirmnessDesc ; glGrFirmnessVal ; <''$glGrFirmness
+stdout LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table>'
 
 NB. Table of values - Common Values
 stdout LT1,'<h4>Common Measurements</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>Alt</th><th>Dist OB</th><th>Dist Tr</th><th>Tree Recov</th><th>Dist Wat</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>Surface contours</th><th>Dist Tree</th><th>Tree</th><th>Tree +1</th><th>Mounds</th><th>Bunk Frac</th><th>Dist OB</th><th>Dist Wat</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
-stdout LT4,'<td><input value="',(":;glGrAlt),'" tabindex="1" ',(InputFieldnum 'alt'; 3),'>',LT4,'</td>'
-stdout LT4,'<td><input value="',(":;glGrOOBDist),'" tabindex="4" ',(InputFieldnum 'oobdist'; 3),'>',LT4,'</td>'
-stdout LT4,'<td><input value="',(":;glGrTreeDist),'" tabindex="5" ',(InputFieldnum 'treedist'; 3),'>',LT4,'</td>'
 stdout LT4,'<td>'
-djwSelect 'treerecov' ; 6 ; glTreeRecovDesc ; glTreeRecovVal ; <''$glGrTreeRecov
+djwSelect 'contour' ; 10 ; glGrContourDesc ; glGrContourVal ; <''$glGrContour
 stdout LT4,'</td>'
+stdout LT4,'<td><input value="',(":;glGrTreeDist),'" tabindex="11" ',(InputFieldnum 'treedist'; 3),'>',LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'tree' ; 12 ; glGrTreeDesc ; glGrTreeVal ; <''$glGrTree
+stdout LT4,'</td>'
+stdout LT4,'<td><input type="checkbox" id="treetween" name="treetween" value="1" '
+stdout ((''$glGrTreeTween)#'checked'),' tabindex="13">',LT4,'</td>'
+stdout LT4,'<td><input type="checkbox" id="rrmounds" name="rrmounds" value="1" '
+stdout ((''$glGrRRMounds)#'checked'),' tabindex="14">',LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'bunkfraction' ; 12 ; glBunkFractionDesc ; glBunkFractionVal ; <''$glGrBunkFraction
+stdout LT4,'</td>'
+stdout LT4,'<td><input value="',(":;glGrOOBDist),'" tabindex="13" ',(InputFieldnum 'oobdist'; 3),'>',LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glGrWaterDist),'" tabindex="7" ',(InputFieldnum 'waterdist'; 3),'>',LT4,'</td>'
 stdout LT3,'</tr>'
+stdout '</tbody></table>'
+
+NB. Table of values - Green Surface, R&R
+stdout LT1,'<h4>Green Surface, Recov and Rough</h4>'
+stdout LT1,'<table>',LT2,'<thead>'
+stdout LT3,'<tr>'
+stdout LT4,'<th colspan="3">Green Surface</th><th colspan="3">Recoverability and Rough</th>'
+stdout LT3,'</tr>'
+stdout LT3,'<tr>'
+stdout LT4,'<th>Stimp</th><th>All</th><th>Unpleasant</th><th>Rough Inconsistent</th><th>Rise and Drop</th><th>Unpleasant</th>'
+stdout LT3,'</tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT3,'<tr>'
+stdout LT4,'<td><input value="',(":;glGrStimp),'" tabindex="15" ',(InputFieldnum 'stimp'; 3),'>',LT4,'</td>'
+stdout LT4,'<td><input type="checkbox" id="all" name="all" value="1" '
+stdout ' tabindex="16">',LT4,'</td>'
+stdout LT4,'<td><input type="checkbox" id="surfaceunpleasant" name="surfaceunpleasant" value="1" '
+stdout ((''$glGrSurfaceUnpleasant)#'checked'),' tabindex="13">',LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'rrinconsistent' ; 12 ; glRRInconsistentDesc ; glRRInconsistentVal ; <''$glGrRRInconsistent
+stdout LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'rrrisedrop' ; 12 ; glRRRiseDropDesc ; glRRRiseDropVal ; <''$glGrRRRiseDrop
+stdout LT4,'</td>'
+stdout LT4,'<td><input type="checkbox" id="rrunpleasant" name="rrunpleasant" value="1" '
+stdout ((''$glGrRRUnpleasant)#'checked'),' tabindex="13">',LT4,'</td>'
+stdout LT3,'</tr>'
 stdout '</tbody></table></div>'
+
 
 NB. Submit buttons
 stdout LT1,'<div class="span-15 last">'
@@ -145,7 +187,13 @@ end.
 
 NB. Assign to variables
 circleconcept=: 0
-xx=. djwCGIPost y ; ' ' cut 'frontyards length width circleconcept alt oobdist treedist waterdist'
+tiered=: 0
+all=: 0
+treetween=: 0
+surfaceunpleasant=: 0
+rrmounds=: 0
+rrunpleasant=: 0
+xx=. djwCGIPost y ; ' ' cut 'all frontyards length width diam circleconcept tiered alt oobdist treedist treetween waterdist stimp all surfaceunpleasant rrmounds rrunpleasant'
 glFilename=: dltb ;filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
@@ -179,19 +227,36 @@ glGrUpdateName=: ,<": getenv 'REMOTE_USER'
 glGrUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 glGrTee=: ,>fromtee
 glGrFrontYards=: ,frontyards 
+glGrAlt=: ,alt
 glGrLength=: ,length
 glGrWidth=: ,width
+glGrDiam=: ,diam
 glGrDiam=: ,<. 0.5 + (0.5*length+width)
 glGrCircleConcept=: ,circleconcept
-glGrAlt=: ,alt
+glGrTiered=: ,tiered
+glGrFirmness=: ,firmness
+glGrContour=: ,contour
+glGrTreeDist=: ,treedist
+glGrTree=: ,tree
+glGrTreeTween=: ,treetween
 glGrFWWidth=: ,fwwidth
 glGrOOBDist=: ,oobdist
-glGrTreeDist=: ,treedist
-glGrTreeRecov=: ,treerecov
 glGrWaterDist=: , waterdist
+glGrStimp=: ,stimp
+glGrSurfaceUnpleasant=: ,surfaceunpleasant
+glGrRRInconsistent=: ,rrinconsistent
+glGrRRMounds=: ,rrmounds
+glGrRRRiseDrop=: ,rrrisedrop
+glGrRRUnpleasant=: ,rrunpleasant
+glGrBunkFraction=: ,bunkfraction
 
 NB. Write to files
 keyplan utKeyPut glFilepath,'_green'
+if. all do.
+    utKeyRead glFilepath,'_green'
+    glGrStimp=: 18$ stimp
+    utKeyPut glFilepath,'_green'
+end.
 
 stdout 'Content-type: text/html',LF,LF
 stdout LF,'<html><head>' 

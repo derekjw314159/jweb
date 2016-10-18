@@ -111,16 +111,19 @@ stdout LT2,'<input type="hidden" name="filename" value="',(;glFilename),'">'
 NB. Table of values - Common Values
 stdout LT1,'<h4>Common Measurements</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>Alt</th><th>FW Width</th><th>Bunk LZ</th><th>Bunk in Line</th><th>Dist OB</th><th>Dist Tr</th><th>Dist Wat</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>Alt</th><th>FW Width</th><th>FW +/-W</th><th>Bunk LZ</th><th>Bunk in Line</th><th>Dist OB</th><th>Dist Tr</th><th>Dist Wat</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td><input value="',(":;glPlanAlt),'" tabindex="1" ',(InputFieldnum 'alt'; 3),'>',LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanFWWidth),'" tabindex="2" ',(InputFieldnum 'fwwidth'; 3),'>',LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'widthadj' ; 3 ; glFWWidthAdjDesc ; glFWWidthAdjVal ; <''$glPlanFWWidthAdj
+stdout LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="bunklz" name="bunklz" value="1" '
-stdout ((''$glPlanBunkLZ)#'checked'),' tabindex="3">',LT4,'</td>'
+stdout ((''$glPlanBunkLZ)#'checked'),' tabindex="4">',LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="bunkline" name="bunkline" value="1" '
-stdout ((''$glPlanBunkLine)#'checked'),' tabindex="4">',LT4,'</td>'
-stdout LT4,'<td><input value="',(":;glPlanOOBDist),'" tabindex="5" ',(InputFieldnum 'oobdist'; 3),'>',LT4,'</td>'
-stdout LT4,'<td><input value="',(":;glPlanTreeDist),'" tabindex="6" ',(InputFieldnum 'treedist'; 3),'>',LT4,'</td>'
+stdout ((''$glPlanBunkLine)#'checked'),' tabindex="5">',LT4,'</td>'
+stdout LT4,'<td><input value="',(":;glPlanOOBDist),'" tabindex="6" ',(InputFieldnum 'oobdist'; 3),'>',LT4,'</td>'
+stdout LT4,'<td><input value="',(":;glPlanTreeDist),'" tabindex="7" ',(InputFieldnum 'treedist'; 3),'>',LT4,'</td>'
 NB. stdout LT4,'<td>'
 NB. djwSelect 'treerecov' ; 7 ; glTreeRecovDesc ; glTreeRecovVal ; <''$glPlanTreeRecov
 NB. stdout LT4,'</td>'
@@ -134,15 +137,42 @@ stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
 stdout LT4,'<th>Level</th><th>Firmness</th><th>Twice</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td>'
-djwSelect 'rolllevel' ; 7 ; glRollLevelDesc ; glRollLevelVal ; <''$glPlanRollLevel
+djwSelect 'rolllevel' ; 9 ; glRollLevelDesc ; glRollLevelVal ; <''$glPlanRollLevel
 stdout LT4,'</td>'
 stdout LT4,'<td>'
-djwSelect 'rollfirmness' ; 8 ; glRollFirmnessDesc ; glRollFirmnessVal ; <''$glPlanRollFirmness
+djwSelect 'rollfirmness' ; 10 ; glRollFirmnessDesc ; glRollFirmnessVal ; <''$glPlanRollFirmness
 stdout LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="rolltwice" name="rolltwice" value="1" '
-stdout ((''$glPlanRollTwice)#'checked'),' tabindex="9">',LT4,'</td>'
+stdout ((''$glPlanRollTwice)#'checked'),' tabindex="11">',LT4,'</td>'
 stdout LT3,'</tr>'
-stdout '</tbody></table></div>'
+stdout '</tbody></table>'
+
+NB. Table of values - Shot TO Landing Zone
+stdout LT1,'<h4>Shot TO Landing Zone</h4>'
+stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
+stdout LT4,'<th>Landing Zone not Visible</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT3,'<tr>'
+stdout LT4,'<td><input type="checkbox" id="fwvisible" name="fwvisible" value="1" '
+stdout ((''$glPlanFWVisible)#'checked'),' tabindex="12">',LT4,'</td>'
+stdout LT3,'</tr>'
+stdout '</tbody></table>'
+
+NB. Table of values - Topography
+stdout LT1,'<h4>Topography and Shot FROM Landing Zone</h4>'
+stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
+stdout LT4,'<th>Stance or Lie</th><th>Unpleasant Lie</th><th>Obstructed View</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT3,'<tr>'
+stdout LT4,'<td>'
+djwSelect 'topogstance' ; 13 ; glTopogStanceDesc ; glTopogStanceVal ; <''$glPlanTopogStance
+stdout LT4,'</td>'
+stdout LT4,'<td><input type="checkbox" id="fwunpleasant" name="fwunpleasant" value="1" '
+stdout ((''$glPlanFWUnpleasant)#'checked'),' tabindex="14">',LT4,'</td>'
+stdout LT4,'<td><input type="checkbox" id="fwobstructed" name="fwobstructed" value="1" '
+stdout ((''$glPlanFWObstructed)#'checked'),' tabindex="15">',LT4,'</td>'
+stdout LT3,'</tr>'
+stdout '</tbody></table>'
+
+stdout LT1,'</div>'
 
 NB. Submit buttons
 stdout LT1,'<div class="span-15 last">'
@@ -183,7 +213,10 @@ NB. Assign to variables
 bunklz=: 0
 bunkline=: 0
 rolltwice=: 0
-xx=. djwCGIPost y ; ' ' cut 'alt fwwidth bunklz bunkline oobdist treedist latwaterdist rolltwice'
+fwvisible=: 0
+fwunpleasant=: 0
+fwobstructed=: 0
+xx=. djwCGIPost y ; ' ' cut 'alt fwwidth bunklz bunkline oobdist treedist latwaterdist rolltwice fwvisible fwunpleasant fwobstructed'
 glFilename=: dltb ;filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
@@ -217,6 +250,7 @@ glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
 glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 glPlanAlt=: ,alt
 glPlanFWWidth=: ,fwwidth
+glPlanFWWidthAdj=: ,widthadj
 glPlanBunkLZ=: ,bunklz
 glPlanBunkLine=: ,bunkline
 glPlanOOBDist=: ,oobdist
@@ -226,6 +260,10 @@ glPlanLatWaterDist=: , latwaterdist
 glPlanRollLevel=: ,rolllevel
 glPlanRollFirmness=: ,rollfirmness
 glPlanRollTwice=: ,rolltwice
+glPlanFWVisible=: ,fwvisible
+glPlanTopogStance=: ,topogstance
+glPlanFWUnpleasant=: ,fwunpleasant
+glPlanFWObstructed=: ,fwobstructed
 
 NB. Write to files
 keyplan utKeyPut glFilepath,'_plan'

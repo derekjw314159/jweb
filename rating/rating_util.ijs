@@ -322,6 +322,7 @@ for_g. genders do.
 	ww=. ww *. glPlanTee = t
 	ww=. I. ww *. glPlanGender = g
 	if. 0<#ww do.
+	    NB. Write out measurement points with existing values
 	    key=. ww{glPlanID
 	    key utKeyRead glFilepath,'_plan'
 	    newkey=. 'r<0>2.0' 8!:0 glPlanHole
@@ -384,6 +385,7 @@ label_shot.
 
 		NB. player on this tee
 		NB. Should only be one record
+		NB. Write out a Measurement Point
 		newkey=. EnKey h ; glPlanMeasDist ; t ; g ;ab ; shot
 		newkey=. <6 {. >newkey NB. Just need first six characters
 		glPlanHitYards=: ,0
@@ -411,9 +413,10 @@ label_shot.
 	end.
 	ww=. InterceptPath path ; start ; radius2
 	NB. New logic for transition within 10 yards of 
-	NB. of the green
+	NB. of the green for a Par 3 or 20 for Par 4/5
+	trans_dist=. shot { 10 20 20 20 20 20 
 	rem=. remgroundyards - <. 0.5 + 1{ww
-	if. ( 0 < rem) *. (10 >: rem) *. (glPlanLayupType=' ') do.
+	if. ( 0 < rem) *. (trans_dist >: rem) *. (glPlanLayupType=' ') do.
 		radius2=. radius2 + rem
 		ww=. InterceptPath path ; start ; radius2
 		glPlanLayupType=: ,'T'
@@ -455,10 +458,13 @@ label_shot.
 	glPlanOOBDist=: ,0
 	glPlanTreeDist=: ,0
 	glPlanAlt=: ,0
+	glPlanTopogStance=: ,<''
 	glPlanBunkLZ=: ,0
 	glPlanBunkLine=: ,0
 	glPlanLatWaterDist=: ,0
 	glPlanDefaultHit=: glPlanHitYards
+	glPlanFWVisible=: ,0
+	glPlanFWUnpleasant=: ,0
 	glPlanRRMounds=: ,0
 	glPlanRRRiseDrop=: ,0
 	glPlanRRUnpleasant=: ,0
@@ -537,8 +543,9 @@ glPlanLatWaterDist=: 1 1{glPlanLatWaterDist
 glPlanRRMounds=: 1 1 { glPlanRRMounds
 glPlanRRRiseDrop=: 1 1 { glPlanRRRiseDrop
 glPlanRRUnpleasant=: 1 1 { glPlanRRUnpleasant
-glPlanFWStance=: 1 1 { glPlanFWStance
+glPlanTopogStance=: 1 1 { glPlanTopogStance
 glPlanFWWidthAdj=: 1 1 { glPlanFWWidthAdj
+glPlanFWVisible=: 1 1 { glPlanFWVisible
 glPlanFWUnpleasant=: 1 1 { glPlanFWUnpleasant
 glPlanFWObstructed=: 1 1 { glPlanFWObstructed
 glPlanRRHeight=: 1 1 { glPlanRRHeight
@@ -672,7 +679,6 @@ glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
 glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 glPlanMeasDist=: ,0
 glPlanCarryDist=: ,<' '
-glPlanFWWidth=: ,0
 glPlanOOBDist=: ,0
 glPlanTreeDist=: ,0
 glPlanAlt=: ,0
@@ -686,9 +692,10 @@ glPlanRRMounds=: ,0
 glPlanRRRiseDrop=: ,0
 glPlanRRUnpleasant=: ,0
 glPlanRollTwice=: ,(#glPlanID)$0
+glPlanFWWidth=: ,(#glPlanID)$<0 
 glPlanFWObstructed=: ,(#glPlanID)$0
-glPlanFWSlope=: ,(#glPlanID)$0
-glPlanFWStance=: ,(#glPlanID)$0
+glPlanTopogStance=: ,(#glPlanID)$<''
+glPlanFWVisible=: ,(#glPlanID)$0
 glPlanFWUnpleasant=: ,(#glPlanID)$0
-glPlanFWWidthAdj=: ,(#glPlanID)$0
+glPlanFWWidthAdj=: ,(#glPlanID)$<''
 )
