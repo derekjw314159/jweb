@@ -82,7 +82,7 @@ end.
 NB. Print tees and yardages
 user=. getenv 'REMOTE_USER'
 if. 0 -: user do. user=.'' end.
-stdout LF,'<h2>BB&O Nike U11 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>Prize Leaders</h3>'
+stdout LF,'<h2>BB&O Nike U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>Prize Leaders</h3>'
 
 NB. Order by prize time and get unique entries
 ww=.  /: >glPlFirstName

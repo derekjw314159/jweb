@@ -78,7 +78,7 @@ end.
 NB. Print tees and yardages
 user=. getenv 'REMOTE_USER'
 if. 0 -: user do. user=.'' end.
-stdout LF,'<h2>BB&O Nike U11 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>Leaderboard</h3>'
+stdout LF,'<h2>BB&O Nike U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>Leaderboard</h3>'
 
 NB. Order by leader time and get unique entries
 NB. Need to drop the last nine if a nine-hole competition
