@@ -48,7 +48,7 @@ end.
 NB. Print tees and yardages
 user=. getenv 'REMOTE_USER'
 if. 0 -: user do. user=.'' end.
-stdout LF,'<h2>BB&O Nike U11 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>All players</h3>'
+stdout LF,'<h2>BB&O Nike U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>All players</h3>'
 
 NB. Order by player
 ww=:  /: >glPlFirstName
@@ -136,7 +136,7 @@ end.
 NB. Print tees and yardages
 user=.  getenv 'REMOTE_USER'
 if. 0 -: user do. user=.'' end.
-stdout LF,'<h2>BB&O Nike U11 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>View details for :',(>glPlFirstName),' ',(>glPlLastName),'</h3>'
+stdout LF,'<h2>BB&O Nike U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>View details for :',(>glPlFirstName),' ',(>glPlLastName),'</h3>'
 
 NB. Print scorecard and yardage
 stdout LF,'<div class="span-24 last">'
@@ -254,7 +254,7 @@ end.
 NB. Print tees and yardages
 user=.  getenv 'REMOTE_USER'
 if. 0 -: user do. user=.'' end.
-stdout LF,'<h2>BB&O Nike U11 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2><h3>Edit details for :',(>glPlFirstName),' ',(>glPlLastName),'</h3>','<i>',user,'</i>'
+stdout LF,'<h2>BB&O Nike U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2><h3>Edit details for :',(>glPlFirstName),' ',(>glPlLastName),'</h3>','<i>',user,'</i>'
 
 NB. Print scorecard and yardage
 stdout LF,'<div class="span-24 last">'
