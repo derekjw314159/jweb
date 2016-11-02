@@ -8,11 +8,42 @@ NB. =========================================================
 NB. pdfMulti
 NB. =========================================================
 pdfMulti=: 3 : 0
+'L' pdfMulti y
+:
 'offset size text border'=. y
 offset=. glPDFoffset + offset * glPDFmult
 size=. size * glPDFmult
 NB. r=. 'MultiCell(',(":0{size),', ',(": 1{size),', ''',text,''', ',(":border),', ''J'', true, 0,',(":0{offset),', ',(":1{offset),', false, 0, true, true, ',(":0 * 1{size),',''M'',false);'
-r=. 'WriteHTMLCell(',(":0{size),', ',(": 1{size),', ',(":0{offset),', ',(":1{offset),', ''',text,''', ',(":border),', 0, true, false, '''', false);'
+r=. 'WriteHTMLCell(',(":0{size),', ',(": 1{size),', ',(":0{offset),', ',(":1{offset),', ''',text,''', ',(":border),', 0, true, false, ''',x,''', false);'
+)
+
+NB. =========================================================
+NB. pdfColor
+NB. =========================================================
+NB. Usage:
+NB.   'fore_or_back' pdfColor color
+pdfColor=: 3 : 0
+'T' pdfColor y
+:
+
+select. y
+    case. 'black' do. res=. '(0, 0, 0);'
+    case. 'white' do. res=. '(255, 255, 255);'
+    case. 'grey' do. res=. '(127, 127, 127);'
+    case. 'blue' do. res=. '( 35,  83, 216);'
+    case. 'lightyellow' do. res=. '(247, 253, 156);'
+end.
+res=. (>('FT' i. x){' ' cut 'setFillColor setTextColor'),res
+)
+
+NB. =========================================================
+NB. oN
+NB. =========================================================
+NB. Usage:
+NB.    textcolor on fillcolor
+oN=: 4 : 0
+res=. '$pdf->','T' pdfColor x
+res=. res,LF,'$pdf->','F' pdfColor y
 )
 
 NB. =========================================================
@@ -97,10 +128,19 @@ fname fappend~ LF,'$pdf->SetFont(''helvetica'', '''',  8);'
 fname fappend~ LF,'// -------- New Page -------------'
 fname fappend~ LF,'$pdf->AddPage(''L'');'
 
+NB. Build the data
+hityards=. 'glPlanHitYards' matrix_pull hole ; tee ; gender
+transition=. 'glPlanLayupType' matrix_pull hole ; tee ; gender
+transition=.  +. /"1'T' = >transition
+targvisible=. ((<glTargVisibleVal) i. each 'glPlanFWTargVisible' matrix_pull hole ; tee ; gender) { each <glTargVisibleNum
+visible=. 'glPlanFWVisible' matrix_pull hole ; tee ; gender
+targvisible=. 0, each }: each targvisible NB. Push to the shot after
+targvisible=. visible >. each targvisible
+
 NB. Title row
 fname fappend~ LF,'// -------- Title Row -------------'
-fname fappend~ LF,'$pdf->SetFillColor(255,255,255);'
-fname fappend~ LF,'$pdf->SetTextColor(0, 0, 0);'
+fname fappend~ LF,'$pdf->','F' pdfColor 'white'
+fname fappend~ LF,'$pdf->', 'T' pdfColor 'black'
 fname fappend~ LF,'$pdf->',pdfMulti 0 0 ; 5 1 ; ('<b>CLUB</b>: ',glCourseName); 1
 NB. Need to work out which tees this is serving
 meas=. gender{;glTeMeasured
@@ -122,7 +162,7 @@ for_sh. i. 4 do.
     fname fappend~ LF,'$pdf->',pdfMulti ((3+sh*1.25), 1) ; 1.25 1 ; ('<span style="text-align:center"><b>',(sh{'T234'),'</b></span>'); 1
 end.
 for_ab. i. 2 do.
-    fname fappend~ LF,'$pdf->SetFillColor(255,255,255);'
+    fname fappend~ LF,'$pdf->', 'F' pdfColor 'white'
     fname fappend~ LF,'$pdf->',pdfMulti (0 ,2+ab) ; 3 1 ; ('<span style="text-align:right"><i>',(>ab{' ' cut 'Scratch Bogey'),'</i></span>'); 1
     for_sh. i. 4 do.
 	ww1=. ( (ab = ww{glPlanAbility) *. (sh = ww{glPlanShot)) # ww
@@ -140,13 +180,11 @@ end.
 fname fappend~ LF,'$pdf->SetFillColor(255,255,255);'
 fname fappend~ LF,'$pdf->',pdfMulti (0 ,4) ; 3 1 ; ('<span style="text-align:center">Transition Hole?</span>'); 1
 for_ab. i. 2 do.
-    ww1=. (ab = ww{glPlanAbility) # ww
     txt=. '<span style="text-align:center"><b>',(>ab{'/' cut 'Scratch: / Bogey: '),'</b>'
-    txt=. txt, >(+. / 'T' =ww1{glPlanLayupType) {' ' cut 'No Yes'
+    txt=. txt, >(ab { transition) {' ' cut 'No Yes'
     txt=. txt,'</span>'
-    fname fappend~ LF,'$pdf->SetTextColor( 35, 83, 216);'
+    fname fappend~ LF,'$pdf->', 'T' pdfColor 'blue'
     fname fappend~ LF,'$pdf->',pdfMulti ((3+ab*2.5) ,4) ; 2.5 1 ; txt ; 1
-    fname fappend~ LF,'$pdf->SetTextColor(0, 0, 0);'
 end.
 
 NB. Roll
@@ -160,7 +198,105 @@ fname fappend~ LF,'$pdf->',pdfMulti 3 5 ; 2.5 1 ; '<span style="text-align:cente
 fname fappend~ LF,'$pdf->',pdfMulti 5.5 5 ; 2.5 1 ; '<span style="text-align:center"><b>S2</b></span>'; 1
 fname fappend~ LF,'$pdf->',pdfMulti 0 6 ; 3 1 ; '<i>Downhill/Level/Uphill</i>'; 1
 
-NB. Fairway Carry
+NB. Fairway
+fname fappend~ LF,'// -------- Fairway -------------'
+fname fappend~ LF,'white' oN 'black'
+fname fappend~ LF,'$pdf->',pdfMulti 0 22 ; 3 1 ; '<b>FAIRWAY</b>'; 1
+fname fappend~ LF,'black' oN 'white'
+ww=. ' ' cut 'S1 S2 B1 B2 B3'
+for_i. i. #ww do.
+    fname fappend~ LF,'black' oN 'white'
+    fname fappend~ LF,'$pdf->','C' pdfMulti ((3+i), 22) ; 1  1 ; ('<b>',(>i{ww),'</b>'); 1
+    for_rr. 23 + i.7 do. NB. Grey out the cells
+	fname fappend~ LF,'black' oN 'grey'
+        fname fappend~ LF,'$pdf->',pdfMulti ((3+i), rr) ; 1  1 ; ''; 1
+    end.
+end.
+fname fappend~ LF,'black' oN 'white'
+fname fappend~ LF,'$pdf->','R' pdfMulti 0 23 ; 3  1 ; '<i>Width (Yds) at LZ</i>'; 1
+fname fappend~ LF,'$pdf->','R' pdfMulti 0 24 ; 3  1 ; 'Table Value'; 1
+wid=. }: each 'glPlanFWWidth' matrix_pull hole ; tee ; gender
+fwtot=. 0$<''
+for_ab. 0 1 do.
+    fw=. 0$0
+    for_sh. >ab{wid do.
+	fname fappend~ LF,'black' oN >(0 ~: sh){(' ' cut 'white lightyellow')
+	fname fappend~ LF,'$pdf->', 'C' pdfMulti ((3+sh_index+ 2*ab),23) ; 1 1 ; (;'b' 8!:0 sh) ;1 
+	fname fappend~ LF,'blue' oN 'white'
+	fw=. fw, lookup_fairway_rating gender ; ab ; (+/>ab{hityards) ; sh 
+	fname fappend~ LF,'$pdf->', 'C' pdfMulti ((3+sh_index+ 2*ab),24) ; 1 1 ; (;'bp<+>' (8!:0) _1{fw ) ;1 
+    end.
+    fwtot=. fwtot, <fw
+end.
+NB. Fairway Layup
+fname fappend~ LF,'black' oN 'white'
+fname fappend~ LF,'$pdf->',pdfMulti 0 25 ; 3  1 ; '<i>Lay-up</i>'; 1
+fname fappend~ LF,'$pdf->','R' pdfMulti 2.5 25 ; 0.5  1 ; '<b>L</b>'; 0
+fwl=. 0$<''
+lay=. }: each 'glPlanLayupType' matrix_pull hole ; tee ; gender
+for_ab. 0 1 do.
+    fw=. 0$0
+    for_sh. - 'L' = >ab{lay do.
+	fname fappend~ LF,'black' oN >(0 ~: sh){(' ' cut 'white lightyellow')
+	fname fappend~ LF,'$pdf->', 'C' pdfMulti ((3+sh_index+ 2*ab),25) ; 1 1 ; (;'b' 8!:0 sh) ;1 
+	fw=. fw,sh
+    end.
+    fwl=. fwl, <fw
+end.
+fwtot=. fwtot +each fwl
+NB. Fairway Visibility
+fname fappend~ LF,'black' oN 'white'
+fname fappend~ LF,'$pdf->',pdfMulti 0 26 ; 3  1 ; '<i>Visibility</i>'; 1
+fname fappend~ LF,'$pdf->','R' pdfMulti 2.5 26 ; 0.5  1 ; '<b>V</b>'; 0
+fwl=. 0$<''
+lay=. }: each targvisible
+for_ab. 0 1 do.
+    fw=. 0$0
+    for_sh. >ab{lay do.
+	fname fappend~ LF,'black' oN >(0 ~: sh){(' ' cut 'white lightyellow')
+	fname fappend~ LF,'$pdf->', 'C' pdfMulti ((3+sh_index+ 2*ab),26) ; 1 1 ; (;'bp<+>' 8!:0 sh) ;1 
+	fw=. fw,sh
+    end.
+    fwl=. fwl, <fw
+end.
+fwtot=. fwtot +each fwl
+NB. Fairway Width
+fname fappend~ LF,'black' oN 'white'
+fname fappend~ LF,'$pdf->',pdfMulti 0 27 ; 3  1 ; '<i>Width</i>'; 1
+fname fappend~ LF,'$pdf->','R' pdfMulti 2 27 ; 1  1 ; '<b>+W</b>'; 0
+fwl=. 0$<''
+lay=. }: each 'glPlanFWWidthAdj' matrix_pull hole ; tee ; gender
+lay=. (<glFWWidthAdjVal) i. each lay
+lay=. 0 >. each lay { each <glFWWidthAdjNum
+for_ab. 0 1 do.
+    fw=. 0$0
+    for_sh. >ab{lay do.
+	fname fappend~ LF,'black' oN >(0 ~: sh){(' ' cut 'white lightyellow')
+	fname fappend~ LF,'$pdf->', 'C' pdfMulti ((3+sh_index+ 2*ab),27) ; 1 1 ; (;'bp<+>' 8!:0 sh) ;1 
+	fw=. fw,sh
+    end.
+    fwl=. fwl, <fw
+end.
+fwtot=. fwtot +each fwl
+fname fappend~ LF,'black' oN 'white'
+fname fappend~ LF,'$pdf->',pdfMulti 0 28 ; 3  1 ; '<i>Width</i>'; 1
+fname fappend~ LF,'$pdf->','R' pdfMulti 2 28 ; 1  1 ; '<b>-W</b>'; 0
+fwl=. 0$<''
+lay=. }: each 'glPlanFWWidthAdj' matrix_pull hole ; tee ; gender
+lay=. (<glFWWidthAdjVal) i. each lay
+lay=. 0 <. each lay { each <glFWWidthAdjNum
+for_ab. 0 1 do.
+    fw=. 0$0
+    for_sh. >ab{lay do.
+	fname fappend~ LF,'black' oN >(0 ~: sh){(' ' cut 'white lightyellow')
+	fname fappend~ LF,'$pdf->', 'C' pdfMulti ((3+sh_index+ 2*ab),28) ; 1 1 ; (;'bp<+>' 8!:0 sh) ;1 
+	fw=. fw,sh
+    end.
+    fwl=. fwl, <fw
+end.
+fwtot=. fwtot +each fwl
+
+NB. Recoverability and Rough
 fname fappend~ LF,'// -------- Recoverability and Rough -------------'
 carryyards=. 'F' carry_yards hole; tee ; gender 
 fname fappend~ LF,'$pdf->SetFillColor(0, 0, 0);'
@@ -409,3 +545,51 @@ else.
 end.
 res=. res
 )
+
+NB. =================================================
+NB. lookup_bunker
+NB. =================================================
+NB. Usage:
+NB.   lookup_bunker 
+
+NB. =================================================
+NB. lookup_green_target
+NB. =================================================
+NB. Usage
+NB.   lookup_green_target gender ; abilty ; yards ; diam ; transition
+NB. Returns table value
+lookup_green_target=: 3 :  0
+'gender ab yards diam trans'=. y
+NB. Make transition yards large
+yards=. (trans){(yards, 999)
+if. gender=0 do. NB. Men
+    row=. > ab { 60 80 100 120 140 160 180 200 220 241 400 ; 44 59 74 89 109 129 149 164 180 399
+    col=. 36 31 26 21 17 12
+    mat=. 12 7 $ 2 2 2 2 2 2 2 , 2 2 2 3 3 3 3 ,2 2 3 3 4 4 4 , 2 2 3 4 4 4 5, 2 3 4 4 4 5 6 , 2 3 4 4 5 6 7, 3 3 4 5 6 7 7 , 3 4 5 5 6 7 8, 3 4 5 6 7 8 9, 4 5 6 7 8 8 9, 4 5 6 7 8 9 10, 3 4 4 5 5 6 6
+else.
+
+end.
+row=. + / yards >: row
+col=. + / diam <: col
+res=. (<row,col) { mat
+)
+NB. =================================================
+NB. lookup_fairway_rating
+NB. =================================================
+NB. Usage
+NB.   lookup_green_target gender ; abilty ; yards ; width
+NB. Returns table value
+lookup_fairway_rating=: 3 :  0
+'gender ab yards width'=. y
+if. gender=0 do. NB. Men
+    row=. 340 380 426 
+    col=. 50 39 29 24 19   
+    mat=. 4 6 $ 1 1 2 3 4 5, 1 2 3 3 5 6, 2 3 4 4 6 7, 2 3 4 5 7 8
+else.
+
+end.
+row=. + / yards >: row
+col=. + / width <: col
+res=. (<row,col) { mat
+)
+

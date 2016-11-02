@@ -160,7 +160,7 @@ stdout '</tbody></table>'
 NB. Table of values - Topography
 stdout LT1,'<h4>Topography and Shot FROM Landing Zone</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>Stance or Lie</th><th>Unpleasant Lie</th><th>Obstructed View</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>Stance or Lie</th><th>Unpleasant Lie</th><th>Obstructed Shot</th><th>Targ not Visible</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td>'
 djwSelect 'topogstance' ; 13 ; glTopogStanceDesc ; glTopogStanceVal ; <''$glPlanTopogStance
@@ -169,6 +169,9 @@ stdout LT4,'<td><input type="checkbox" id="fwunpleasant" name="fwunpleasant" val
 stdout ((''$glPlanFWUnpleasant)#'checked'),' tabindex="14">',LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="fwobstructed" name="fwobstructed" value="1" '
 stdout ((''$glPlanFWObstructed)#'checked'),' tabindex="15">',LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'fwtargvisible' ; 16 ; glTargVisibleDesc ; glTargVisibleVal ; <''$glPlanFWTargVisible
+stdout LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table>'
 
@@ -261,6 +264,7 @@ glPlanRollLevel=: ,rolllevel
 glPlanRollFirmness=: ,rollfirmness
 glPlanRollTwice=: ,rolltwice
 glPlanFWVisible=: ,fwvisible
+glPlanFWTargVisible=: ,fwtargvisible
 glPlanTopogStance=: ,topogstance
 glPlanFWUnpleasant=: ,fwunpleasant
 glPlanFWObstructed=: ,fwobstructed

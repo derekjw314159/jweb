@@ -33,6 +33,9 @@ glWaterCartVal=: (<''),':' cut '+1:-1'
 glWaterCartDesc=: ':' cut 'None:+1 Bounce away:-1 Bounce towards'
 glWaterPercentVal=: (<''),':' cut '20%:40%:60%:80%'
 glWaterPercentDesc=: ':' cut '100%:20%:40%:60%:80%'
+glTargVisibleVal=: (<''),':' cut '+1:+2'
+glTargVisibleDesc=: (<''),':' cut '+1 >Half Green:+2 Flag'
+glTargVisibleNum=: 0 1 2
 
 
 NB. ==============================================
@@ -495,6 +498,7 @@ label_shot.
 	glPlanLatWaterDist=: ,0
 	glPlanDefaultHit=: glPlanHitYards
 	glPlanFWVisible=: ,0
+	glPlanFWTargVisible=: ,<''
 	glPlanFWUnpleasant=: ,0
 	glPlanRRMounds=: ,0
 	glPlanRRRiseDrop=: ,0
@@ -577,6 +581,7 @@ glPlanRRUnpleasant=: 1 1 { glPlanRRUnpleasant
 glPlanTopogStance=: 1 1 { glPlanTopogStance
 glPlanFWWidthAdj=: 1 1 { glPlanFWWidthAdj
 glPlanFWVisible=: 1 1 { glPlanFWVisible
+glPlanFWTargVisible=: 1 1 { glPlanFWTargVisible
 glPlanFWUnpleasant=: 1 1 { glPlanFWUnpleasant
 glPlanFWObstructed=: 1 1 { glPlanFWObstructed
 glPlanRRHeight=: 1 1 { glPlanRRHeight
@@ -726,7 +731,8 @@ glPlanRollTwice=: ,(#glPlanID)$0
 glPlanFWWidth=: ,(#glPlanID)$<0 
 glPlanFWObstructed=: ,(#glPlanID)$0
 glPlanTopogStance=: ,(#glPlanID)$<''
-glPlanFWVisible=: ,(#glPlanID)$0
+glPlanFWVisible=: ,(#glPlanID)$<''
+glPlanFWTargVisible=: ,(#glPlanID)$<''
 glPlanFWUnpleasant=: ,(#glPlanID)$0
 glPlanFWWidthAdj=: ,(#glPlanID)$<''
 )
