@@ -25,16 +25,25 @@ NB.   'fore_or_back' pdfColor color
 pdfColor=: 3 : 0
 'T' pdfColor y
 :
-select. y
-    case. 'black' do. res=. '(0, 0, 0);'
-    case. 'white' do. res=. '(255, 255, 255);'
-    case. 'grey' do. res=. '(127, 127, 127);'
-    case. 'lightgrey' do. res=. '(180, 180, 180);'
-    case. 'blue' do. res=. '( 35,  83, 216);'
-    case. 'lightyellow' do. res=. '(247, 253, 156);'
-    case. 'lightblue' do. res=. '(176, 224, 230);'
+NB. Keep record of old color to avoid too many lines being written
+if. _1 = 4!:0 <'glOldColor' do. glOldColor=: '' ; '' end.
+NB. Is same color?
+if. y -: > ('TF' i. x) { glOldColor do.
+    NB. No change
+    res=. ''
+else.
+    select. y
+	case. 'black' do. res=. '(0, 0, 0);'
+	case. 'white' do. res=. '(255, 255, 255);'
+	case. 'grey' do. res=. '(127, 127, 127);'
+	case. 'lightgrey' do. res=. '(180, 180, 180);'
+	case. 'blue' do. res=. '( 35,  83, 216);'
+	case. 'lightyellow' do. res=. '(247, 253, 156);'
+	case. 'lightblue' do. res=. '(176, 224, 230);'
+    end.
+    glOldColor=: (<y) ('TF' i. x) } glOldColor
+    res=.LF,'$pdf->', (>('FT' i. x){' ' cut 'setFillColor setTextColor'),res
 end.
-res=. (>('FT' i. x){' ' cut 'setFillColor setTextColor'),res
 )
 
 NB. =========================================================
@@ -43,8 +52,8 @@ NB. =========================================================
 NB. Usage:
 NB.    textcolor on fillcolor
 oN=: 4 : 0
-res=. LF,'$pdf->','T' pdfColor x
-res=. res,LF,'$pdf->','F' pdfColor y
+res=. 'T' pdfColor x
+res=. res,'F' pdfColor y
 )
 
 NB. =========================================================
@@ -332,8 +341,7 @@ rollslope=. 'glPlanRollSlope' matrix_pull hole ; tee ; gender
 
 NB. Title row
 fname fappend~ LF,'// -------- Title Row -------------'
-fname fappend~ LF,'$pdf->','F' pdfColor 'white'
-fname fappend~ LF,'$pdf->', 'T' pdfColor 'black'
+fname fappend~ 'black' oN 'white'
 fname fappend~ LF,'$pdf->',pdfMulti 0 0 ; 5 1 ; ('<b>CLUB</b>: ',glCourseName); 1
 NB. Need to work out which tees this is serving
 meas=. gender{;glTeMeasured
@@ -348,10 +356,10 @@ NB. ---------------------------
 NB. Shots Played
 NB. ---------------------------
 fname fappend~ LF,'// -------- Shots Played -------------'
-fname fappend~ LF,write_title 0 1 ; 3 1; 'SHOTS PLAYED'
+fname fappend~ write_title 0 1 ; 3 1; 'SHOTS PLAYED'
 sh=. ' ' cut 'T 2 3 4'
 sh=. (<'<b>'), each sh, each <'</b>'
-fname fappend~ LF,'C' write_cell 3 1 ; 1.25; <sh
+fname fappend~ 'C' write_cell 3 1 ; 1.25; <sh
 for_ab. i. 2 do.
     fname fappend~ LF,('R' ; 1) write_cell (0 ,2+ab) ; 3 ; ('<i>',(>ab{' ' cut 'Scratch Bogey'),'</i>')
     ww2=. I. (ab=glPlanAbility) 
@@ -413,9 +421,7 @@ NB. ------------------------
 NB. Fairway
 NB. ------------------------
 fname fappend~ LF,'// -------- Fairway -------------'
-fname fappend~ 'white' oN 'black'
 fname fappend~ write_title 0 22 ; 3 ; 'FAIRWAY'
-fname fappend~ 'black' oN 'white'
 ww=. ' ' cut 'S1 S2 B1 B2 B3'
 ww=. (<'<b>'), each ww
 ww=. ww, each <'</b>'
@@ -483,6 +489,27 @@ fwtot=. fwtot + lay
 NB. Fairway Overall rating
 fname fappend~ 'R' write_footer 0 33 ; 3 ; 'Fairway Rating'
 fname fappend~ 'C' write_footer 3 33 ;  2 3 ; fwtot
+
+NB. ------------------------
+NB. Elevation
+NB. ------------------------
+fname fappend~ write_title 0 11 ; 3 1 ; 'ELEVATION'
+fname fappend~ write_cell 3 11 ; 3 ; 'Tee to Gr (<b>gt 10ft</b>)'
+sh=. glGrAlt - glTeAlt
+sh=. sh * 10<: |sh NB. Minimum 10ft
+fname fappend~ 'R' write_input 6 11 ; 1 1 ; (0 >. sh),0 <. sh 
+
+NB. ------------------------
+NB. Lay-Up
+NB. ------------------------
+fname fappend~ write_title 0 12 ; 3 1 ; 'F/LAY-UP'
+fname fappend~ write_cell 3 12 ; 2 ; 'Forc / DLeg'
+sh=. 'glPlanDefaultHit' matrix_pull hole ; tee ; gender
+sh=. 50 <. >+/ each sh - each 'glPlanHitYards' matrix_pull hole ; tee ; gender
+NB. Look for negative dogleg
+sh=. sh - 50 <. >+/ each | each 'glPlanDoglegNeg' matrix_pull hole ; tee ; gender
+ww=. ('Sc: ';'Bo: ') , each 'bp<+>' 8!:0 sh
+fname fappend~ 'C' write_input 5 12 ; 1.5 ;  <(<"0 (0 ~: sh))#each ww
 
 NB. ------------------------
 NB. Recoverability and Rough

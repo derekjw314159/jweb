@@ -281,6 +281,7 @@ for_rr. i. #glPlanID do.
 		stdout (('L'=rr{glPlanLayupType)#(3{.": >rr{glPlanLayupCategory)),'</a></td><td>', (": <. 0.5 + rr{glPlanRemGroundYards),'</td>' 
 		if. 0<rr{glPlanRemGroundYards do.
 		    other=. ''
+		    other=. other, (0 ~: rr{glPlanDoglegNeg)#' D/LNeg:',": |rr{glPlanDoglegNeg
 		    other=. other, (0<#>rr{glPlanRollExtreme)#' RoEx:',;>rr{glPlanRollExtreme
 		    other=. other, (0<#>rr{glPlanRollTwice)#' Ro2:',;>rr{glPlanRollTwice
 		    other=. other, (rr{glPlanFWVisible)#' LZ:V'
@@ -327,6 +328,7 @@ for_rr. i. #glPlanID do.
 		stdout '<td colspan="3"><i>Measured Point</i></td>'
 		NB. stdout LT3,'<td>',(": rr{glPlanRemGroundYards),'</td>'
 		other=. ''
+		other=. other, (0 ~: rr{glPlanDoglegNeg)#' D/LNeg:',": |rr{glPlanDoglegNeg
 		other=. other, (0<#>rr{glPlanRollExtreme)#' RoEx:',;>rr{glPlanRollExtreme
 		other=. other, (0<#>rr{glPlanRollTwice)#' Ro2:',;>rr{glPlanRollTwice
 		other=. other, (rr{glPlanFWVisible)#' LZ:V'

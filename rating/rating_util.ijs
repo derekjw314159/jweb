@@ -508,7 +508,11 @@ label_shot.
 	glPlanBunkLZ=: ,0
 	glPlanBunkLine=: ,0
 	glPlanLatWaterDist=: ,0
-	glPlanDefaultHit=: glPlanHitYards
+	if. glPlanLayupType='L' do.
+	    glPlanDefaultHit=: ,defaulthit
+	else.
+	    glPlanDefaultHit=: glPlanHitYards
+	end.
 	glPlanFWVisible=: ,0
 	glPlanFWTargVisible=: ,<''
 	glPlanFWUnpleasant=: ,0
@@ -606,6 +610,7 @@ glPlanRollLevel=: 1 1{glPlanRollLevel
 glPlanRollSlope=: 1 1 {glPlanRollSlope
 glPlanRollExtreme=: 1 1 {glPlanRollExtreme
 glPlanRollTwice=: 1 1 {glPlanRollTwice
+glPlanDoglegNeg=: 1 1 {glPlanDoglegNeg
 
 utKeyPut glFilepath,'_plan'
 )
@@ -750,4 +755,5 @@ glPlanFWVisible=: ,(#glPlanID)$<''
 glPlanFWTargVisible=: ,(#glPlanID)$<''
 glPlanFWUnpleasant=: ,(#glPlanID)$0
 glPlanFWWidthAdj=: ,(#glPlanID)$<''
+glPlanDoglegNeg=: ,(#glPlanID)$0
 )
