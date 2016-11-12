@@ -25,13 +25,14 @@ NB.   'fore_or_back' pdfColor color
 pdfColor=: 3 : 0
 'T' pdfColor y
 :
-
 select. y
     case. 'black' do. res=. '(0, 0, 0);'
     case. 'white' do. res=. '(255, 255, 255);'
     case. 'grey' do. res=. '(127, 127, 127);'
+    case. 'lightgrey' do. res=. '(180, 180, 180);'
     case. 'blue' do. res=. '( 35,  83, 216);'
     case. 'lightyellow' do. res=. '(247, 253, 156);'
+    case. 'lightblue' do. res=. '(176, 224, 230);'
 end.
 res=. (>('FT' i. x){' ' cut 'setFillColor setTextColor'),res
 )
@@ -42,9 +43,199 @@ NB. =========================================================
 NB. Usage:
 NB.    textcolor on fillcolor
 oN=: 4 : 0
-res=. '$pdf->','T' pdfColor x
+res=. LF,'$pdf->','T' pdfColor x
 res=. res,LF,'$pdf->','F' pdfColor y
 )
+
+NB. =========================================================
+NB. write_title
+NB. =========================================================
+NB. Write out title block, white on black
+NB. Puts the text in bold
+write_title=: 3 : 0
+'offset size text'=. y
+text=. '<b>',text,'</b>'
+res=. 'white' oN 'black'
+res=. res,LF,'$pdf->', pdfMulti offset ; size ; text ; 1
+)
+
+NB. =========================================================
+NB. write_row_head
+NB. =========================================================
+NB. Write out title block, white on black
+NB. Puts the text with the second element right element
+write_row_head=: 3 : 0
+'offset size t1 t2'=. y
+res=. ('R' ; 0) write_cell (offset + 2{. 0{size) ; (1{size) ; t2
+res=. res, ('L' ; 1) write_cell offset  ; (+/size) ; t1
+)
+
+
+NB. =========================================================
+NB. write_cell
+NB. =========================================================
+NB. Write out ordinary call, black on white
+NB. Usage
+NB. (justify box) write_cell offset ; size ; array
+NB. If size contains negative elements, they are padded with grey cells
+write_cell=: 3 : 0
+('L' ; 1) write_cell y
+:
+NB. Unpick the array
+'offset size array'=. y
+if. 0=L. x do. x=. x ; 1 end.
+'just boxe'=. x
+if. 2 =  3!:0 array do.
+    array=. <array NB. box a text string
+end.
+array=. ,array NB. Make a vector
+NB. Pad the size to the right width
+size=. (({:$size)>. {:$array)$size
+res=. ''
+for_sz. size do.
+    NB. May be a grey call
+    if. sz<0 do.
+	res=. res, write_lightgrey (offset+2{. sz_index{+/ \0,|size); |sz
+    else.
+	res=.res, 'black' oN 'white'
+	sh=. ((sz_index){_1 + (+/) \ size >: 0 ){array
+	if. 1=L. sh do. sh=. >sh end.`
+	if. 2 ~: 3!:0 sh do. sh=. ;'p<+>' 8!:0 sh end.
+	res=. res,LF,'$pdf->', just pdfMulti (offset+2{. sz_index{+/ \0,|size); (sz,1) ; sh ; boxe
+    end.
+end.
+)
+NB. =========================================================
+NB. write_input
+NB. =========================================================
+NB. Usage
+NB.    (justify box) write_cell offset ; size ; array
+NB. Write out input cell, black on lightyellow if it is a value
+NB. or blank if not
+NB. If size contains negative elements, they are padded with grey cells
+write_input=: 3 : 0
+('C' ; 1) write_input y
+:
+NB. Unpick the array
+'offset size array'=. y
+if. 0=L. x do. x=. x ; 1 end.
+'just boxe'=. x
+if. 2 =  3!:0 array do.
+    array=. <array NB. box a text string
+end.
+array=. ,array NB. Make a vector
+NB. Pad the size to the right width
+size=. (({:$size)>. {:$array)$size
+res=. ''
+for_sz. size do.
+    NB. May be a grey call
+    if. sz<0 do.
+	res=. res, write_lightgrey (offset+2{. sz_index{+/ \0,|size); |sz
+    else.
+	sh=. ((sz_index){_1 + (+/) \ size >: 0 ){array
+	if. 1=L. sh do. sh=. >sh end.`
+	if. 2 ~: 3!:0 sh do. sh=. ;'bp<+>' 8!:0 sh end.
+	if. 0=#sh do.
+	    res=. res, 'black' oN 'white'
+	else.
+	    res=. res, 'black' oN 'lightyellow'
+	end.
+	res=. res,LF,'$pdf->', just pdfMulti (offset+2{. sz_index{+/ \0,|size); (sz,1) ; sh ; boxe
+    end.
+end.
+)
+
+NB. =========================================================
+NB. write_calc
+NB. =========================================================
+NB. Write out calculated call, blue on lightblue
+NB. Usage
+NB. (justify box) write_calc offset ; size ; array
+NB. If size contains negative elements, they are padded with grey cells
+write_calc=: 3 : 0
+('C' ; 1) write_calc y
+:
+NB. Unpick the array
+'offset size array'=. y
+if. 0=L. x do. x=. x ; 1 end.
+'just boxe'=. x
+if. 2 =  3!:0 array do.
+    array=. <array NB. box a text string
+end.
+array=. ,array NB. Make a vector
+NB. Pad the size to the right width
+size=. (({:$size)>. {:$array)$size
+res=. ''
+for_sz. size do.
+    NB. May be a grey call
+    if. sz<0 do.
+	res=. res, write_lightgrey (offset+2{. sz_index{+/ \0,|size); |sz
+    else.
+	res=.res, 'blue' oN 'lightblue'
+	sh=. ((sz_index){_1 + (+/) \ size >: 0 ){array
+	if. 1=L. sh do. sh=. >sh end.`
+	if. 2 ~: 3!:0 sh do. sh=. ;'p<+>' 8!:0 sh end.
+	res=. res,LF,'$pdf->', just pdfMulti (offset+2{. sz_index{+/ \0,|size); (sz,1) ; sh ; boxe
+    end.
+end.
+)
+
+NB. =========================================================
+NB. write_footer
+NB. =========================================================
+NB. Write out calculated call, blue on lightblue
+NB. Usage
+NB. (justify box) write_calc offset ; size ; array
+NB. If size contains negative elements, they are padded with grey cells
+write_footer=: 3 : 0
+('L' ; 1) write_footer y
+:
+NB. Unpick the array
+'offset size array'=. y
+if. 0=L. x do. x=. x ; 1 end.
+'just boxe'=. x
+if. 2 =  3!:0 array do.
+    array=. <array NB. box a text string
+end.
+array=. ,array NB. Make a vector
+NB. Pad the size to the right width
+size=. (({:$size)>. {:$array)$size
+res=. ''
+for_sz. size do.
+    NB. May be a grey call
+    if. sz<0 do.
+	res=. res, write_lightgrey (offset+2{. sz_index{+/ \0,|size); |sz
+    else.
+	res=.res, 'white' oN 'blue'
+	sh=. ((sz_index){_1 + (+/) \ size >: 0 ){array
+	if. 1=L. sh do. sh=. >sh end.`
+	if. 2 ~: 3!:0 sh do. sh=. ;'p<+>' 8!:0 sh end.
+	sh=. '<b>',sh,'</b>'
+	res=. res,LF,'$pdf->', just pdfMulti (offset+2{. sz_index{+/ \0,|size); (sz,1) ; sh ; boxe
+    end.
+end.
+)
+
+NB. =========================================================
+NB. write_lightgrey
+NB. =========================================================
+NB. Write out a lightgrey cell, boxed
+NB. Usage:
+NB. write_lightgray offset ; grid
+NB. <grid> should be a rank two array of the width of the cells to be written
+write_lightgrey=: 3 : 0
+NB. Unpick the array
+'offset size'=. y
+NB. Make a rank two array of sizes
+size=. (_2{. $ ,: ,: size)$ ;size
+res=. 'white' oN 'lightgrey'
+for_rr. size do.
+    for_sh. rr do.
+	res=. res,LF,'$pdf->',pdfMulti (offset+(sh_index{+/ \0,rr),rr_index) ; ((sh_index{rr),1) ; '' ; 1
+    end.
+end.
+)
+
 
 NB. =========================================================
 NB. rating_report
@@ -75,7 +266,6 @@ stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 djwBlueprintCSS ''
 
-
 NB. Error page - No such course
 if. 0<#err do.
     djwErrorPage err ; ('No such course name : ',glFilename) ; '/jw/rating/plan/v' ; 'Back to rating plan'
@@ -94,17 +284,18 @@ end.
 
 NB. Need to work out which tees this is serving
 t=. I. glTeHole=hole
-
 t=. glTeTee= tee
 t=. t *. glTeHole=hole
 (t#glTeID) utKeyRead glFilepath,'_tee'
 t_index=. glTees i. tee
 
+NB. Read the Green
 ((hole=glGrHole)#glGrID) utKeyRead glFilepath,'_green'
 
-NB. Order by ability, shot
+NB. Order by ability, shot and re-read the plan
 ww=. ww /: ww{glPlanShot
 ww=. ww /: ww{glPlanAbility
+(ww{glPlanID) utKeyRead glFilepath,'_plan'
 
 fname fwrite~ '<?php'
 fname fappend~ LF,'require_once(''tcpdf_include.php'');'
@@ -136,6 +327,8 @@ targvisible=. ((<glTargVisibleVal) i. each 'glPlanFWTargVisible' matrix_pull hol
 visible=. 'glPlanFWVisible' matrix_pull hole ; tee ; gender
 targvisible=. 0, each }: each targvisible NB. Push to the shot after
 targvisible=. visible >. each targvisible
+rolllevel=. 'glPlanRollLevel' matrix_pull hole ; tee ; gender
+rollslope=. 'glPlanRollSlope' matrix_pull hole ; tee ; gender
 
 NB. Title row
 fname fappend~ LF,'// -------- Title Row -------------'
@@ -151,152 +344,149 @@ fname fappend~ LF,'$pdf->',pdfMulti 13 0 ; 3 1 ; ('<b>LENGTH</b>: ',":(<t_index,
 fname fappend~ LF,'$pdf->',pdfMulti 16 0 ; 5 1 ; '<b>DATE RATED</b>:' ; 1
 fname fappend~ LF,'$pdf->',pdfMulti 21 0 ; 7 1 ; '<b>T/LEADER</b>:' ; 1
 
+NB. ---------------------------
 NB. Shots Played
+NB. ---------------------------
 fname fappend~ LF,'// -------- Shots Played -------------'
-fname fappend~ LF,'$pdf->SetFillColor(0,0,0);'
-fname fappend~ LF,'$pdf->SetTextColor(255, 255, 255);'
-fname fappend~ LF,'$pdf->',pdfMulti 0 1 ; 3 1 ; '<b>SHOTS PLAYED</b>'; 1
-fname fappend~ LF,'$pdf->SetFillColor(255,255,255);'
-fname fappend~ LF,'$pdf->SetTextColor(0,0,0);'
-for_sh. i. 4 do.
-    fname fappend~ LF,'$pdf->',pdfMulti ((3+sh*1.25), 1) ; 1.25 1 ; ('<span style="text-align:center"><b>',(sh{'T234'),'</b></span>'); 1
-end.
+fname fappend~ LF,write_title 0 1 ; 3 1; 'SHOTS PLAYED'
+sh=. ' ' cut 'T 2 3 4'
+sh=. (<'<b>'), each sh, each <'</b>'
+fname fappend~ LF,'C' write_cell 3 1 ; 1.25; <sh
 for_ab. i. 2 do.
-    fname fappend~ LF,'$pdf->', 'F' pdfColor 'white'
-    fname fappend~ LF,'$pdf->',pdfMulti (0 ,2+ab) ; 3 1 ; ('<span style="text-align:right"><i>',(>ab{' ' cut 'Scratch Bogey'),'</i></span>'); 1
-    for_sh. i. 4 do.
-	ww1=. ( (ab = ww{glPlanAbility) *. (sh = ww{glPlanShot)) # ww
-	if. 0=#ww1 do.
-	    fname fappend~ LF,'$pdf->SetFillColor(127,127,127);'
-	    fname fappend~ LF,'$pdf->',pdfMulti ((3+sh*1.25) ,2+ab) ; 1.25 1 ; ' '; 1
-	else.
-	    fname fappend~ LF,'$pdf->SetFillColor(255,255,255);'
-	    fname fappend~ LF,'$pdf->SetTextColor( 35, 83, 216);'
-	    fname fappend~ LF,'$pdf->',pdfMulti ((3+sh*1.25) ,2+ab) ; 1.25 1 ; ('<span style="text-align:center">',((": ww1{glPlanHitYards),(''$'T'=ww1{glPlanLayupType)#'T'),'</span>') ; 1
-	    fname fappend~ LF,'$pdf->SetTextColor(0, 0, 0);'
-	end.
-    end.
+    fname fappend~ LF,('R' ; 1) write_cell (0 ,2+ab) ; 3 ; ('<i>',(>ab{' ' cut 'Scratch Bogey'),'</i>')
+    ww2=. I. (ab=glPlanAbility) 
+    ww2=. ('' (8!:0) ww2{glPlanHitYards),each <"0 ww2{glPlanLayupType
+    fname fappend~ ('C' ; 1) write_calc (3, 2+ab) ; (4{.((#ww2)$1.25), 4$_1.25) ; <ww2
 end.
-fname fappend~ LF,'$pdf->SetFillColor(255,255,255);'
-fname fappend~ LF,'$pdf->',pdfMulti (0 ,4) ; 3 1 ; ('<span style="text-align:center">Transition Hole?</span>'); 1
+fname fappend~ ('R' ; 1) write_cell 0 4 ; 3 ; 'Transition Hole?'
 for_ab. i. 2 do.
-    txt=. '<span style="text-align:center"><b>',(>ab{'/' cut 'Scratch: / Bogey: '),'</b>'
+    txt=. '<b>',(>ab{'/' cut 'Scratch: / Bogey: '),'</b>'
     txt=. txt, >(ab { transition) {' ' cut 'No Yes'
-    txt=. txt,'</span>'
-    fname fappend~ LF,'$pdf->', 'T' pdfColor 'blue'
-    fname fappend~ LF,'$pdf->',pdfMulti ((3+ab*2.5) ,4) ; 2.5 1 ; txt ; 1
+    fname fappend~ write_calc ((3+ab*2.5) ,4) ; 2.5 ; txt 
 end.
 
+NB. ----------------
 NB. Roll
+NB. ----------------
 fname fappend~ LF,'// -------- Roll -------------'
-fname fappend~ LF,'$pdf->SetFillColor(0,0,0);'
-fname fappend~ LF,'$pdf->SetTextColor(255, 255, 255);'
-fname fappend~ LF,'$pdf->',pdfMulti 0 5 ; 3 1 ; '<b>ROLL</b>'; 1
-fname fappend~ LF,'$pdf->SetFillColor(255,255,255);'
-fname fappend~ LF,'$pdf->SetTextColor(0,0,0);'
-fname fappend~ LF,'$pdf->',pdfMulti 3 5 ; 2.5 1 ; '<span style="text-align:center"><b>S1</b></span>'; 1
-fname fappend~ LF,'$pdf->',pdfMulti 5.5 5 ; 2.5 1 ; '<span style="text-align:center"><b>S2</b></span>'; 1
-fname fappend~ LF,'$pdf->',pdfMulti 0 6 ; 3 1 ; '<i>Downhill/Level/Uphill</i>'; 1
-
-NB. Fairway
-fname fappend~ LF,'// -------- Fairway -------------'
-fname fappend~ LF,'white' oN 'black'
-fname fappend~ LF,'$pdf->',pdfMulti 0 22 ; 3 1 ; '<b>FAIRWAY</b>'; 1
-fname fappend~ LF,'black' oN 'white'
-ww=. ' ' cut 'S1 S2 B1 B2 B3'
-for_i. i. #ww do.
-    fname fappend~ LF,'black' oN 'white'
-    fname fappend~ LF,'$pdf->','C' pdfMulti ((3+i), 22) ; 1  1 ; ('<b>',(>i{ww),'</b>'); 1
-    for_rr. 23 + i.7 do. NB. Grey out the cells
-	fname fappend~ LF,'black' oN 'grey'
-        fname fappend~ LF,'$pdf->',pdfMulti ((3+i), rr) ; 1  1 ; ''; 1
-    end.
+fname fappend~ write_title 0 5 ; 3 1 ; 'TEE ROLL'
+ww=. ' ' cut '<b>S1</b> <b>B1</b>'
+fname fappend~ 'C' write_cell 3 5 ; 2.5 ; <ww
+NB. Roll Slope
+fname fappend~ write_cell 0 6 ; 3 ; '<i>Slope in Tee Shot LZ</i>'
+lay=. (glRollLevelVal i. >0{ each rolllevel) { glRollLevelNum
+lay=. lay, each (<' '),each (glRollSlopeVal i. >0{ each rollslope) { glRollSlopeNum
+fname fappend~ ('C'; 1) write_input 3 6 ; 2.5 ;  <lay
+NB. Roll lookup table
+fname fappend~ LF,('R' ; 1) write_cell 0 7 ; 3 ; '<i>Table Value</i>'  
+fwtot=. 0 0 
+fw=. 0$0
+for_ab. 0 1 do.
+    sh=. 0{ > ab { rolllevel
+    sh=.  sh ; <0{ > ab { rollslope
+    sh=. lookup_roll_rating sh
+    fname fappend~ ('C' ; 1) write_calc ((3+ 2.5 *ab),7) ; 2.5 ;  sh  
+    fw=. fw, sh
 end.
-fname fappend~ LF,'black' oN 'white'
-fname fappend~ LF,'$pdf->','R' pdfMulti 0 23 ; 3  1 ; '<i>Width (Yds) at LZ</i>'; 1
-fname fappend~ LF,'$pdf->','R' pdfMulti 0 24 ; 3  1 ; 'Table Value'; 1
+fwtot=. fwtot + fw
+NB. Roll Extreme
+fname fappend~ write_row_head 0 8 ; 2.5 0.5 ; '<i>Extreme</i>'; '<b>E</b>' 
+lay=. 'glPlanRollExtreme' matrix_pull hole ; tee ; gender
+sh=. >0{ each lay
+sh=. (glRollExtremeVal i. sh){glRollExtremeNum
+fname fappend~ ('C' ; 1) write_input 3 8 ; 2.5 ; sh
+fwtot=. fwtot + sh
+NB. Roll Twice
+fname fappend~ write_row_head 0 9 ; 2.5 0.5; '<i>Twice</i>'; '<b>2</b>'
+lay=. 'glPlanRollTwice' matrix_pull hole ; tee ; gender
+sh=. >each (#each) each lay NB. Find first of length >0
+sh=. 0< each sh
+sh=. >{. each sh # each lay
+sh=. (glRollTwiceVal i. sh){glRollTwiceNum
+fname fappend~ ('C' ; 1) write_input 3 9 ; 2.5 ; sh
+fwtot=. fwtot + sh
+NB. Roll Overall rating
+fname fappend~ ('R'; 1 ) write_footer 0 10 ; 3  ; 'Roll Rating'
+fname fappend~ ('C'; 1 ) write_footer 3 10 ; 2.5 ; fwtot
+
+NB. ------------------------
+NB. Fairway
+NB. ------------------------
+fname fappend~ LF,'// -------- Fairway -------------'
+fname fappend~ 'white' oN 'black'
+fname fappend~ write_title 0 22 ; 3 ; 'FAIRWAY'
+fname fappend~ 'black' oN 'white'
+ww=. ' ' cut 'S1 S2 B1 B2 B3'
+ww=. (<'<b>'), each ww
+ww=. ww, each <'</b>'
+fname fappend~ 'C' write_cell 3 22 ; 1 ; <ww
+NB. Fairway Width
+fname fappend~ 'R' write_cell 0 23 ; 3 ; '<i>Width (Yds) at LZ</i>'
+fname fappend~ 'R' write_cell 0 24 ; 3 ; 'Table Value'
 wid=. }: each 'glPlanFWWidth' matrix_pull hole ; tee ; gender
+select. z=. j. / > #each wid
+    case. 0j0 do. sz=. _1 _1, _1 _1 _1
+    case. 0j1 do. sz=. _1 _1,  1 _1 _1
+    case. 1j1 do. sz=.  1 _1,  1 _1 _1
+    case. 1j2 do. sz=.  1 _1,  1  1 _1
+    case. 2j2 do. sz=.  1  1 , 1  1 _1
+    case. 2j3 do. sz=.  1  1 , 1  1  1
+end.
 fwtot=. 0$<''
 for_ab. 0 1 do.
     fw=. 0$0
     for_sh. >ab{wid do.
-	fname fappend~ LF,'black' oN >(0 ~: sh){(' ' cut 'white lightyellow')
-	fname fappend~ LF,'$pdf->', 'C' pdfMulti ((3+sh_index+ 2*ab),23) ; 1 1 ; (;'b' 8!:0 sh) ;1 
-	fname fappend~ LF,'blue' oN 'white'
 	fw=. fw, lookup_fairway_rating gender ; ab ; (+/>ab{hityards) ; sh 
-	fname fappend~ LF,'$pdf->', 'C' pdfMulti ((3+sh_index+ 2*ab),24) ; 1 1 ; (;'bp<+>' (8!:0) _1{fw ) ;1 
     end.
     fwtot=. fwtot, <fw
 end.
+fname fappend~ 'C' write_input 3 23 ; sz ; (;wid) 
+fname fappend~ 'C' write_calc 3 24 ; sz ; (;fwtot) 
 NB. Fairway Layup
-fname fappend~ LF,'black' oN 'white'
-fname fappend~ LF,'$pdf->',pdfMulti 0 25 ; 3  1 ; '<i>Lay-up</i>'; 1
-fname fappend~ LF,'$pdf->','R' pdfMulti 2.5 25 ; 0.5  1 ; '<b>L</b>'; 0
-fwl=. 0$<''
-lay=. }: each 'glPlanLayupType' matrix_pull hole ; tee ; gender
-for_ab. 0 1 do.
-    fw=. 0$0
-    for_sh. - 'L' = >ab{lay do.
-	fname fappend~ LF,'black' oN >(0 ~: sh){(' ' cut 'white lightyellow')
-	fname fappend~ LF,'$pdf->', 'C' pdfMulti ((3+sh_index+ 2*ab),25) ; 1 1 ; (;'b' 8!:0 sh) ;1 
-	fw=. fw,sh
-    end.
-    fwl=. fwl, <fw
-end.
-fwtot=. fwtot +each fwl
+fname fappend~ write_row_head 0 25 ; 2.5 0.5; '<i>Lay-up</i>'; '<b>L</b>'
+lay=. - each 'L' =each }: each 'glPlanLayupType' matrix_pull hole ; tee ; gender NB. -1 if Layup
+fname fappend~ 'C' write_input 3 25 ; sz ; (;lay)
+fwtot=. fwtot +each lay
 NB. Fairway Visibility
-fname fappend~ LF,'black' oN 'white'
-fname fappend~ LF,'$pdf->',pdfMulti 0 26 ; 3  1 ; '<i>Visibility</i>'; 1
-fname fappend~ LF,'$pdf->','R' pdfMulti 2.5 26 ; 0.5  1 ; '<b>V</b>'; 0
-fwl=. 0$<''
+fname fappend~ write_row_head 0 26 ; 2.5 0.5; '<i>Visibility</i>'; '<b>V</b>'
 lay=. }: each targvisible
-for_ab. 0 1 do.
-    fw=. 0$0
-    for_sh. >ab{lay do.
-	fname fappend~ LF,'black' oN >(0 ~: sh){(' ' cut 'white lightyellow')
-	fname fappend~ LF,'$pdf->', 'C' pdfMulti ((3+sh_index+ 2*ab),26) ; 1 1 ; (;'bp<+>' 8!:0 sh) ;1 
-	fw=. fw,sh
-    end.
-    fwl=. fwl, <fw
-end.
-fwtot=. fwtot +each fwl
+fname fappend~ 'C' write_input 3 26 ; sz ; (;lay)
+fwtot=. fwtot +each lay
 NB. Fairway Width
-fname fappend~ LF,'black' oN 'white'
-fname fappend~ LF,'$pdf->',pdfMulti 0 27 ; 3  1 ; '<i>Width</i>'; 1
-fname fappend~ LF,'$pdf->','R' pdfMulti 2 27 ; 1  1 ; '<b>+W</b>'; 0
-fwl=. 0$<''
-lay=. }: each 'glPlanFWWidthAdj' matrix_pull hole ; tee ; gender
-lay=. (<glFWWidthAdjVal) i. each lay
-lay=. 0 >. each lay { each <glFWWidthAdjNum
-for_ab. 0 1 do.
-    fw=. 0$0
-    for_sh. >ab{lay do.
-	fname fappend~ LF,'black' oN >(0 ~: sh){(' ' cut 'white lightyellow')
-	fname fappend~ LF,'$pdf->', 'C' pdfMulti ((3+sh_index+ 2*ab),27) ; 1 1 ; (;'bp<+>' 8!:0 sh) ;1 
-	fw=. fw,sh
-    end.
-    fwl=. fwl, <fw
-end.
-fwtot=. fwtot +each fwl
-fname fappend~ LF,'black' oN 'white'
-fname fappend~ LF,'$pdf->',pdfMulti 0 28 ; 3  1 ; '<i>Width</i>'; 1
-fname fappend~ LF,'$pdf->','R' pdfMulti 2 28 ; 1  1 ; '<b>-W</b>'; 0
-fwl=. 0$<''
-lay=. }: each 'glPlanFWWidthAdj' matrix_pull hole ; tee ; gender
-lay=. (<glFWWidthAdjVal) i. each lay
-lay=. 0 <. each lay { each <glFWWidthAdjNum
-for_ab. 0 1 do.
-    fw=. 0$0
-    for_sh. >ab{lay do.
-	fname fappend~ LF,'black' oN >(0 ~: sh){(' ' cut 'white lightyellow')
-	fname fappend~ LF,'$pdf->', 'C' pdfMulti ((3+sh_index+ 2*ab),28) ; 1 1 ; (;'bp<+>' 8!:0 sh) ;1 
-	fw=. fw,sh
-    end.
-    fwl=. fwl, <fw
-end.
-fwtot=. fwtot +each fwl
+fname fappend~ write_row_head 0 27 ; 2.1 0.9; '<i>Width</i>'; '<b>+W</b>'
+lay=.  }: each 'glPlanFWWidthAdj' matrix_pull hole ; tee ; gender
+lay=. ((<glFWWidthAdjVal) i. each lay) { each <glFWWidthAdjNum
+fname fappend~ 'C' write_input 3 27 ; sz ; (0>. ; lay)
+fwtot=. fwtot +each lay NB. Only need to add once
+fname fappend~ write_row_head 0 28 ; 2.1 0.9; '<i>Width</i>'; '<b>-W</b>'
+fname fappend~ 'C' write_input 3 28 ; sz ; (0<.;lay)
+NB. Fairway Obstructed
+fname fappend~ write_row_head 0 29 ; 2.5 0.5; '<i>Obtructed</i>'; '<b>O</b>'
+lay=. _2}. each 0, each 'glPlanFWObstructed' matrix_pull hole ; tee ; gender
+lay=. (<"0 (0 1)) *each lay NB. Bogey only, so set to zero for scratch
+fwtot=. fwtot +each lay
+lay=. (0;1) #each lay NB. Suppress bogey
+fname fappend~ 'C' write_input 3 29 ; (_1 _1, 2}.sz) ; (;lay)
+NB. Total shot value
+fname fappend~ LF, 'R' write_cell 0 30 ; 3  ; 'Total Shot Value'
+fname fappend~ 'C' write_calc 3 30 ; sz ; (;fwtot)
+NB. Highest shot value
+fname fappend~ LF, write_cell 0 31 ; 3  ; 'Highest Shot Value'
+fwtot=. > ( >. / each 0, each fwtot) NB. Beware empty on par threes so tack on zero
+fname fappend~ 'C' write_calc 3 31 ; 2 3 ; (;fwtot)
+NB. Fairway Unpleasant
+fname fappend~ write_row_head 0 32 ; 2.5 0.5; '<i>Unpleasant</i>'; '<b>U</b>'
+lay=. 'glPlanFWUnpleasant' matrix_pull hole ; tee ; gender NB. One number for all shots
+lay=. +. /"1 > lay 
+fname fappend~ 'C' write_input 3 32 ;  2 3 ; (;lay)
+fwtot=. fwtot + lay
+NB. Fairway Overall rating
+fname fappend~ 'R' write_footer 0 33 ; 3 ; 'Fairway Rating'
+fname fappend~ 'C' write_footer 3 33 ;  2 3 ; fwtot
 
+NB. ------------------------
 NB. Recoverability and Rough
+NB. ------------------------
 fname fappend~ LF,'// -------- Recoverability and Rough -------------'
 carryyards=. 'F' carry_yards hole; tee ; gender 
 fname fappend~ LF,'$pdf->SetFillColor(0, 0, 0);'
@@ -356,14 +546,14 @@ for_ab. 0 1 do.
     end.
 end.
 
+NB. -----------------------------
 NB. Altitude
+NB. -----------------------------
 fname fappend~ LF,'// -------- Altitude -------------'
 alt=. (' ' cut 'glPlanAlt glGrAlt') matrix_pull hole; tee ; gender
-fname fappend~ LF,'$pdf->SetFillColor(127, 127, 127);'
-fname fappend~ LF,'$pdf->SetTextColor(0, 0, 0);'
+fname fappend~ 'black' oN 'grey'
 fname fappend~ LF,'$pdf->',pdfMulti 3 46 ; 4 1 ; '<b>Altimeter Readings</b>' ; 1
-fname fappend~ LF,'$pdf->SetFillColor(255, 255, 255);'
-fname fappend~ LF,'$pdf->SetTextColor(0, 0, 0);'
+fname fappend~ 'black' oN 'white'
 fname fappend~ LF,'$pdf->',pdfMulti 7 46 ; 4.5 1 ; '<b>On Tee:</b>' ; 1
 fname fappend~ LF,'$pdf->',pdfMulti 11.5 46 ; 4.5 1 ; '<b>Scratch Approach:</b>' ; 1
 fname fappend~ LF,'$pdf->',pdfMulti 16.0 46 ; 4.5 1 ; '<b>Bogey Approach:</b>' ; 1
@@ -396,22 +586,13 @@ NB. or
 NB. (variabe variable_green) matrix_pull hole ; tee ; gender 
 NB.
 NB. Returns a two element boxed array with the shot values for scratch, bogey
+NB. Assume the glFilepath,'_plan' is already read
 matrix_pull=: 4 : 0
 'hole tee gender'=. y
 hole=. ''$ hole
 tee=. ''$ tee
 gender=. ''$ gender
 shortname=. glFilename,'_',(;'r<0>2.0' 8!:0 (1+hole)),(gender{'MW'),tee
-
-if. fexist glFilepath,'.ijf' do.
-	ww=.utFileGet glFilepath
-	utKeyRead glFilepath,'_plan'
-	utKeyRead glFilepath,'_tee'
-	utKeyRead glFilepath,'_green'
-	err=. ''
-else.
-	err=. 'No such course : ',glFilename
-end.
 
 if. 0 =L. x do.
     x1=. x
@@ -436,7 +617,7 @@ t_index=. glTees i. tee
 NB. Pull the green variables
 ((hole=glGrHole)#glGrID) utKeyRead glFilepath,'_green'
 
-NB. Order by ability, shot
+NB. Order by ability, shot and re-read the plan
 ww=. ww /: ww{glPlanShot
 ww=. ww /: ww{glPlanAbility
 
@@ -449,13 +630,13 @@ for_ab. i. 2 do.
 	rr=. ''
     end.
     for_sh. i. 4 do.
-	ww1=. ( (ab = ww{glPlanAbility) *. (sh = ww{glPlanShot)) # ww
+	ww1=. I. (ab = glPlanAbility) *. (sh = glPlanShot) 
 	if. 0<#ww1 do.
 	    rr=. rr, ww1{ ".x1
 	end.
 
     end.
-    NB. Drop the last and pull the tree variable
+    NB. Drop the last and pull the tee variable if both variables were requested
     if. 0<#x2 do.
 	rr=. }: rr
 	rr=. rr, ". x2
@@ -511,17 +692,6 @@ carry_yards=: 4 : 0
 hole=. ''$ hole
 tee=. ''$ tee
 gender=. ''$ gender
-shortname=. glFilename,'_',(;'r<0>2.0' 8!:0 (1+hole)),(gender{'MW'),tee
-
-if. fexist glFilepath,'.ijf' do.
-	ww=.utFileGet glFilepath
-	utKeyRead glFilepath,'_plan'
-	utKeyRead glFilepath,'_tee'
-	utKeyRead glFilepath,'_green'
-	err=. ''
-else.
-	err=. 'No such course : ',glFilename
-end.
 
 yards=: 'glPlanHitYards' matrix_pull hole ; tee ; gender 
 ww=. hole = glPlanHole
@@ -563,10 +733,13 @@ lookup_green_target=: 3 :  0
 NB. Make transition yards large
 yards=. (trans){(yards, 999)
 if. gender=0 do. NB. Men
-    row=. > ab { 60 80 100 120 140 160 180 200 220 241 400 ; 44 59 74 89 109 129 149 164 180 399
+    row=. > ab { 60 80 100 120 140 160 180 200 220 241 400 ; 30 45 60 75 90 110 130 150 165 181 400
     col=. 36 31 26 21 17 12
     mat=. 12 7 $ 2 2 2 2 2 2 2 , 2 2 2 3 3 3 3 ,2 2 3 3 4 4 4 , 2 2 3 4 4 4 5, 2 3 4 4 4 5 6 , 2 3 4 4 5 6 7, 3 3 4 5 6 7 7 , 3 4 5 5 6 7 8, 3 4 5 6 7 8 9, 4 5 6 7 8 8 9, 4 5 6 7 8 9 10, 3 4 4 5 5 6 6
 else.
+    row=. > ab { 30 50 70 90 110 130 150 170 185 201 400 ; 21 35 50 65 80 95 105 115 125 141 400
+    col=. 36 31 26 21 17 12
+    mat=. 12 7 $ 2 2 2 2 2 2 2 , 2 2 2 3 3 3 3 ,2 2 3 3 4 4 4 , 2 2 3 4 4 4 5, 2 3 4 4 4 5 6 , 2 3 4 4 5 6 7, 3 3 4 5 6 7 7 , 3 4 5 5 6 7 8, 3 4 5 6 7 8 9, 4 5 6 7 8 8 9, 4 5 6 7 8 9 10, 3 4 4 5 5 6 6
 
 end.
 row=. + / yards >: row
@@ -590,6 +763,20 @@ else.
 end.
 row=. + / yards >: row
 col=. + / width <: col
+res=. (<row,col) { mat
+)
+
+NB. =================================================
+NB. lookup_roll_rating
+NB. =================================================
+NB. Usage
+NB.   lookup_roll_rating level ; slope
+NB. Returns table value
+lookup_roll_rating=: 3 :  0
+'level slope'=. y
+row=. glRollLevelVal i. level
+col=. glRollSlopeVal i. slope
+mat=. 3 3 $ _1 _2 _3, 0 0 0 , 1 2 3
 res=. (<row,col) { mat
 )
 

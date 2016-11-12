@@ -9,6 +9,18 @@ NB. Global values and descriptions
 NB. ==============================================
 glTreeVal=: (<''),':' cut 'MP:Mod:Sig:Ext'
 glTreeDesc=: ':' cut 'Zero:Min Pr:Mod Pr:Sig Pr:Ext Pr'
+glRollLevelVal=: 1 0 2{ (<''),':' cut 'Down:Up'
+glRollLevelDesc=: ':' cut 'Downhill:Level:Uphill'
+glRollLevelNum=: ':' cut 'Down:Level:Up'
+glRollSlopeVal=:  (<''),':' cut 'Mod:Sig'
+glRollSlopeDesc=: ':' cut 'Minor Slope (5y):Moderate Slope (10y):Significant Slope (15y)'
+glRollSlopeNum=: ':' cut 'Minor:Mod:Sig'
+glRollExtremeVal=:  (<''),':' cut '+1:+2:-1:-2'
+glRollExtremeDesc=:  ':' cut 'Normal Firmness:+1 Extreme Soft:+2 Extreme Soft:-1 Extreme Firm:-2 Extreme Firm'
+glRollExtremeNum=: 0 1 2 _1 _2
+glRollTwiceVal=:  (<''),':' cut '+1:-1'
+glRollTwiceDesc=:  ':' cut 'Normal:+1 Less Cumulative Roll:-1 More Cumulative Roll'
+glRollTwiceNum=: 0 1 _1
 glRRRiseDropVal=: (<''),':' cut '>5'':>10'''
 glRRRiseDropDesc=: ':' cut 'None:+1 >5'':+2 >10'''
 glTopogStanceVal=: (<''),':' cut 'MA:SA:EA'
@@ -503,7 +515,8 @@ label_shot.
 	glPlanRRMounds=: ,0
 	glPlanRRRiseDrop=: ,0
 	glPlanRRUnpleasant=: ,0
-	glPlanRollTwice=: ,0
+	glPlanRollExtreme=: ,<''
+	glPlanRollTwice=: ,<''
 	glPlanSqueezeWidth=: ,0
 	glPlanCarryType=: ,' '
 	glPlanSqueezeType=: ,' '
@@ -590,7 +603,8 @@ glPlanRRMounds=: 1 1 { glPlanRRMounds
 glPlanRRRiseDrop=: 1 1 { glPlanRRRiseDrop
 glPlanRRUnpleasant=: 1 1 {glPlanRRUnpleasant
 glPlanRollLevel=: 1 1{glPlanRollLevel
-glPlanRollFirmness=: 1 1 {glPlanRollFirmness
+glPlanRollSlope=: 1 1 {glPlanRollSlope
+glPlanRollExtreme=: 1 1 {glPlanRollExtreme
 glPlanRollTwice=: 1 1 {glPlanRollTwice
 
 utKeyPut glFilepath,'_plan'
@@ -727,7 +741,8 @@ glPlanRRInconsistent=:,0
 glPlanRRMounds=: ,0
 glPlanRRRiseDrop=: ,0
 glPlanRRUnpleasant=: ,0
-glPlanRollTwice=: ,(#glPlanID)$0
+glPlanRollExtreme=: ,(#glPlanID)$<''
+glPlanRollTwice=: ,(#glPlanID)$<''
 glPlanFWWidth=: ,(#glPlanID)$<0 
 glPlanFWObstructed=: ,(#glPlanID)$0
 glPlanTopogStance=: ,(#glPlanID)$<''

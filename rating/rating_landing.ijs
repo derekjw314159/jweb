@@ -134,16 +134,20 @@ stdout '</tbody></table>'
 NB. Table of values - Roll
 stdout LT1,'<h4>Roll</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>Level</th><th>Firmness</th><th>Twice</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>Level</th><th>Slope</th><th>Extreme</th><th>Twice</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td>'
 djwSelect 'rolllevel' ; 9 ; glRollLevelDesc ; glRollLevelVal ; <''$glPlanRollLevel
 stdout LT4,'</td>'
 stdout LT4,'<td>'
-djwSelect 'rollfirmness' ; 10 ; glRollFirmnessDesc ; glRollFirmnessVal ; <''$glPlanRollFirmness
+djwSelect 'rollslope' ; 10 ; glRollSlopeDesc ; glRollSlopeVal ; <''$glPlanRollSlope
 stdout LT4,'</td>'
-stdout LT4,'<td><input type="checkbox" id="rolltwice" name="rolltwice" value="1" '
-stdout ((''$glPlanRollTwice)#'checked'),' tabindex="11">',LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'rollextreme' ; 11 ; glRollExtremeDesc ; glRollExtremeVal ; <''$glPlanRollExtreme
+stdout LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'rolltwice' ; 12 ; glRollTwiceDesc ; glRollTwiceVal ; <''$glPlanRollTwice
+stdout LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table>'
 
@@ -215,11 +219,10 @@ end.
 NB. Assign to variables
 bunklz=: 0
 bunkline=: 0
-rolltwice=: 0
 fwvisible=: 0
 fwunpleasant=: 0
 fwobstructed=: 0
-xx=. djwCGIPost y ; ' ' cut 'alt fwwidth bunklz bunkline oobdist treedist latwaterdist rolltwice fwvisible fwunpleasant fwobstructed'
+xx=. djwCGIPost y ; ' ' cut 'alt fwwidth bunklz bunkline oobdist treedist latwaterdist fwvisible fwunpleasant fwobstructed'
 glFilename=: dltb ;filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
@@ -261,7 +264,8 @@ glPlanTreeDist=: ,treedist
 NB. glPlanTreeRecov=: ,treerecov
 glPlanLatWaterDist=: , latwaterdist
 glPlanRollLevel=: ,rolllevel
-glPlanRollFirmness=: ,rollfirmness
+glPlanRollSlope=: ,rollslope
+glPlanRollExtreme=: ,rollextreme
 glPlanRollTwice=: ,rolltwice
 glPlanFWVisible=: ,fwvisible
 glPlanFWTargVisible=: ,fwtargvisible

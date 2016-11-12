@@ -227,7 +227,7 @@ tees=. (glTees e. ww) # glTees
 for_t. tees do.
 	stdout '<th>',(>(glTees i. t){glTeesName),'</th>'
 end.
-stdout '<th colspan=1>Player Shot</th><th>Hit / Layup</th><th>ToGreen</th><th>Edits</th><th>Alt</th><th>F/width</th><th>Bunk in LZ</th><th>Bunk LoP</th><th>Dist OB</th><th>Dist Tr</th><th>Dist Wat</th><th>F/w U/L/D</th><th>So/Av Fi</th><th>MP/MA SA/EA</th><th>F/w +/-W</th><th colspan="3">Other Variables</th></tr></thead><tbody>'
+stdout '<th colspan=1>Player Shot</th><th>Hit / Layup</th><th>ToGreen</th><th>Edits</th><th>Alt</th><th>F/width</th><th>Bunk in LZ</th><th>Bunk LoP</th><th>Dist OB</th><th>Dist Tr</th><th>Dist Wat</th><th>Roll U/L/D</th><th>Mi/Mo /Sig</th><th>MP/MA SA/EA</th><th>F/w +/-W</th><th colspan="3">Other Variables</th></tr></thead><tbody>'
 NB. Sort the records and re-read
 rr=. I. glPlanHole=hole
 rr=. rr /: rr { glPlanShot
@@ -281,7 +281,8 @@ for_rr. i. #glPlanID do.
 		stdout (('L'=rr{glPlanLayupType)#(3{.": >rr{glPlanLayupCategory)),'</a></td><td>', (": <. 0.5 + rr{glPlanRemGroundYards),'</td>' 
 		if. 0<rr{glPlanRemGroundYards do.
 		    other=. ''
-		    other=. other, (rr{glPlanRollTwice)#' Ro:2'
+		    other=. other, (0<#>rr{glPlanRollExtreme)#' RoEx:',;>rr{glPlanRollExtreme
+		    other=. other, (0<#>rr{glPlanRollTwice)#' Ro2:',;>rr{glPlanRollTwice
 		    other=. other, (rr{glPlanFWVisible)#' LZ:V'
 		    other=. other, (rr{glPlanFWUnpleasant)#' FW:U'
 		    other=. other, (rr{glPlanFWObstructed)#' FW:O'
@@ -297,7 +298,7 @@ for_rr. i. #glPlanID do.
 		    NB.	stdout LT3,'<td>',(;(glTreeRecovVal i. rr{glPlanTreeRecov){glTreeRecovDesc),'</td>'
 		    stdout LT3, '<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanLatWaterDist),'</td>'
 		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanRollLevel),'</td>'
-		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanRollFirmness),'</td>'
+		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (3{. ":  ,>rr{glPlanRollSlope),'</td>'
 		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanTopogStance),'</td>'
 		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (6{. ":  ,>rr{glPlanFWWidthAdj),'</td>'
 		    stdout LT3,'<td colspan="3">',(}.other),'</td>'
@@ -326,7 +327,8 @@ for_rr. i. #glPlanID do.
 		stdout '<td colspan="3"><i>Measured Point</i></td>'
 		NB. stdout LT3,'<td>',(": rr{glPlanRemGroundYards),'</td>'
 		other=. ''
-		other=. other, (rr{glPlanRollTwice)#' Ro:2'
+		other=. other, (0<#>rr{glPlanRollExtreme)#' RoEx:',;>rr{glPlanRollExtreme
+		other=. other, (0<#>rr{glPlanRollTwice)#' Ro2:',;>rr{glPlanRollTwice
 		other=. other, (rr{glPlanFWVisible)#' LZ:V'
 		other=. other, (rr{glPlanFWUnpleasant)#' FW:U'
 		other=. other, (rr{glPlanFWObstructed)#' FW:O'
@@ -340,7 +342,7 @@ for_rr. i. #glPlanID do.
 		NB. stdout LT3,'<td>',(;(glTreeRecovVal i. rr{glPlanTreeRecov){glTreeRecovDesc),'</td>'
 		stdout LT3, '<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanLatWaterDist),'</td>'
 		stdout LT3, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanRollLevel),'</td>'
-		stdout LT3, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanRollFirmness),'</td>'
+		stdout LT3, '<td style="border-right: 1px solid lightgray">', (3{. ":  ,>rr{glPlanRollSlope),'</td>'
 		stdout LT3, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanTopogStance),'</td>'
 		stdout LT3, '<td style="border-right: 1px solid lightgray">', (6{. ":  ,>rr{glPlanFWWidthAdj),'</td>'
 		stdout LT3,'<td colspan=3>',(}.other),'</td>'

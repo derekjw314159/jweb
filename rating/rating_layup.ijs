@@ -71,7 +71,7 @@ if. ( -. glPlanLayupType e. 'LR' ) do.  NB. Not found, or transition
 	glPlanLayupCategory=: ,<'forced'
 	glPlanLayupReason=: ,<'Water'
 	glPlanRollLevel=: ,<''
-	glPlanRollFirmness=: ,<''
+	glPlanRollSlope=: ,<''
 	ww=. utKeyPut glFilepath,'_plan'
 end. 
 
