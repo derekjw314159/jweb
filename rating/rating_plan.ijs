@@ -31,7 +31,6 @@ elseif. 1 do.
 end.
 )
 
-
 NB. =========================================================
 NB. Synonyms
 NB. jweb_rating_plan
@@ -65,7 +64,6 @@ stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 NB. stdout LF,'<script>setTimeout(function(){window.location.href=''http://www.google.com''},5000);</script>'
-
 
 djwBlueprintCSS ''
 
@@ -227,7 +225,7 @@ tees=. (glTees e. ww) # glTees
 for_t. tees do.
 	stdout '<th>',(>(glTees i. t){glTeesName),'</th>'
 end.
-stdout '<th colspan=1>Player Shot</th><th>Hit / Layup</th><th>ToGreen</th><th>Edits</th><th>Alt</th><th>F/width</th><th>Bunk in LZ</th><th>Bunk LoP</th><th>Dist OB</th><th>Dist Tr</th><th>Dist Wat</th><th>Roll U/L/D</th><th>Mi/Mo /Sig</th><th>MP/MA SA/EA</th><th>F/w +/-W</th><th colspan="3">Other Variables</th></tr></thead><tbody>'
+stdout '<th>Player Shot</th><th>Hit / Layup</th><th>ToGreen</th><th>Edits</th><th>Alt</th><th>F/width</th><th>Bunk in LZ</th><th>Bunk LoP</th><th>Dist OB</th><th>Dist Tr</th><th>Dist Wat</th><th>Roll U/L/D</th><th>Mi/Mo /Sig</th><th>MP/MA SA/EA</th><th>F/w +/-W</th><th colspan="3">Other Variables</th></tr></thead><tbody>'
 NB. Sort the records and re-read
 rr=. I. glPlanHole=hole
 rr=. rr /: rr { glPlanShot
@@ -272,7 +270,7 @@ for_rr. i. #glPlanID do.
 				stdout '</td>'
 			end.
 		end.
-		stdout '<td colspan=1>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr{glPlanShot),({.>(glTees i. rr{glPlanTee){glTeesName),'</td>'
+		stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr{glPlanShot),({.>(glTees i. rr{glPlanTee){glTeesName),'</td>'
 		stdout '<td><a href="/jw/rating/layup/e/',(glFilename),'/'
 		stdout ;": 1+rr{glPlanHole
 		stdout (;rr{glPlanTee),'/'

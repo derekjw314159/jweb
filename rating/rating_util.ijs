@@ -46,7 +46,18 @@ glWaterCartDesc=: ':' cut 'None:+1 Bounce away:-1 Bounce towards'
 glWaterPercentVal=: (<''),':' cut '20%:40%:60%:80%'
 glWaterPercentDesc=: ':' cut '100%:20%:40%:60%:80%'
 glTargVisibleVal=: (<''),':' cut '+1:+2'
-glTargVisibleDesc=: (<''),':' cut '+1 >Half Green:+2 Flag'
+glTargVisibleDesc=: (<''),':' cut '+1 gt Half Green:+2 Flag'
+glGrFirmnessVal=: (<''),':' cut 'firm:soft'
+glGrFirmnessDesc=: ':' cut 'Av:+1 Firm:-1 Soft'
+glFWWidthAdjVal=: (<''),':' cut '+1 red:+2 very:-1 bounce:-1 gentle:-2 very'
+glFWWidthAdjDesc=: ':' cut 'No Adj:+1 Reduced:+2 Very Reduced:-1 Bounce Back:-1 Gentle Rough:-2 Very Gentle Rough'
+glFWWidthAdjNum=: 0 1 2 _1 _1 _2
+glLayupCategoryVal=: (<''), ':' cut 'dogleg:forced:choice'
+glLayupCategoryDesc=: ':' cut 'Dogleg:Forced Layup:Layup by Choice'
+glGrContourVal=: (<''),':' cut 'MC:HC'
+glGrContourDesc=: ':' cut 'RF/GS:MC/MS:HC/SS'
+glGrVisibilityVal=: (<''),':' cut '+1:+2'
+glGrVisibilityDesc=: ':' cut 'OK:+1 less than 1/2 visible:blind'
 glTargVisibleNum=: 0 1 2
 
 
@@ -508,7 +519,7 @@ label_shot.
 	glPlanBunkLZ=: ,0
 	glPlanBunkLine=: ,0
 	glPlanLatWaterDist=: ,0
-	if. glPlanLayupType='L' do.
+	if. (glPlanLayupType='L') *. (glPlanLayupCategory ~: <'choice') do.
 	    glPlanDefaultHit=: ,defaulthit
 	else.
 	    glPlanDefaultHit=: glPlanHitYards

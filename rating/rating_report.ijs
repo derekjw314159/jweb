@@ -492,7 +492,8 @@ fname fappend~ 'C' write_footer 3 33 ;  2 3 ; fwtot
 
 NB. ------------------------
 NB. Elevation
-NB. ------------------------
+NB. -------------------------
+fname fappend~ LF,'// -------- Elevation -------------'
 fname fappend~ write_title 0 11 ; 3 1 ; 'ELEVATION'
 fname fappend~ write_cell 3 11 ; 3 ; 'Tee to Gr (<b>gt 10ft</b>)'
 sh=. glGrAlt - glTeAlt
@@ -502,14 +503,44 @@ fname fappend~ 'R' write_input 6 11 ; 1 1 ; (0 >. sh),0 <. sh
 NB. ------------------------
 NB. Lay-Up
 NB. ------------------------
+fname fappend~ LF,'// -------- Lay-Up -------------'
 fname fappend~ write_title 0 12 ; 3 1 ; 'F/LAY-UP'
 fname fappend~ write_cell 3 12 ; 2 ; 'Forc / DLeg'
 sh=. 'glPlanDefaultHit' matrix_pull hole ; tee ; gender
-sh=. 50 <. >+/ each sh - each 'glPlanHitYards' matrix_pull hole ; tee ; gender
+NB. Have to do the 0 >. maximum in case of a transition as well as a layup
+sh=. 50 <. >+/ each 0 >. each sh - each 'glPlanHitYards' matrix_pull hole ; tee ; gender
 NB. Look for negative dogleg
 sh=. sh - 50 <. >+/ each | each 'glPlanDoglegNeg' matrix_pull hole ; tee ; gender
 ww=. ('Sc: ';'Bo: ') , each 'bp<+>' 8!:0 sh
 fname fappend~ 'C' write_input 5 12 ; 1.5 ;  <(<"0 (0 ~: sh))#each ww
+NB. Layup Type
+sh=. 'glPlanLayupCategory' matrix_pull hole ; tee ; gender
+sh=. (<glLayupCategoryVal) i. each sh
+sh=. sh {each <glLayupCategoryDesc,<''
+sh=. ('L'=each 'glPlanLayupType' matrix_pull hole ; tee ; gender) #each sh
+sh=. <>{. each sh
+fname fappend~ 'R' write_cell 0 13 ; 3 ; 'Layup Type'
+fname fappend~ 'C' write_input 3 13 ; 2 3 ; sh
+NB. Layup Reason
+sh=. 'glPlanLayupReason' matrix_pull hole ; tee ; gender
+sh=. ('L'=each 'glPlanLayupType' matrix_pull hole ; tee ; gender) #each sh
+sh=. <>{. each sh
+fname fappend~ 'R' write_cell 0 14 ; 3 ; 'Layup Reason'
+fname fappend~ 'C' write_input 3 14 ; 2 3 ; sh
+
+
+NB. ------------------------
+NB. Topography
+NB. ------------------------
+fname fappend~ LF,'// -------- Topography -------------'
+fname fappend~ write_title 0 15 ; 3 1 ; 'TOPOGRAPHY'
+fname fappend~ write_cell 3 15 ; 2 ; 'Forc / DLeg'
+alt=. (' ' cut 'glPlanAlt glGrAlt') matrix_pull hole; tee ; gender
+alt=. >(-&-/) each _2 {. each alt
+alt=. alt * 3<gender{glTePar
+ww=. ('Sc: ';'Bo: ') , each 'bp<+>' 8!:0 alt
+fname fappend~ 'C' write_input 5 15 ; 1.5 ;  <(<"0 (0 ~: alt))#each ww
+
 
 NB. ------------------------
 NB. Recoverability and Rough
