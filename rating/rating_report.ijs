@@ -18,6 +18,45 @@ r=. 'WriteHTMLCell(',(":0{size),', ',(": 1{size),', ',(":0{offset),', ',(":1{off
 )
 
 NB. =========================================================
+NB. pdfLine
+NB. =========================================================
+NB. Usage:
+NB.   pdfLine offset ; size
+pdfLine=: 3 : 0
+'offset size'=. y
+offset=. glPDFoffset + offset * glPDFmult
+size=. size * glPDFmult
+res=. LF,'$pdf->Line(',(":0{offset),', ',(": 1{offset),', ',(":0{offset+size),', ',(":1{offset+size),', '''');'
+)
+
+NB. =========================================================
+NB. pdfBox
+NB. =========================================================
+NB. Usage:
+NB.   pdfBox offset ; size
+NB. Need to draw as four lines because the standard box function fills
+NB. and we need a hollow box
+pdfBox=: 3 : 0
+'offset size'=. y
+res=. pdfLine offset ; 0 1 * size
+res=. res, pdfLine (offset + 0 1 * size) ; 1 0 * size
+res=. res, pdfLine offset ; 1 0 * size
+res=. res, pdfLine (offset + 1 0 * size) ; 0 1 * size
+)
+
+NB. =========================================================
+NB. pdfDiag
+NB. =========================================================
+NB. Usage:
+NB.   pdfDiag offset ; size
+NB. Draws diagnoal from bottom left to top right
+pdfDiag=: 3 : 0
+'offset size'=. y
+res=. pdfLine (offset + 0 1 * size) ; 1 _1 * size
+)
+
+
+NB. =========================================================
 NB. pdfColor
 NB. =========================================================
 NB. Usage:
@@ -73,12 +112,29 @@ NB. write_row_head
 NB. =========================================================
 NB. Write out title block, white on black
 NB. Puts the text with the second element right element
+NB. Need to write in several steps because the box may be overwritten
 write_row_head=: 3 : 0
+NB. Format for each one
+('cell' ; 'cell' ; 1) write_row_head y
+:
+NB. Defaults
+if. 0=L. x do. x=. ,<x end.
+x=. ,x
+if. 1=#x do. x=. x,x,<1 end.
+if. 2=#x do. x=. x,<1 end.
+". 'fn1=: write_',>0{x
+". 'fn2=: write_',>1{x
+bx=. >2{x
 'offset size t1 t2'=. y
-res=. ('R' ; 0) write_cell (offset + 2{. 0{size) ; (1{size) ; t2
-res=. res, ('L' ; 1) write_cell offset  ; (+/size) ; t1
+res=. ('R' ; 0) fn2 (offset + 2{. 0{size) ; (1{size) ; t2
+res=. res, ('L' ; 0) fn1 offset  ; (0{size) ; t1
+if. 0<bx do.
+	res=. res, pdfBox  offset ; ((+/size), 1)
+end.
+if. 2=bx do.
+	res=. res, pdfLine ((offset+0{size),0) ; 0 1
+end. 
 )
-
 
 NB. =========================================================
 NB. write_cell
@@ -114,6 +170,7 @@ for_sz. size do.
     end.
 end.
 )
+
 NB. =========================================================
 NB. write_input
 NB. =========================================================
@@ -282,7 +339,7 @@ end.
 
 NB. file exists if we have got this far
 NB. Need to check this is a valid shot
-ww=. glPlanRecType='P'
+ww=. glPlanRecType e. 'P'
 ww=. ww *. glPlanHole=hole
 ww=. ww *. glPlanTee=tee
 ww=. I. ww *. glPlanGender=gender
@@ -351,6 +408,8 @@ fname fappend~ LF,'$pdf->',pdfMulti 11 0 ; 2 1 ; ('<b>PAR</b>: ',":gender{,glTeP
 fname fappend~ LF,'$pdf->',pdfMulti 13 0 ; 3 1 ; ('<b>LENGTH</b>: ',":(<t_index,hole){glTeesYards); 1
 fname fappend~ LF,'$pdf->',pdfMulti 16 0 ; 5 1 ; '<b>DATE RATED</b>:' ; 1
 fname fappend~ LF,'$pdf->',pdfMulti 21 0 ; 7 1 ; '<b>T/LEADER</b>:' ; 1
+
+fname fappend~ pdfDiag  3 2 ; 1.25 1
 
 NB. ---------------------------
 NB. Shots Played
@@ -508,7 +567,8 @@ fname fappend~ write_title 0 12 ; 3 1 ; 'F/LAY-UP'
 fname fappend~ write_cell 3 12 ; 2 ; 'Forc / DLeg'
 sh=. 'glPlanDefaultHit' matrix_pull hole ; tee ; gender
 NB. Have to do the 0 >. maximum in case of a transition as well as a layup
-sh=. 50 <. >+/ each 0 >. each sh - each 'glPlanHitYards' matrix_pull hole ; tee ; gender
+NB. Also have to drop the last item, replaced by logic to see if the Layup Type is 'L'
+sh=. 50 <. >+/ each ('L'=each 'glPlanLayupType' matrix_pull hole; tee ; gender) * each 0 >. each sh - each 'glPlanHitYards' matrix_pull hole ; tee ; gender
 NB. Look for negative dogleg
 sh=. sh - 50 <. >+/ each | each 'glPlanDoglegNeg' matrix_pull hole ; tee ; gender
 ww=. ('Sc: ';'Bo: ') , each 'bp<+>' 8!:0 sh
@@ -520,48 +580,61 @@ sh=. sh {each <glLayupCategoryDesc,<''
 sh=. ('L'=each 'glPlanLayupType' matrix_pull hole ; tee ; gender) #each sh
 sh=. <>{. each sh
 fname fappend~ 'R' write_cell 0 13 ; 3 ; 'Layup Type'
-fname fappend~ 'C' write_input 3 13 ; 2 3 ; sh
+fname fappend~ 'C' write_input 3 13 ; 3   2   ; sh
 NB. Layup Reason
 sh=. 'glPlanLayupReason' matrix_pull hole ; tee ; gender
 sh=. ('L'=each 'glPlanLayupType' matrix_pull hole ; tee ; gender) #each sh
 sh=. <>{. each sh
 fname fappend~ 'R' write_cell 0 14 ; 3 ; 'Layup Reason'
-fname fappend~ 'C' write_input 3 14 ; 2 3 ; sh
-
+fname fappend~ 'C' write_input 3 14 ; 3   2   ; sh
 
 NB. ------------------------
 NB. Topography
 NB. ------------------------
 fname fappend~ LF,'// -------- Topography -------------'
-fname fappend~ write_title 0 15 ; 3 1 ; 'TOPOGRAPHY'
-fname fappend~ write_cell 3 15 ; 2 ; 'Forc / DLeg'
 alt=. (' ' cut 'glPlanAlt glGrAlt') matrix_pull hole; tee ; gender
+fname fappend~ write_title 0 15 ; 3 1 ; 'TOPOGRAPHY'
 alt=. >(-&-/) each _2 {. each alt
 alt=. alt * 3<gender{glTePar
-ww=. ('Sc: ';'Bo: ') , each 'bp<+>' 8!:0 alt
-fname fappend~ 'C' write_input 5 15 ; 1.5 ;  <(<"0 (0 ~: alt))#each ww
-
+fname fappend~ (' ' cut 'cell input') write_row_head 3 15 ; 1.2  0.8 ; 'App S:' ; 0{alt
+fname fappend~ (' ' cut 'cell input') write_row_head 5 15 ; 2 1 ; 'App Elev B:' ; 1{alt
+fname fappend~ 'R' write_cell 0 16 ; 3 ; '<i>(LZtoLZ or Appr)</i>'
+ww=. ' ' cut 'LZ1-2 Appr LZ1-1 LZ2-3 Appr'
+ww=. (<'<b>'), each ww
+ww=. ww, each <'</b>'
+fname fappend~ 'C' write_cell 3 16 ; 1 ; <ww
+NB. Topog Level
+fname fappend~ 'R' write_cell 0 17 ; 3 ; '<i><b>(MP/MA/SA/EA)<b></i>'
+wid=. }: each 'glPlanTopogStance' matrix_pull hole ; tee ; gender
+select. z=. j. / > #each wid
+    case. 0j0 do. sz=. _1 _1, _1 _1 _1
+    case. 0j1 do. sz=. _1 _1, _1 _1  1
+    case. 1j1 do. sz=. _1  1,  1 _1 _1
+    case. 1j2 do. sz=. _1  1,  1 _1  1
+    case. 2j2 do. sz=.  1  1 , 1 _1  1
+    case. 2j3 do. sz=.  1  1 , 1  1  1
+end.
+wid=. (<glTopogStanceVal) i. each wid
+fname fappend~ 'C' write_input 3 17 ; sz ; < (;wid) { glTopogStanceText
+fname fappend~ 'R' write_cell 0 18 ; 3 ; 'Table Value'
+wid=. wid {each <glTopogStanceNum
+fname fappend~ 'C' write_calc  3 18 ; sz ; (;wid) 
+fname fappend~ 'R' write_cell 0 19 ; 3 ; 'Total Shot Value'
+fname fappend~ 'C' write_calc  3 19 ; sz ; (;wid) 
+fname fappend~ 'R' write_cell 0 20 ; 3 ; 'Highest Shot Value'
+fname fappend~ 'C' write_calc  3 20 ; 2 3 ; (0 >. ;>. / each wid) 
+fname fappend~ 'R' write_footer 0 21 ; 3 ; 'Topography'
+fname fappend~ 'C' write_footer 3 21 ;  2 3 ; (0 >. ;>. / each wid)
 
 NB. ------------------------
 NB. Recoverability and Rough
 NB. ------------------------
 fname fappend~ LF,'// -------- Recoverability and Rough -------------'
 carryyards=. 'F' carry_yards hole; tee ; gender 
-fname fappend~ LF,'$pdf->SetFillColor(0, 0, 0);'
-fname fappend~ LF,'$pdf->SetTextColor(255, 255, 255);'
-fname fappend~ LF,'$pdf->',pdfMulti 8 1 ; 3 1 ; '<b>RECOV & ROUGH</b>' ; 1
-fname fappend~ LF,'$pdf->SetFillColor(255, 255, 255);'
-fname fappend~ LF,'$pdf->SetTextColor(0, 0, 0);'
-fname fappend~ LF,'$pdf->',pdfMulti 8 8 ; 1.25 1 ; '<i>Yd:</i>' ; 1
-fname fappend~ LF,'$pdf->SetFillColor(247, 253, 156);'
-fname fappend~ LF,'$pdf->',pdfMulti 8.5 8 ; 0.75 1   ; (":0{>0{carryyards) ; 0
-fname fappend~ LF,'$pdf->SetFillColor(255, 255, 255);'
-fname fappend~ LF,'$pdf->',pdfMulti 9.25 8 ; 1.25 1 ; '<i>Ht:</i>'; 1
-fname fappend~ LF,'$pdf->SetFillColor(247, 253, 156);'
-fname fappend~ LF,'$pdf->',pdfMulti 9.75 8 ; 0.75 1   ; (":glGrRRRoughLength) ; 0
-fname fappend~ LF,'$pdf->SetFillColor(255, 255, 255);'
-fname fappend~ LF,'$pdf->SetFillColor(255, 255, 255);'
-fname fappend~ LF,'$pdf->',pdfMulti 10.5 8 ; 0.5 1 ; '<b>C</b>'; 1
+fname fappend~ write_title 8 1 ; 3 1 ; '<b>RECOV & ROUGH</b>' 
+fname fappend~ ('cell' ; 'input') write_row_head 8 8 ; 0.7 0.55 ; '<i>Yd:</i>' ; ":0{>0{carryyards
+fname fappend~ ('cell' ; 'input') write_row_head 9.25 8 ; 0.7 0.55 ; '<i>Ht:</i>'; (":glGrRRRoughLength) 
+fname fappend~ 'R' write_cell 10.5 8 ; 0.5 ; '<b>C</b>'
 
 NB. Bunkers
 fname fappend~ LF,'// -------- Bunkers -------------'
@@ -571,12 +644,10 @@ fname fappend~ LF,'$pdf->SetTextColor(255, 255, 255);'
 fname fappend~ LF,'$pdf->',pdfMulti 8 16 ; 3 1 ; '<b>BUNKERS</b>' ; 1
 fname fappend~ LF,'$pdf->SetFillColor(255, 255, 255);'
 fname fappend~ LF,'$pdf->SetTextColor(0, 0, 0);'
-
 fname fappend~ LF,'$pdf->',pdfMulti 11 16 ; 3 1 ; 'Green Protection:' ; 1
 fname fappend~ LF,'$pdf->SetFillColor(247, 253, 156);'
 fname fappend~ LF,'$pdf->',pdfMulti 14 16; 4 1 ; (; > (glBunkFractionVal i. glGrBunkFraction){glBunkFractionDesc) ; 1  
 fname fappend~ LF,'$pdf->SetFillColor(255, 255, 255);'
-
 fname fappend~ LF,'$pdf->',pdfMulti 8 17; 3 1 ; '' ; 1 
 ww=. ' ' cut 'S1 S2 S3 B1 B2 B3 B4'
 for_i. ww do.
@@ -609,20 +680,18 @@ NB. Altitude
 NB. -----------------------------
 fname fappend~ LF,'// -------- Altitude -------------'
 alt=. (' ' cut 'glPlanAlt glGrAlt') matrix_pull hole; tee ; gender
-fname fappend~ 'black' oN 'grey'
+fname fappend~ 'black' oN 'lightgrey'
 fname fappend~ LF,'$pdf->',pdfMulti 3 46 ; 4 1 ; '<b>Altimeter Readings</b>' ; 1
-fname fappend~ 'black' oN 'white'
-fname fappend~ LF,'$pdf->',pdfMulti 7 46 ; 4.5 1 ; '<b>On Tee:</b>' ; 1
-fname fappend~ LF,'$pdf->',pdfMulti 11.5 46 ; 4.5 1 ; '<b>Scratch Approach:</b>' ; 1
-fname fappend~ LF,'$pdf->',pdfMulti 16.0 46 ; 4.5 1 ; '<b>Bogey Approach:</b>' ; 1
-fname fappend~ LF,'$pdf->',pdfMulti 20.4 46 ; 4.5 1 ; '<b>At Green:</b>' ; 1
-fname fappend~ LF,'$pdf->SetFillColor(247, 253, 156);'
-fname fappend~ LF,'$pdf->',pdfMulti 10 46 ; 1.3 1 ; (":glTeAlt); 0 NB. Tee
+fname fappend~ ('cell' ; 'input') write_row_head 7 46 ; 3 1.5 ; '<b>On Tee:</b>' ; ":glTeAlt
 if. glTePar>3 do.
-    fname fappend~ LF,'$pdf->',pdfMulti 14.5 46 ; 1.3 1 ; (":_2{>0{alt); 0 NB. Scratch
-    fname fappend~ LF,'$pdf->',pdfMulti 19 46 ; 1.3 1 ; (":_2{>1{alt); 0 NB. Bogey
+	fname fappend~ ('cell' ; 'input') write_row_head 11.5 46 ; 3 1.5 ; '<b>Scratch Approach:</b>' ; ":_2{>0{alt 
+	fname fappend~ ('cell' ; 'input') write_row_head 16   46 ; 3 1.5 ; '<b>Bogey Approach:</b>' ; ":_2{>1{alt 
+else.
+	fname fappend~ write_cell 11.5 46 ; 4.5 ; '<b>Scratch Approach:</b>' 
+	fname fappend~ write_cell 16   46 ; 4.5 ; '<b>Bogey Approach:</b>' 
 end.
-fname fappend~ LF,'$pdf->',pdfMulti 23.5 46 ; 1.3 1 ; (":_1{>0{alt); 0 NB. Green
+fname fappend~ ('cell' ; 'input') write_row_head 20.5 46 ; 3 1.5 ; '<b>At Green:</b>' ; ":_1{>0{alt 
+
 
 NB. End of Page
 fname fappend~ LF,'// -------- End of Page -------------'
@@ -752,6 +821,9 @@ tee=. ''$ tee
 gender=. ''$ gender
 
 yards=: 'glPlanHitYards' matrix_pull hole ; tee ; gender 
+NB. Need to read the hole file again
+oldid=. glPlanID
+utKeyRead glFilepath,'_plan'
 ww=. hole = glPlanHole
 ww=. ww *. 'C'=glPlanRecType
 ww=. ww *. x=glPlanCarryType
@@ -771,6 +843,7 @@ else.
 	res=. res >. each carry
     end.
 end.
+oldid utKeyRead glFilepath,'_plan'
 res=. res
 )
 
