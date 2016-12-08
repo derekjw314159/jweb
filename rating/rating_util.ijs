@@ -7,8 +7,10 @@ glMY=: 1.0936133
 NB. ==============================================
 NB. Global values and descriptions
 NB. ==============================================
-glTreeVal=: (<''),':' cut 'MP:Mod:Sig:Ext'
-glTreeDesc=: ':' cut 'Zero:Min Pr:Mod Pr:Sig Pr:Ext Pr'
+glTreeVal=: (<''),':' cut '+2 P3 Mod:+3 P3 Sig:+4 P3 Ext:+1 P4 MP(-1):.:+3 P4 Mod(-1):+4 P4 Mod:+5 P4 Sig(-1):+6 P4 Sig:+7 P4 Ext(-1):+8 P4 Ext' NB. Need two defaults
+glTreeDesc=: ':' cut '+1 Par3 Min Prob:+2 Par3 Mod Prob:+3 Par3 Sig Prob:+4 Par3 Ext Prob:+1 Min Prob(-1):+2 Min Prob:+3 Mod Prob (-1):+4 Mod Prob:+5 Sig Prob (-1):+6 Sig Prob:+7 Ext Prob (-1):+8 Ext Prob'
+glTreePar=: 3 3 3 3 4 4 4 4 4 4 4 4 
+glTreeNum=: 1 2 3 4 1 2 3 4 5 6 7 8
 glRollLevelVal=: 1 0 2{ (<''),':' cut 'Down:Up'
 glRollLevelDesc=: ':' cut 'Downhill:Level:Uphill'
 glRollLevelNum=: ':' cut 'Down:Level:Up'
@@ -25,7 +27,7 @@ glRRRiseDropVal=: (<''),':' cut '>5'':>10'''
 glRRRiseDropDesc=: ':' cut 'None:+1 >5'':+2 >10'''
 glTopogStanceVal=: (<''),':' cut 'MA:SA:EA'
 glTopogStanceDesc=: ':' cut 'Minor Problem:Moderately Awkward:Signif Awkward:Extremely Awkward'
-glTopogStanceText=: ':' cut 'MP:MA:SA;EA'
+glTopogStanceText=: ':' cut 'MP:MA:SA:EA'
 glTopogStanceNum=: 1 2 3 4
 glBunkFractionVal=: (<''),':' cut '<1/4:<1/2:<3/4:>3/4'
 glBunkFractionDesc=: ':' cut 'Zero:0 - 1/4:1/4 - 1/2:1/2 - 3/4:Greater than 3/4'
@@ -439,6 +441,8 @@ label_shot.
 	    NB. but do need to restore glPlanID
 	    glPlanID=: ,EnKey h ; '' ; t ; g ; ab ; shot
 	    glPlanLayupType=: ,' '
+	    glPlanLayupCategory=: ,<''
+	    glPlanLayupReason=: ,<''
     elseif. 1=$ww do.
 	    ww utKeyRead glFilepath,'_plan'
 

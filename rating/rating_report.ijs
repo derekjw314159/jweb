@@ -595,29 +595,35 @@ fname fappend~ LF,'// -------- Topography -------------'
 alt=. (' ' cut 'glPlanAlt glGrAlt') matrix_pull hole; tee ; gender
 fname fappend~ write_title 0 15 ; 3 1 ; 'TOPOGRAPHY'
 alt=. >(-&-/) each _2 {. each alt
-alt=. alt * 3<gender{glTePar
-fname fappend~ (' ' cut 'cell input') write_row_head 3 15 ; 1.2  0.8 ; 'App S:' ; 0{alt
-fname fappend~ (' ' cut 'cell input') write_row_head 5 15 ; 2 1 ; 'App Elev B:' ; 1{alt
+NB. alt=. alt * 3<gender{glTePar
+NB. Alt has to be multiples of 10ft, and rounding is incorrect for negatives
+alt=. (*alt) * 10 * <. 0.5 + 0.1*(|alt)
+NB. For Par 3s, 40 is the maximum
+if. (gender{glTePar) = 3 do. alt=. _40 >. alt <. 40 end.
+fname fappend~ (' ' cut 'cell calc') write_row_head 3 15 ; 1.2  0.8 ; 'App S:' ; 0{alt
+fname fappend~ (' ' cut 'cell calc') write_row_head 5 15 ; 2 1 ; 'App Elev B:' ; 1{alt
 fname fappend~ 'R' write_cell 0 16 ; 3 ; '<i>(LZtoLZ or Appr)</i>'
 ww=. ' ' cut 'LZ1-2 Appr LZ1-1 LZ2-3 Appr'
-ww=. (<'<b>'), each ww
-ww=. ww, each <'</b>'
+ww=. (<'<b>'), each ww, each <'</b>'
 fname fappend~ 'C' write_cell 3 16 ; 1 ; <ww
 NB. Topog Level
 fname fappend~ 'R' write_cell 0 17 ; 3 ; '<i><b>(MP/MA/SA/EA)<b></i>'
 wid=. }: each 'glPlanTopogStance' matrix_pull hole ; tee ; gender
 select. z=. j. / > #each wid
-    case. 0j0 do. sz=. _1 _1, _1 _1 _1
-    case. 0j1 do. sz=. _1 _1, _1 _1  1
+    case. 0j0 do. sz=. 2, 3  
+		wid=. (2$,<,<'Par3') NB. Append special value for Par 3
+    case. 0j1 do. sz=. 2, _1 _1  1 NB. Append special value for Par 3
+		wid=. (<,<'Par3'),}.wid NB. Append special value for Par 3
     case. 1j1 do. sz=. _1  1,  1 _1 _1
     case. 1j2 do. sz=. _1  1,  1 _1  1
     case. 2j2 do. sz=.  1  1 , 1 _1  1
     case. 2j3 do. sz=.  1  1 , 1  1  1
 end.
-wid=. (<glTopogStanceVal) i. each wid
-fname fappend~ 'C' write_input 3 17 ; sz ; < (;wid) { glTopogStanceText
+sh=. wid
+wid=. (<glTopogStanceVal,<'Par3') i. each wid
+fname fappend~ 'C' write_input 3 17 ; sz ; < (;wid) { glTopogStanceText,<'Par 3'
 fname fappend~ 'R' write_cell 0 18 ; 3 ; 'Table Value'
-wid=. wid {each <glTopogStanceNum
+wid=. lookup_topog_rating alt ; <sh
 fname fappend~ 'C' write_calc  3 18 ; sz ; (;wid) 
 fname fappend~ 'R' write_cell 0 19 ; 3 ; 'Total Shot Value'
 fname fappend~ 'C' write_calc  3 19 ; sz ; (;wid) 
@@ -910,4 +916,26 @@ col=. glRollSlopeVal i. slope
 mat=. 3 3 $ _1 _2 _3, 0 0 0 , 1 2 3
 res=. (<row,col) { mat
 )
+
+NB. =================================================
+NB. lookup_topog_rating
+NB. =================================================
+NB. Usage
+NB.   lookup_roll_topog_rating alt ; stance
+NB. Returns table value
+lookup_topog_rating=: 3 :  0
+'alt stance'=. y
+mat=. i. 5 5 
+res=. 0$<''
+for_gender. i. 2 do.
+	rr=. 0$0
+	for_sh. >gender{stance do.
+		row=. + / (| gender{alt * sh_index=_1+#>gender{stance) >: 10 20 30 40 NB. Only applies to approach (final) shot
+		col=. (glTopogStanceVal,<'Par3') i. sh
+		rr=. rr, (<row, col){mat
+	end.
+	res=. res, <rr
+end.
+)
+
 

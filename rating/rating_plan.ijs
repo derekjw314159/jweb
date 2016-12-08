@@ -217,7 +217,7 @@ stdout LF,TAB,'<div class="span-24 last">'
 
 stdout LF,'<table>'
 stdout LF,'<thead><tr>'
-utKeyRead glFilepath,'_tee'
+utKeyRead glFilepath,'_tee' NB. Just read for this hole
 ww=. I. glTeHole = hole
 ww=. (+. /"1 ww{glTeMeasured ) # ww{glTeTee NB. Either gender
 tees=. (glTees e. ww) # glTees
@@ -401,7 +401,7 @@ NB. Green Data
 
 stdout LF,'<div class="span-24 last">'
 stdout LT1,'<table><thead>'
-stdout LT3,'<tr><th>Green</th><th>From tee</th><th>To Front</th><th>Alt</th><th>Len</th><th>Wid</th><th>Diam</th><th>Tier</th><th>Firm</th><th>Contour</th><th>Stimp</th><th>Tree</th><th>Tree +1</th><th>Mounds</th><th>Bunk Frac</th><th>Bunk Dep</th><th>OOB Dist</th><th>Water Dist</th><th>Water Frac</th><th>Water SurrDist</th><th colspan="5">Other Variables</th></tr>'
+stdout LT3,'<tr><th>Green</th><th>From tee</th><th>To Front</th><th>Alt</th><th>Len</th><th>Wid</th><th>Diam</th><th>Tier</th><th>Firm</th><th>Contour</th><th>Stimp</th><th>Mounds</th><th>Bunk Frac</th><th>Bunk Dep</th><th>OOB Dist</th><th>Water Dist</th><th>Water Frac</th><th>Water SurrDist</th><th colspan="5">Other Variables</th></tr>'
 stdout LT2,'</thead><tbody><tr>'
 ww=. ''$glGrHole i. hole
 other=. ''
@@ -427,8 +427,6 @@ stdout LT4,'<td style="border-right: 1px solid lightgray">',(>(ww{glGrTiered){' 
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(>ww{glGrFirmness),'</td>'
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(>ww{glGrContour),'</td>'
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 ww{glGrStimp),'</td>'
-stdout LT4,'<td style="border-right: 1px solid lightgray">',(>ww{glGrTree),'</td>'
-stdout LT4,'<td style="border-right: 1px solid lightgray">',(>(ww{glGrTreeTween){' ' cut '. +1'),'</td>'
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(>(ww{glGrRRMounds){' ' cut '. y'),'</td>'
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(>ww{glGrBunkFraction),'</td>'
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(>ww{glGrBunkDepth),'</td>'
@@ -439,6 +437,34 @@ stdout LT4,'<td style="border-right: 1px solid lightgray">',(>ww{glGrWaterSurrDi
 stdout LT4,'<td colspan="5">',(}.other),'</td>'
 stdout LT2,'</tr></tbody></table>'
 stdout LF,'</div>' NB. main span
+
+NB. Tree variables
+utKeyRead glFilepath,'_tee' NB. Just read for this hole
+((hole=glTeHole)#glTeID) utKeyRead glFilepath,'_tee' NB. Just read for this hole
+head=. ''
+row=. ''
+for_t. glTeTee do.
+    for_g. i. 2 do.
+	if. (<t_index,g){glTeMeasured do.
+		for_ab. i. 2 do.
+			head=. head,'<th style="border-right: 1px solid lightgray">',(>(glTees i. t){glTeesName),' ',(>g{' ' cut 'Men Women'),' ',(>ab{' 'cut 'Scr Bgy'),'</th>'
+			row=. row,'<td style="border-right: 1px solid lightgray">',(>(<t_index,g,ab){glTeTree),'</td>'
+		end.
+
+	end.
+    end.
+end.
+stdout LF,'<div class="span-24">'
+stdout LT1,'<h4>Tree Difficulty</h4>'
+stdout LT2,'<table><thead>'
+stdout LT3,'<tr>'
+stdout LT4,head
+stdout LT3,'</tr></thead><tbody>'
+stdout LT3,'<tr>'
+stdout LT4,row
+stdout LT3,'</tr></tbody></table>'
+stdout LF,'</div>' NB. main span
+
 stdout LF,'        '
 for_h. i. 18 do.
 	if. h=hole do.

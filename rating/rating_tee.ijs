@@ -48,7 +48,7 @@ hole=. ''$glTeHole
 stdout LT1,'<form action="/jw/rating/tee/editpost/',(;glFilename),'" method="post">'
 
 stdout LF,'<h2>Course : ', glCourseName,EM,EM,'Tee Measurements</h2>'
-stdout LF,'<div class="span-12 append-1">'
+stdout LF,'<div class="span-6 append-1">'
 stdout LF,'<table><thead><tr><th></th><th>Value</th></tr></thead><tbody>'
 stdout LF,'<tr><td>Hole:</td><td>',(":1+ ; glTeHole),'</td></tr>'
 stdout LF,'<tr><td>Tee:</td><td>',(": ; (glTees i. glTeTee){glTeesName),'</td></tr>'
