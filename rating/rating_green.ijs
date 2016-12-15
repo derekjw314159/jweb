@@ -293,7 +293,7 @@ glGrAlt=: ,alt
 glGrLength=: ,length
 glGrWidth=: ,width
 glGrDiam=: ,diam
-glGrDiam=: ,<. 0.5 + (0.5*length+width)
+if. 0=glGrDiam do. glGrDiam=: ,<. 0.5 + (0.5*length+width) end.
 glGrCircleConcept=: ,circleconcept
 glGrTiered=: ,tiered
 glGrFirmness=: ,firmness

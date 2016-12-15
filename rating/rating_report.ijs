@@ -200,7 +200,7 @@ for_sz. size do.
     else.
 	sh=. ((sz_index){_1 + (+/) \ size >: 0 ){array
 	if. 1=L. sh do. sh=. >sh end.`
-	if. 2 ~: 3!:0 sh do. sh=. ;'bp<+>' 8!:0 sh end.
+	if. 2 ~: 3!:0 sh do. sh=. ;'b' 8!:0 sh end.
 	if. 0=#sh do.
 	    res=. res, 'black' oN 'white'
 	else.
@@ -633,6 +633,21 @@ fname fappend~ 'R' write_footer 0 21 ; 3 ; 'Topography'
 fname fappend~ 'C' write_footer 3 21 ;  2 3 ; (0 >. ;>. / each wid)
 
 NB. ------------------------
+NB. Green Target
+NB. ------------------------
+fname fappend~ LF,'// -------- Green Target -------------'
+fname fappend~ write_title 0 35 ; 3 1 ; '<b>GREEN TARGET</b>' 
+fname fappend~ (' ' cut 'cell input') write_row_head 3 35 ; 0.80 0.45 ; 'Circ:' ; <glGrCircleConcept{'ny'
+fname fappend~ (' ' cut 'cell input') write_row_head 4.25 35 ; 0.60 0.65 ; 'W:' ; glGrWidth
+fname fappend~ (' ' cut 'cell input') write_row_head 5.50 35 ; 0.60 0.65 ; 'L:' ; glGrLength
+fname fappend~ (' ' cut 'cell input') write_row_head 6.75 35 ; 0.60 0.65 ; 'Di:' ; glGrDiam
+greenval=. >_1 { each hityards
+greenval=. lookup_green_target gender ; greenval ; (''$glGrDiam) ; transition
+fname fappend~ 'R' write_cell 0 36 ; 3 ; <<'Table Value'
+fname fappend~ write_calc 3 36 ; 2.5 2.5 ; greenval
+fwtot=. greenval
+
+NB. ------------------------
 NB. Recoverability and Rough
 NB. ------------------------
 fname fappend~ LF,'// -------- Recoverability and Rough -------------'
@@ -863,26 +878,29 @@ NB. =================================================
 NB. lookup_green_target
 NB. =================================================
 NB. Usage
-NB.   lookup_green_target gender ; abilty ; yards ; diam ; transition
+NB.   lookup_green_target gender ; yards ; diam ; transition
 NB. Returns table value
 lookup_green_target=: 3 :  0
-'gender ab yards diam trans'=. y
+'gender yards diam trans'=. y
 NB. Make transition yards large
-yards=. (trans){(yards, 999)
-if. gender=0 do. NB. Men
-    row=. > ab { 60 80 100 120 140 160 180 200 220 241 400 ; 30 45 60 75 90 110 130 150 165 181 400
-    col=. 36 31 26 21 17 12
-    mat=. 12 7 $ 2 2 2 2 2 2 2 , 2 2 2 3 3 3 3 ,2 2 3 3 4 4 4 , 2 2 3 4 4 4 5, 2 3 4 4 4 5 6 , 2 3 4 4 5 6 7, 3 3 4 5 6 7 7 , 3 4 5 5 6 7 8, 3 4 5 6 7 8 9, 4 5 6 7 8 8 9, 4 5 6 7 8 9 10, 3 4 4 5 5 6 6
-else.
-    row=. > ab { 30 50 70 90 110 130 150 170 185 201 400 ; 21 35 50 65 80 95 105 115 125 141 400
-    col=. 36 31 26 21 17 12
-    mat=. 12 7 $ 2 2 2 2 2 2 2 , 2 2 2 3 3 3 3 ,2 2 3 3 4 4 4 , 2 2 3 4 4 4 5, 2 3 4 4 4 5 6 , 2 3 4 4 5 6 7, 3 3 4 5 6 7 7 , 3 4 5 5 6 7 8, 3 4 5 6 7 8 9, 4 5 6 7 8 8 9, 4 5 6 7 8 9 10, 3 4 4 5 5 6 6
-
+res=. 0$0
+for_ab. i. 2 do.
+	yy=.(ab{yards)+999*(ab{trans) 
+	if. gender=0 do. NB. Men
+	    row=. > ab { 60 80 100 120 140 160 180 200 220 241 400 ; 30 45 60 75 90 110 130 150 165 181 400
+	    col=. 36 31 26 21 17 12
+	    mat=. 12 7 $ 2 2 2 2 2 2 2 , 2 2 2 3 3 3 3 ,2 2 3 3 4 4 4 , 2 2 3 4 4 4 5, 2 3 4 4 4 5 6 , 2 3 4 4 5 6 7, 3 3 4 5 6 7 7 , 3 4 5 5 6 7 8, 3 4 5 6 7 8 9, 4 5 6 7 8 8 9, 4 5 6 7 8 9 10, 3 4 4 5 5 6 6
+	else.
+	    row=. > ab { 30 50 70 90 110 130 150 170 185 201 400 ; 21 35 50 65 80 95 105 115 125 141 400
+	    col=. 36 31 26 21 17 12
+	    mat=. 12 7 $ 2 2 2 2 2 2 2 , 2 2 2 3 3 3 3 ,2 2 3 3 4 4 4 , 2 2 3 4 4 4 5, 2 3 4 4 4 5 6 , 2 3 4 4 5 6 7, 3 3 4 5 6 7 7 , 3 4 5 5 6 7 8, 3 4 5 6 7 8 9, 4 5 6 7 8 8 9, 4 5 6 7 8 9 10, 3 4 4 5 5 6 6
+	end.
+	row=. + / yy >: row
+	col=. + / diam <: col
+	res=. res, (<row,col) { mat
 end.
-row=. + / yards >: row
-col=. + / diam <: col
-res=. (<row,col) { mat
 )
+
 NB. =================================================
 NB. lookup_fairway_rating
 NB. =================================================
@@ -896,7 +914,9 @@ if. gender=0 do. NB. Men
     col=. 50 39 29 24 19   
     mat=. 4 6 $ 1 1 2 3 4 5, 1 2 3 3 5 6, 2 3 4 4 6 7, 2 3 4 5 7 8
 else.
-
+    row=. 270 310 356 
+    col=. 35 30 25 20 19   
+    mat=. 4 6 $ 1 1 2 3 4 5, 1 2 3 3 5 6, 2 3 4 4 6 7, 2 3 4 5 7 8
 end.
 row=. + / yards >: row
 col=. + / width <: col
@@ -925,7 +945,7 @@ NB.   lookup_roll_topog_rating alt ; stance
 NB. Returns table value
 lookup_topog_rating=: 3 :  0
 'alt stance'=. y
-mat=. i. 5 5 
+mat=. 5 5 $ 1 3 4 5, 0, 2 4 5 6, 1, 3 5 6 7, 2, 4 6 7 8, 3, 5 7 8 9, 4
 res=. 0$<''
 for_gender. i. 2 do.
 	rr=. 0$0
@@ -937,5 +957,3 @@ for_gender. i. 2 do.
 	res=. res, <rr
 end.
 )
-
-
