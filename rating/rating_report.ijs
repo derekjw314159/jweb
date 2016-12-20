@@ -722,13 +722,13 @@ fname fappend~ 'C' write_input 18 11; 1.25 ;  <rr{glWaterFractionText
 fname fappend~ 'C' write_input 19.25 11; 1.25 ;  <cc{glWaterSurrDistText
 fname fappend~ 'R' write_cell 20.5 11 ; 0.5 ; '<b>S</b>'
 fw=. lookup_water_surround (rr{glWaterFractionNum) ; (cc{glWaterSurrDistNum) ; greenval ; <hityards
+watersurr=. fw
 fname fappend~ write_calc 21 11; sz ; (;fw)
 fwtot=. fwtot +each fw
 fname fappend~ 'R' write_cell 18 12 ; 3 ; 'Total Shot Value'
 fname fappend~ write_calc 21 12 ; sz ; (;fwtot)
 fname fappend~ 'R' write_cell 18 13 ; 3 ; 'Highest Shot Value'
 fname fappend~ write_calc 21 13 ; 3 4 ; (;>. / each fwtot)
-
 fname fappend~ 'R' write_footer 18 15 ; 3 ; 'Water Rating'
 fname fappend~ 'C' write_footer 21 15 ;  3 4 ; (;>./each fwtot)
 
@@ -744,50 +744,104 @@ ww=. ' ' cut 'S1 S2 S3 B1 B2 B3 B4'
 ww=. (<'<b>'), each ww, each (<'</b>')
 fname fappend~ 'C' write_cell 11 2; (7$1) ; <ww
 fname fappend~ 'R' write_cell 8 3; 3 ; <<'Table Value'
-fname fappend~ write_cell 11 3; 3 4 ; <2$<''
+fwtot=. lookup_recoverability gender ; greenval ; glGrRRRoughLength
+fname fappend~ write_calc 11 3 ; 3 4 ; fwtot
+NB. Fairway Layup
+fname fappend~ write_row_head 8 4 ; 2.5 0.5; '<i>Lay-up</i>'; '<b>L</b>'
+lay=. - each 'L' =each 'glPlanLayupType' matrix_pull hole ; tee ; gender NB. -1 if Layup
+fname fappend~ 'C' write_input 11 4 ; sz ; (;lay)
+fwtot=. fwtot + > +/each lay
+NB. Mounds
+fname fappend~ write_row_head 8 6 ; 2.5 0.5; '<i>Mounds</i>'; '<b>M</b>'
+lay=. ('glPlanRRMounds' ; 'glGrRRMounds') matrix_pull hole ; tee ; gender 
+fname fappend~ 'C' write_input 11 6 ; sz ; (;lay)
+fwtot=. fwtot + > +/each lay
 NB. Carry
-fname fappend~ ('cell' ; 'input') write_row_head 8 8 ; 0.6 0.65 ; '<i>Yd</i>' ; ":0{>0{carryyards
-fname fappend~ ('cell' ; 'input') write_row_head 9.25 8 ; 0.6 0.65 ; '<i>Ht</i>'; (":glGrRRRoughLength) 
+fname fappend~ ('cell' ; 'input') write_row_head 8 8 ; 0.55 0.7 ; '<i>Y</i>' ; ":0{>0{carryyards
+fname fappend~ ('cell' ; 'input') write_row_head 9.25 8 ; 0.55 0.7 ; '<i>H</i>'; (":glGrRRRoughLength) 
+lay=. lookup_carry_rough gender ; carryyards ; glGrRRRoughLength
 fname fappend~ 'R' write_cell 10.5 8 ; 0.5 ; '<b>C</b>'
+fname fappend~ 'C' write_calc 11 8 ; sz ; (;lay)
+fwtot=. fwtot + > +/each lay
+NB. Sub-Total
+fname fappend~ 'R' write_cell 8 9 ; 3 ; 'Sum of <b><u>all</u></b> Values'
+fname fappend~ write_calc 11 9 ; 3 4 ; fwtot
+NB. Rise & Drop
+lay=. ''$(glRRRiseDropVal i. glGrRRRiseDrop){glRRRiseDropNum
+fname fappend~ write_input 8 10 ; 1.25 ; <(*lay ){':' cut 'Frac:&gt;&frac12;'
+fname fappend~ write_input 9.25 10 ; 1.25 ; <lay {':' cut 'Ft:5&#39;-10&#39;:&gt;10&#39;'
+fname fappend~ write_cell 10.5 10 ; 0.5 ; <<'<b>R</b>'
+fname fappend~ write_calc 11 10 ; 3 4 ; 2$lay
+fwtot=. fwtot + lay
+NB. Surround
+lay=. >(>./ each watersurr)
+lay=. ( 2 3 i. lay){1 2 0
+fname fappend~ write_row_head 8 14 ; 2.5 0.5 ; '<i>Surr&#39;d (Water)</i>' ; '<b>S</b>'
+fname fappend~ write_input 11 14 ; 3 4 ; lay
+fwtot=. fwtot + lay
+NB. Total
+fname fappend~ 'R' write_footer 8 15 ; 3 ; 'Recov & R Rating'
+fname fappend~ 'C' write_footer 11 15 ;  3 4 ; fwtot
 
+NB. ----------------------------------------
 NB. Bunkers
+NB. ----------------------------------------
 fname fappend~ LF,'// -------- Bunkers -------------'
 carryyards=. 'B' carry_yards hole; tee ; gender 
-fname fappend~ LF,'$pdf->SetFillColor(0, 0, 0);'
-fname fappend~ LF,'$pdf->SetTextColor(255, 255, 255);'
-fname fappend~ LF,'$pdf->',pdfMulti 8 16 ; 3 1 ; '<b>BUNKERS</b>' ; 1
-fname fappend~ LF,'$pdf->SetFillColor(255, 255, 255);'
-fname fappend~ LF,'$pdf->SetTextColor(0, 0, 0);'
-fname fappend~ LF,'$pdf->',pdfMulti 11 16 ; 3 1 ; 'Green Protection:' ; 1
-fname fappend~ LF,'$pdf->SetFillColor(247, 253, 156);'
-fname fappend~ LF,'$pdf->',pdfMulti 14 16; 4 1 ; (; > (glBunkFractionVal i. glGrBunkFraction){glBunkFractionDesc) ; 1  
+fname fappend~ write_title 8 16 ; 3 1 ; '<b>BUNKERS</b>'
+fname fappend~ write_cell 11 16 ; 3 ; 'Green Protection:' 
+fname fappend~ write_input 14 16; 4 ; <(glBunkFractionVal i. glGrBunkFraction){glBunkFractionText
 fname fappend~ LF,'$pdf->SetFillColor(255, 255, 255);'
 fname fappend~ LF,'$pdf->',pdfMulti 8 17; 3 1 ; '' ; 1 
 ww=. ' ' cut 'S1 S2 S3 B1 B2 B3 B4'
 for_i. ww do.
     fname fappend~ LF,'$pdf->',pdfMulti ((11+i_index),17) ; 1 1 ; ('<span style="text-align: center">',( > i),'</span>') ; 1  
 end. 
-fname fappend~ LF,'$pdf->',pdfMulti 8 18 ; 3 1 ; '<span style="text-align: right">Table Value</span>' ; 1 
-fname fappend~ LF,'$pdf->',pdfMulti 11 18 ; 3 1 ; '' ; 1 
-fname fappend~ LF,'$pdf->',pdfMulti 14 18 ; 4 1 ; '' ; 1 
-
+NB. Table Value
+fname fappend~ 'R' write_cell 8 18 ; 3 ; <<'Table Value' 
+lay=. lookup_bunker_rating greenval ; (glBunkFractionVal i. glGrBunkFraction){glBunkFractionNum
+fname fappend~ write_calc  11 18 ; 3 4 ; lay
+fwtot=. lay
+NB. Carry
 fname fappend~ LF,'$pdf->',pdfMulti 8 20 ; 2.5 1 ; '<i>Carry</i>' ; 1
 fname fappend~ LF,'$pdf->',pdfMulti 10.5 20 ; 0.5 1 ; '<b>C</b>'; 1
 fname fappend~ LF,'$pdf->SetFillColor(127, 127, 127);' NB. Grey out boxes
 fname fappend~ LF,'$pdf->',pdfMulti 11 20 ; 7 1 ; '' ; 1
 for_ab. 0 1 do.
     for_sh. >ab_index { carryyards do.
-	if. sh>0 do.
-	    fname fappend~ LF,'$pdf->SetFillColor(247, 253, 156);'
-	    fname fappend~ LF,'$pdf->',pdfMulti (( 11 +(3* ab) + sh_index),20) ;  1 1   ; (":sh) ; 1
-	    fname fappend~ LF,'$pdf->SetFillColor(255, 255, 255);'
-	else.
-	    fname fappend~ LF,'$pdf->SetFillColor(127, 127, 127);'
-	    fname fappend~ LF,'$pdf->',pdfMulti (( 11 +(3* ab) + sh_index),20) ;  1 1   ; '' ; 1
-	    fname fappend~ LF,'$pdf->SetFillColor(255, 255, 255);'
-	end.	    
+		if. sh>0 do.
+			fname fappend~ LF,'$pdf->SetFillColor(247, 253, 156);'
+			fname fappend~ LF,'$pdf->',pdfMulti (( 11 +(3* ab) + sh_index),20) ;  1 1   ; (":sh) ; 1
+			fname fappend~ LF,'$pdf->SetFillColor(255, 255, 255);'
+		else.
+			fname fappend~ LF,'$pdf->SetFillColor(127, 127, 127);'
+			fname fappend~ LF,'$pdf->',pdfMulti (( 11 +(3* ab) + sh_index),20) ;  1 1   ; '' ; 1
+			fname fappend~ LF,'$pdf->SetFillColor(255, 255, 255);'
+		end.	    
     end.
 end.
+NB. Sub-Total
+fname fappend~ 'R' write_cell 8 22 ; 3 ; <<'Sum of <b><u>all</u></b> Values'
+fname fappend~ write_calc  11 22 ; 3 4 ; fwtot
+NB. Landing Zones
+lz=. }: each 'glPlanBunkLZ' matrix_pull hole ; tee ; gender
+lop=. }: each 'glPlanBunkLine' matrix_pull hole ; tee ; gender
+fname fappend~ write_cell 8 23 ; 0.5 ; <<'S'
+fname fappend~ 'C' write_input 8.3571 23 ; (2{.((#>0{lz)$0.3571),2$_0.3571) ; <<"0 (>0{lz){' y'
+fname fappend~ write_cell 9.0713 23 ; 0.5 ; <<'B'
+fname fappend~ 'C' write_input 9.4284 23 ; (3{.((#>0{lz)$0.3571),3$_0.3571) ; <<"0 (>1{lz){' y'
+fname fappend~ write_cell 8 24 ; 2 ; <<'Bog Ln/Play'
+fname fappend~ write_input 10 24 ; 0.5 ; (+. / >1{lop){'ny'
+fname fappend~ 'black' oN 'white'
+fname fappend~ LF,'$pdf->',pdfMulti 10.5 23 ; 0.5 2 ; ('<b>N</b>') ; 1
+NB. Calculate Negative adjustment
+fw=. ((+. / >0{lz) {_1 0 ), ((+. / (>1{lz),(>1{lop)){_1 0) 
+fw=. _1 >. fw - 0=># each lz NB. Par 3
+fname fappend~ 'black' oN 'lightblue'
+fname fappend~ LF,'$pdf->',pdfMulti 11 23 ; 3 2 ;  ('<span style="text-align: center">',(;(8!:0) 0{fw),'</span>') ; 1
+fname fappend~ LF,'$pdf->',pdfMulti 14 23 ; 4 2 ;  ('<span style="text-align: center">',(;(8!:0) 1{fw),'</span>') ; 1
+fwtot=. fwtot + fw
+
 
 NB. -----------------------------
 NB. Altitude
@@ -1107,6 +1161,7 @@ for_ab. 0 1  do.
 	res=. res, <rr
 end.
 )
+
 NB. =================================================
 NB. lookup_water_surround
 NB. =================================================
@@ -1122,4 +1177,76 @@ res=. res * greenval >: 5 _1
 NB. Pad out to number of shots
 res=. <"0 res
 res=. ((-&#)each shot) {. each res
+)
+
+NB. =================================================
+NB. lookup_recoverability
+NB. =================================================
+NB. Usage
+NB.   lookup_recoverability gender ; greenval ; rrlength
+NB. Returns table value
+lookup_recoverability=: 3 : 0
+'gender greenval rrlength'=. y
+if. gender=0 do.
+	mat=. 5 5 $ 1 3 4 6 7 , 2 4 5 7 8 , 3 5 6 8 9 , 4 6 7 9 10, 5 7 8 10 10 
+	row=. 4 5 7 9 ,: 3 4 6 8
+	col=. 2 3.01 4.01 6.01
+else.
+	mat=. 5 5 $ 1 3 4 6 7 , 2 4 5 7 8 , 3 5 6 8 9 , 4 6 7 9 10, 5 7 8 10 10 
+	row=. 4 5 7 9 ,: 3 4 6 8 
+	col=. 2 2.51 3.51 5.01
+end.
+
+res=. 0$0
+for_ab. 0 1  do.
+    r=. +/ (ab{greenval) >: (ab{row) 
+    res=. res, (<r, +/(''$rrlength) >: col){mat
+end.
+)
+
+NB. =================================================
+NB. lookup_carry_rough
+NB. =================================================
+NB. Usage
+NB.   lookup_carry_rough gender ; carryyards ; rrlength
+NB. Returns table value
+lookup_carry_rough=: 3 : 0
+'gender carryyards rrlength'=. y
+if. gender=0 do.
+	mat=. 2 4 $ 0 0 1 2, 0 1 3 4
+	row=. ,160
+	col=. 2 3.01 4.01 
+else.
+	mat=. 2 4 $ 0 0 1 2, 0 1 3 4
+	row=. ,120
+	col=. 2 2.51 3.51 
+end.
+
+res=. <0*>0{carryyards NB. Scratch set to zero
+for_ab. ,1  do. NB. Bogey only
+    rr=. 0$0
+    for_sh. >ab{carryyards do.
+	r=. +/ sh >: row
+	rr=. rr, (<r, +/(''$rrlength) >: col){mat
+    end.
+    res=. res, <rr
+end.
+)
+
+NB. =================================================
+NB. lookup_bunker_rating
+NB. =================================================
+NB. Usage
+NB.   lookup_bunker_rating greenval ; bunkfraction
+NB. Returns table value
+lookup_bunker_rating=: 3 : 0
+'greenval bunkfraction'=. y
+mat=. 6 5 $ 0 1 2 2 3, 0 2 2 3 4, 0 2 3 4 5, 0 3 4 5 6, 0 4 5 6 7, 0 5 6 7 8
+row=. 3 4 5 7 9 ,: 2 3 4 6 8
+
+res=. 0$0
+for_ab.  0 1  do. 
+	r=. +/  (ab{greenval)  >: ab{row
+    res=. res, (<r, bunkfraction){mat
+end.
 )

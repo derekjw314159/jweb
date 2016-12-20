@@ -111,7 +111,7 @@ stdout LT2,'<input type="hidden" name="filename" value="',(;glFilename),'">'
 NB. Table of values - Common Values
 stdout LT1,'<h4>Common Measurements</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>Alt</th><th>FW Width</th><th>FW +/-W</th><th>Bunk LZ</th><th>Bunk in Line</th><th>Dist OB</th><th>Dist Tr</th><th>Dist Wat</th><th>Dogleg Neg</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>Alt</th><th>FW Width</th><th>FW +/-W</th><th>Bunk LZ</th><th>Bunk in Line</th><th>Dist OB</th><th>Dist Tr</th><th>Dist Wat</th><th>Mounds</th><th>Dogleg Neg</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td><input value="',(":;glPlanAlt),'" tabindex="1" ',(InputFieldnum 'alt'; 3),'>',LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanFWWidth),'" tabindex="2" ',(InputFieldnum 'fwwidth'; 3),'>',LT4,'</td>'
@@ -128,7 +128,9 @@ NB. stdout LT4,'<td>'
 NB. djwSelect 'treerecov' ; 7 ; glTreeRecovDesc ; glTreeRecovVal ; <''$glPlanTreeRecov
 NB. stdout LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanLatWaterDist),'" tabindex="8" ',(InputFieldnum 'latwaterdist'; 3),'>',LT4,'</td>'
-stdout LT4,'<td><input value="',(":;glPlanDoglegNeg),'" tabindex="9" ',(InputFieldnum 'doglegneg'; 3),'>',LT4,'</td>'
+stdout LT4,'<td><input type="checkbox" id="rrmounds" name="rrmounds" value="1" '
+stdout ((''$glPlanRRMounds)#'checked'),' tabindex="9">',LT4,'</td>'
+stdout LT4,'<td><input value="',(":;glPlanDoglegNeg),'" tabindex="10" ',(InputFieldnum 'doglegneg'; 3),'>',LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table>'
 
@@ -223,7 +225,8 @@ bunkline=: 0
 fwvisible=: 0
 fwunpleasant=: 0
 fwobstructed=: 0
-xx=. djwCGIPost y ; ' ' cut 'alt fwwidth bunklz bunkline oobdist treedist latwaterdist doglegneg fwvisible fwunpleasant fwobstructed'
+rrmounds=: 0
+xx=. djwCGIPost y ; ' ' cut 'alt fwwidth bunklz bunkline oobdist treedist latwaterdist doglegneg fwvisible fwunpleasant fwobstructed rrmounds'
 glFilename=: dltb ;filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
@@ -274,6 +277,7 @@ glPlanFWTargVisible=: ,fwtargvisible
 glPlanTopogStance=: ,topogstance
 glPlanFWUnpleasant=: ,fwunpleasant
 glPlanFWObstructed=: ,fwobstructed
+glPlanRRMounds=: ,rrmounds
 
 NB. Write to files
 keyplan utKeyPut glFilepath,'_plan'

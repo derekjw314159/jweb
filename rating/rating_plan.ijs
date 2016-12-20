@@ -286,6 +286,7 @@ for_rr. i. #glPlanID do.
 		    other=. other, (rr{glPlanFWUnpleasant)#' FW:U'
 		    other=. other, (rr{glPlanFWObstructed)#' FW:O'
 		    other=. other, (0<#>rr{glPlanFWTargVisible)#' Targ:',;>rr{glPlanFWTargVisible
+		    other=. other, (rr{glPlanRRMounds)#' RR:M'
 		    stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">E</a> <a href="/jw/rating/landingcopy/e/',(glFilename),'/',(;rr{glPlanID),'">C</a>'
 
 		    stdout '<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanAlt),'</td>'
@@ -332,6 +333,7 @@ for_rr. i. #glPlanID do.
 		other=. other, (rr{glPlanFWVisible)#' LZ:V'
 		other=. other, (rr{glPlanFWUnpleasant)#' FW:U'
 		other=. other, (rr{glPlanFWObstructed)#' FW:O'
+		other=. other, (rr{glPlanRRMounds)#' RR:M'
 		stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">E</a> <a href="/jw/rating/landing/d/',glFilename,'/',(;rr{glPlanID),'">D</a>'
 		stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanAlt),'</td>'
 		stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanFWWidth),'</td>'
