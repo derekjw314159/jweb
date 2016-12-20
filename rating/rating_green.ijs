@@ -98,9 +98,7 @@ end.
 stdout LT2,'</tbody></table>'
 stdout LT1,'</div>'
 
-
 NB. Hidden variables
-
 
 stdout LT1,'<div class="span-12 last">'
 stdout LT2,'<input type="hidden" name="prevname" value="',(":;glGrUpdateName),'">'
