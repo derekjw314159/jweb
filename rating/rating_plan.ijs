@@ -31,7 +31,6 @@ elseif. 1 do.
 end.
 )
 
-
 NB. =========================================================
 NB. Synonyms
 NB. jweb_rating_plan
@@ -65,7 +64,6 @@ stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 NB. stdout LF,'<script>setTimeout(function(){window.location.href=''http://www.google.com''},5000);</script>'
-
 
 djwBlueprintCSS ''
 
@@ -219,7 +217,7 @@ stdout LF,TAB,'<div class="span-24 last">'
 
 stdout LF,'<table>'
 stdout LF,'<thead><tr>'
-utKeyRead glFilepath,'_tee'
+utKeyRead glFilepath,'_tee' NB. Just read for this hole
 ww=. I. glTeHole = hole
 ww=. (+. /"1 ww{glTeMeasured ) # ww{glTeTee NB. Either gender
 tees=. (glTees e. ww) # glTees
@@ -227,7 +225,7 @@ tees=. (glTees e. ww) # glTees
 for_t. tees do.
 	stdout '<th>',(>(glTees i. t){glTeesName),'</th>'
 end.
-stdout '<th colspan=1>Player Shot</th><th>Hit / Layup</th><th>ToGreen</th><th>Edits</th><th>Alt</th><th>F/width</th><th>Bunk in LZ</th><th>Bunk LoP</th><th>Dist OB</th><th>Dist Tr</th><th>Dist Wat</th><th>F/w U/L/D</th><th>So/Av Fi</th><th>MP/MA SA/EA</th><th>F/w +/-W</th><th colspan="3">Other Variables</th></tr></thead><tbody>'
+stdout '<th>Player Shot</th><th>Hit / Layup</th><th>ToGreen</th><th>Edits</th><th>Alt</th><th>F/width</th><th>Bunk in LZ</th><th>Bunk LoP</th><th>Dist OB</th><th>Dist Tr</th><th>Dist Wat</th><th>Roll U/L/D</th><th>Mi/Mo /Sig</th><th>MP/MA SA/EA</th><th>F/w +/-W</th><th colspan="3">Other Variables</th></tr></thead><tbody>'
 NB. Sort the records and re-read
 rr=. I. glPlanHole=hole
 rr=. rr /: rr { glPlanShot
@@ -272,7 +270,7 @@ for_rr. i. #glPlanID do.
 				stdout '</td>'
 			end.
 		end.
-		stdout '<td colspan=1>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr{glPlanShot),({.>(glTees i. rr{glPlanTee){glTeesName),'</td>'
+		stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr{glPlanShot),({.>(glTees i. rr{glPlanTee){glTeesName),'</td>'
 		stdout '<td><a href="/jw/rating/layup/e/',(glFilename),'/'
 		stdout ;": 1+rr{glPlanHole
 		stdout (;rr{glPlanTee),'/'
@@ -281,10 +279,13 @@ for_rr. i. #glPlanID do.
 		stdout (('L'=rr{glPlanLayupType)#(3{.": >rr{glPlanLayupCategory)),'</a></td><td>', (": <. 0.5 + rr{glPlanRemGroundYards),'</td>' 
 		if. 0<rr{glPlanRemGroundYards do.
 		    other=. ''
-		    other=. other, (rr{glPlanRollTwice)#' Ro:2'
+		    other=. other, (0 ~: rr{glPlanDoglegNeg)#' D/LNeg:',": |rr{glPlanDoglegNeg
+		    other=. other, (0<#>rr{glPlanRollExtreme)#' RoEx:',;>rr{glPlanRollExtreme
+		    other=. other, (0<#>rr{glPlanRollTwice)#' Ro2:',;>rr{glPlanRollTwice
 		    other=. other, (rr{glPlanFWVisible)#' LZ:V'
 		    other=. other, (rr{glPlanFWUnpleasant)#' FW:U'
 		    other=. other, (rr{glPlanFWObstructed)#' FW:O'
+		    other=. other, (0<#>rr{glPlanFWTargVisible)#' Targ:',;>rr{glPlanFWTargVisible
 		    stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">E</a> <a href="/jw/rating/landingcopy/e/',(glFilename),'/',(;rr{glPlanID),'">C</a>'
 
 		    stdout '<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanAlt),'</td>'
@@ -296,7 +297,7 @@ for_rr. i. #glPlanID do.
 		    NB.	stdout LT3,'<td>',(;(glTreeRecovVal i. rr{glPlanTreeRecov){glTreeRecovDesc),'</td>'
 		    stdout LT3, '<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanLatWaterDist),'</td>'
 		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanRollLevel),'</td>'
-		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanRollFirmness),'</td>'
+		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (3{. ":  ,>rr{glPlanRollSlope),'</td>'
 		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanTopogStance),'</td>'
 		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (6{. ":  ,>rr{glPlanFWWidthAdj),'</td>'
 		    stdout LT3,'<td colspan="3">',(}.other),'</td>'
@@ -325,7 +326,9 @@ for_rr. i. #glPlanID do.
 		stdout '<td colspan="3"><i>Measured Point</i></td>'
 		NB. stdout LT3,'<td>',(": rr{glPlanRemGroundYards),'</td>'
 		other=. ''
-		other=. other, (rr{glPlanRollTwice)#' Ro:2'
+		other=. other, (0 ~: rr{glPlanDoglegNeg)#' D/LNeg:',": |rr{glPlanDoglegNeg
+		other=. other, (0<#>rr{glPlanRollExtreme)#' RoEx:',;>rr{glPlanRollExtreme
+		other=. other, (0<#>rr{glPlanRollTwice)#' Ro2:',;>rr{glPlanRollTwice
 		other=. other, (rr{glPlanFWVisible)#' LZ:V'
 		other=. other, (rr{glPlanFWUnpleasant)#' FW:U'
 		other=. other, (rr{glPlanFWObstructed)#' FW:O'
@@ -339,7 +342,7 @@ for_rr. i. #glPlanID do.
 		NB. stdout LT3,'<td>',(;(glTreeRecovVal i. rr{glPlanTreeRecov){glTreeRecovDesc),'</td>'
 		stdout LT3, '<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanLatWaterDist),'</td>'
 		stdout LT3, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanRollLevel),'</td>'
-		stdout LT3, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanRollFirmness),'</td>'
+		stdout LT3, '<td style="border-right: 1px solid lightgray">', (3{. ":  ,>rr{glPlanRollSlope),'</td>'
 		stdout LT3, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanTopogStance),'</td>'
 		stdout LT3, '<td style="border-right: 1px solid lightgray">', (6{. ":  ,>rr{glPlanFWWidthAdj),'</td>'
 		stdout LT3,'<td colspan=3>',(}.other),'</td>'
@@ -398,7 +401,7 @@ NB. Green Data
 
 stdout LF,'<div class="span-24 last">'
 stdout LT1,'<table><thead>'
-stdout LT3,'<tr><th>Green</th><th>From tee</th><th>To Front</th><th>Alt</th><th>Len</th><th>Wid</th><th>Diam</th><th>Tier</th><th>Firm</th><th>Contour</th><th>Stimp</th><th>Tree</th><th>Tree +1</th><th>Mounds</th><th>Bunk Frac</th><th>Bunk Dep</th><th>OOB Dist</th><th>Water Dist</th><th>Water Frac</th><th>Water SurrDist</th><th colspan="5">Other Variables</th></tr>'
+stdout LT3,'<tr><th>Green</th><th>From tee</th><th>To Front</th><th>Alt</th><th>Len</th><th>Wid</th><th>Diam</th><th>Tier</th><th>Firm</th><th>Contour</th><th>Stimp</th><th>Mounds</th><th>Bunk Frac</th><th>Bunk Dep</th><th>OOB Dist</th><th>Water Dist</th><th>Water Frac</th><th>Water SurrDist</th><th colspan="5">Other Variables</th></tr>'
 stdout LT2,'</thead><tbody><tr>'
 ww=. ''$glGrHole i. hole
 other=. ''
@@ -424,8 +427,6 @@ stdout LT4,'<td style="border-right: 1px solid lightgray">',(>(ww{glGrTiered){' 
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(>ww{glGrFirmness),'</td>'
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(>ww{glGrContour),'</td>'
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 ww{glGrStimp),'</td>'
-stdout LT4,'<td style="border-right: 1px solid lightgray">',(>ww{glGrTree),'</td>'
-stdout LT4,'<td style="border-right: 1px solid lightgray">',(>(ww{glGrTreeTween){' ' cut '. +1'),'</td>'
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(>(ww{glGrRRMounds){' ' cut '. y'),'</td>'
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(>ww{glGrBunkFraction),'</td>'
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(>ww{glGrBunkDepth),'</td>'
@@ -436,6 +437,34 @@ stdout LT4,'<td style="border-right: 1px solid lightgray">',(>ww{glGrWaterSurrDi
 stdout LT4,'<td colspan="5">',(}.other),'</td>'
 stdout LT2,'</tr></tbody></table>'
 stdout LF,'</div>' NB. main span
+
+NB. Tree variables
+utKeyRead glFilepath,'_tee' NB. Just read for this hole
+((hole=glTeHole)#glTeID) utKeyRead glFilepath,'_tee' NB. Just read for this hole
+head=. ''
+row=. ''
+for_t. glTeTee do.
+    for_g. i. 2 do.
+	if. (<t_index,g){glTeMeasured do.
+		for_ab. i. 2 do.
+			head=. head,'<th style="border-right: 1px solid lightgray">',(>(glTees i. t){glTeesName),' ',(>g{' ' cut 'Men Women'),' ',(>ab{' 'cut 'Scr Bgy'),'</th>'
+			row=. row,'<td style="border-right: 1px solid lightgray">',(>(<t_index,g,ab){glTeTree),'</td>'
+		end.
+
+	end.
+    end.
+end.
+stdout LF,'<div class="span-24">'
+stdout LT1,'<h4>Tree Difficulty</h4>'
+stdout LT2,'<table><thead>'
+stdout LT3,'<tr>'
+stdout LT4,head
+stdout LT3,'</tr></thead><tbody>'
+stdout LT3,'<tr>'
+stdout LT4,row
+stdout LT3,'</tr></tbody></table>'
+stdout LF,'</div>' NB. main span
+
 stdout LF,'        '
 for_h. i. 18 do.
 	if. h=hole do.

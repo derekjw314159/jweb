@@ -71,7 +71,7 @@ if. ( -. glPlanLayupType e. 'LR' ) do.  NB. Not found, or transition
 	glPlanLayupCategory=: ,<'forced'
 	glPlanLayupReason=: ,<'Water'
 	glPlanRollLevel=: ,<''
-	glPlanRollFirmness=: ,<''
+	glPlanRollSlope=: ,<''
 	ww=. utKeyPut glFilepath,'_plan'
 end. 
 
@@ -94,7 +94,7 @@ sequence=. (glPlanLayupType='R') |. 'LR'
 extraline=. 0
 
 NB. Print the table of parameters
-stdout LF,'<div class="span-12 last">'
+stdout LF,'<div class="span-12 append-1">'
 stdout LF,'<table><thead><tr><th></th><th>Value</th></tr></thead><tbody>'
 
 stdout LF,'<tr><td>Hole:</td><td>',(":1+ ; hole),'</td></tr><tr><td>Tee:</td><td>',>(glTees i. tee){glTeesName

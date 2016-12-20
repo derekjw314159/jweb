@@ -7,12 +7,28 @@ glMY=: 1.0936133
 NB. ==============================================
 NB. Global values and descriptions
 NB. ==============================================
-glTreeVal=: (<''),':' cut 'MP:Mod:Sig:Ext'
-glTreeDesc=: ':' cut 'Zero:Min Pr:Mod Pr:Sig Pr:Ext Pr'
+glTreeVal=: (<''),':' cut '+2 P3 Mod:+3 P3 Sig:+4 P3 Ext:+1 P4 MP(-1):.:+3 P4 Mod(-1):+4 P4 Mod:+5 P4 Sig(-1):+6 P4 Sig:+7 P4 Ext(-1):+8 P4 Ext' NB. Need two defaults
+glTreeDesc=: ':' cut '+1 Par3 Min Prob:+2 Par3 Mod Prob:+3 Par3 Sig Prob:+4 Par3 Ext Prob:+1 Min Prob(-1):+2 Min Prob:+3 Mod Prob (-1):+4 Mod Prob:+5 Sig Prob (-1):+6 Sig Prob:+7 Ext Prob (-1):+8 Ext Prob'
+glTreePar=: 3 3 3 3 4 4 4 4 4 4 4 4 
+glTreeNum=: 1 2 3 4 1 2 3 4 5 6 7 8
+glRollLevelVal=: 1 0 2{ (<''),':' cut 'Down:Up'
+glRollLevelDesc=: ':' cut 'Downhill:Level:Uphill'
+glRollLevelNum=: ':' cut 'Down:Level:Up'
+glRollSlopeVal=:  (<''),':' cut 'Mod:Sig'
+glRollSlopeDesc=: ':' cut 'Minor Slope (5y):Moderate Slope (10y):Significant Slope (15y)'
+glRollSlopeNum=: ':' cut 'Minor:Mod:Sig'
+glRollExtremeVal=:  (<''),':' cut '+1:+2:-1:-2'
+glRollExtremeDesc=:  ':' cut 'Normal Firmness:+1 Extreme Soft:+2 Extreme Soft:-1 Extreme Firm:-2 Extreme Firm'
+glRollExtremeNum=: 0 1 2 _1 _2
+glRollTwiceVal=:  (<''),':' cut '+1:-1'
+glRollTwiceDesc=:  ':' cut 'Normal:+1 Less Cumulative Roll:-1 More Cumulative Roll'
+glRollTwiceNum=: 0 1 _1
 glRRRiseDropVal=: (<''),':' cut '>5'':>10'''
 glRRRiseDropDesc=: ':' cut 'None:+1 >5'':+2 >10'''
 glTopogStanceVal=: (<''),':' cut 'MA:SA:EA'
 glTopogStanceDesc=: ':' cut 'Minor Problem:Moderately Awkward:Signif Awkward:Extremely Awkward'
+glTopogStanceText=: ':' cut 'MP:MA:SA:EA'
+glTopogStanceNum=: 1 2 3 4
 glBunkFractionVal=: (<''),':' cut '<1/4:<1/2:<3/4:>3/4'
 glBunkFractionDesc=: ':' cut 'Zero:0 - 1/4:1/4 - 1/2:1/2 - 3/4:Greater than 3/4'
 glBunkDepthVal=: (<''),':' cut '2-3:3-5:5-6:6-8:8-10:10-12:12-15:>15'
@@ -27,12 +43,31 @@ glRRInconsistentVal=: (<''),':' cut '+1:-1'
 glRRInconsistentDesc=: ':' cut 'None:+1 Harder:-1 Easier'
 glWaterFractionVal=: (<''),':' cut '1/4-<1/2:>1/2'
 glWaterFractionDesc=: ':' cut '0 - 1/4:1/4 - 1/2:>1/2'
-glWaterSurrDistVal=: (<''),':' cut '1-5:6-10:11-20:>20'
-glWaterSurrDistDesc=: ':' cut 'None:1 - 5:6 - 10:11 - 20:>20'
+glWaterFractionNum=: 0 1 2
+glWaterFractionText=: (<''),':' cut 'lt 1/2:gt 1/2'
+glWaterSurrDistVal=: (<''),':' cut '1-4:5-10:11-20:>20'
+glWaterSurrDistDesc=: ':' cut 'None:1 - 4:5 - 10:11 - 20:>20'
+glWaterSurrDistNum=: 0 3 2 1 0
+glWaterSurrDistText=: (<''),':' cut '1-4:5-10:11-20:gt 20'
 glWaterCartVal=: (<''),':' cut '+1:-1'
 glWaterCartDesc=: ':' cut 'None:+1 Bounce away:-1 Bounce towards'
 glWaterPercentVal=: (<''),':' cut '20%:40%:60%:80%'
 glWaterPercentDesc=: ':' cut '100%:20%:40%:60%:80%'
+glTargVisibleVal=: (<''),':' cut '+1:+2'
+glTargVisibleDesc=: (<''),':' cut '+1 gt Half Green:+2 Flag'
+glGrFirmnessVal=: (<''),':' cut 'firm:soft'
+glGrFirmnessDesc=: ':' cut 'Av:+1 Firm:-1 Soft'
+glGrFirmnessNum=: 0 1 _1
+glFWWidthAdjVal=: (<''),':' cut '+1 red:+2 very:-1 bounce:-1 gentle:-2 very'
+glFWWidthAdjDesc=: ':' cut 'No Adj:+1 Reduced:+2 Very Reduced:-1 Bounce Back:-1 Gentle Rough:-2 Very Gentle Rough'
+glFWWidthAdjNum=: 0 1 2 _1 _1 _2
+glLayupCategoryVal=: (<''), ':' cut 'dogleg:forced:choice'
+glLayupCategoryDesc=: ':' cut 'Dogleg:Forced Layup:Layup by Choice'
+glGrContourVal=: (<''),':' cut 'MC:HC'
+glGrContourDesc=: ':' cut 'RF/GS:MC/MS:HC/SS'
+glGrVisibilityVal=: (<''),':' cut '+1:+2'
+glGrVisibilityDesc=: ':' cut 'OK:+1 less than 1/2 visible:blind'
+glTargVisibleNum=: 0 1 2
 
 
 NB. ==============================================
@@ -411,6 +446,8 @@ label_shot.
 	    NB. but do need to restore glPlanID
 	    glPlanID=: ,EnKey h ; '' ; t ; g ; ab ; shot
 	    glPlanLayupType=: ,' '
+	    glPlanLayupCategory=: ,<''
+	    glPlanLayupReason=: ,<''
     elseif. 1=$ww do.
 	    ww utKeyRead glFilepath,'_plan'
 
@@ -493,13 +530,19 @@ label_shot.
 	glPlanBunkLZ=: ,0
 	glPlanBunkLine=: ,0
 	glPlanLatWaterDist=: ,0
-	glPlanDefaultHit=: glPlanHitYards
+	if. (glPlanLayupType='L') *. (glPlanLayupCategory ~: <'choice') do.
+	    glPlanDefaultHit=: ,defaulthit
+	else.
+	    glPlanDefaultHit=: glPlanHitYards
+	end.
 	glPlanFWVisible=: ,0
+	glPlanFWTargVisible=: ,<''
 	glPlanFWUnpleasant=: ,0
 	glPlanRRMounds=: ,0
 	glPlanRRRiseDrop=: ,0
 	glPlanRRUnpleasant=: ,0
-	glPlanRollTwice=: ,0
+	glPlanRollExtreme=: ,<''
+	glPlanRollTwice=: ,<''
 	glPlanSqueezeWidth=: ,0
 	glPlanCarryType=: ,' '
 	glPlanSqueezeType=: ,' '
@@ -577,6 +620,7 @@ glPlanRRUnpleasant=: 1 1 { glPlanRRUnpleasant
 glPlanTopogStance=: 1 1 { glPlanTopogStance
 glPlanFWWidthAdj=: 1 1 { glPlanFWWidthAdj
 glPlanFWVisible=: 1 1 { glPlanFWVisible
+glPlanFWTargVisible=: 1 1 { glPlanFWTargVisible
 glPlanFWUnpleasant=: 1 1 { glPlanFWUnpleasant
 glPlanFWObstructed=: 1 1 { glPlanFWObstructed
 glPlanRRHeight=: 1 1 { glPlanRRHeight
@@ -585,8 +629,10 @@ glPlanRRMounds=: 1 1 { glPlanRRMounds
 glPlanRRRiseDrop=: 1 1 { glPlanRRRiseDrop
 glPlanRRUnpleasant=: 1 1 {glPlanRRUnpleasant
 glPlanRollLevel=: 1 1{glPlanRollLevel
-glPlanRollFirmness=: 1 1 {glPlanRollFirmness
+glPlanRollSlope=: 1 1 {glPlanRollSlope
+glPlanRollExtreme=: 1 1 {glPlanRollExtreme
 glPlanRollTwice=: 1 1 {glPlanRollTwice
+glPlanDoglegNeg=: 1 1 {glPlanDoglegNeg
 
 utKeyPut glFilepath,'_plan'
 )
@@ -722,11 +768,14 @@ glPlanRRInconsistent=:,0
 glPlanRRMounds=: ,0
 glPlanRRRiseDrop=: ,0
 glPlanRRUnpleasant=: ,0
-glPlanRollTwice=: ,(#glPlanID)$0
+glPlanRollExtreme=: ,(#glPlanID)$<''
+glPlanRollTwice=: ,(#glPlanID)$<''
 glPlanFWWidth=: ,(#glPlanID)$<0 
 glPlanFWObstructed=: ,(#glPlanID)$0
 glPlanTopogStance=: ,(#glPlanID)$<''
-glPlanFWVisible=: ,(#glPlanID)$0
+glPlanFWVisible=: ,(#glPlanID)$<''
+glPlanFWTargVisible=: ,(#glPlanID)$<''
 glPlanFWUnpleasant=: ,(#glPlanID)$0
 glPlanFWWidthAdj=: ,(#glPlanID)$<''
+glPlanDoglegNeg=: ,(#glPlanID)$0
 )

@@ -6,9 +6,7 @@ NB. rating_green_e
 NB. =========================================================
 jweb_rating_green_e=: 3 : 0
 NB. Retrieve the details
-
 NB. y has two elements only
-
 'filename keyy'=. y
 glFilename=: dltb filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
@@ -41,8 +39,9 @@ if. -. keyy e. keydir (glFilepath,'_green') do.
     djwErrorPage err ; ('No such green measurement point : ',}. ; (<'/'),each y) ; ('/jw/rating/plan/v/',glFilename) ; 'Back to rating plan'
 end.
 
-NB. Read the single record
+NB. Read the single green record, and relevant tee record
 keyy utKeyRead glFilepath,'_green'
+((glTeHole=''$glGrHole)#glTeID) utKeyRead glFilepath,'_tee'
 
 stdout LF,'<h2>Course : ', glCourseName,EM,EM,'Green Measurements</h2>'
 
@@ -57,7 +56,7 @@ if. 0=glGrFrontYards do.
     glGrTee=: ,backtee
 end.
 
-stdout LF,'<div class="span-12 last">'
+stdout LF,'<div class="span-11 append-1">'
 stdout LF,'<table><thead><tr><th>Parameter</th><th>Value</th></tr></thead><tbody>'
 
 stdout LF,'<tr><td>Hole:</td><td>',(":1+ ; glGrHole),'</td></tr>'
@@ -69,12 +68,39 @@ for_t. (glTees) do.
 	stdout '<td>',(":,holelength),'</td></tr>'
 	NB. Backtee different from tee in question
 end.
-stdout LT2,'</tbody></table></div>'
+stdout LT2,'</tbody></table>'
 
 stdout LT1,'<form action="/jw/rating/green/editpost/',(;glFilename),'" method="post">'
 
+NB. New tree variables
+stdout LT1,'<h4>Tree Difficulty</h4>'
+stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
+stdout LT4,'<th>From Tee</th><th>Men/Women</th><th>Scratch</th><th>Bogey</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+ind=. 0
+for_t. glTeTee do.
+    for_g. i. 2 do.
+	stdout LT3,'<tr>'
+	stdout LT4,'<td>',(>(glTees i. t){glTeesName),'</td><td>',>g{' ' cut 'Men Women'
+	for_ab. i. 2 do.
+		ind=. ind+1
+		if. (<t_index,g){glTeMeasured do.
+			stdout LT4,'<td>'
+			msk=. glTreePar=4<.(<t_index,g){glTePar
+			djwSelect ('tree',t,(":g),(":ab)) ; ind ; (msk#glTreeDesc) ; (msk#glTreeVal) ; <(<t_index,g,ab){glTeTree 
+			stdout LT4,'</td>'
+		else.
+			stdout LT4,'<td><input type="hidden" name="',('tree',t,(":g),(":ab)),'" value="',(>(<t_index,g,ab){glTeTree),'"></td>'
+		end.
+	end.
+	stdout LT3,'</tr>'
+    end.
+end.
+stdout LT2,'</tbody></table>'
+stdout LT1,'</div>'
+
 NB. Hidden variables
-stdout LT1,'<div class="span-20 last">'
+
+stdout LT1,'<div class="span-12 last">'
 stdout LT2,'<input type="hidden" name="prevname" value="',(":;glGrUpdateName),'">'
 stdout LT2,'<input type="hidden" name="prevtime" value="',(;glGrUpdateTime),'">'
 stdout LT2,'<input type="hidden" name="keyplan" value="',(;keyy),'">'
@@ -183,7 +209,7 @@ stdout '</tbody></table></div>'
 
 
 NB. Submit buttons
-stdout LT1,'<div class="span-15 last">'
+stdout LT1,'<div class="span-24 last">'
 
 stdout LF,'<input type="submit" name="control_calc" value="Calc" tabindex="',(":2),'">'
 stdout LF,'     <input type="submit" name="control_done" value="Done" tabindex="',(,":3),'">'
@@ -230,6 +256,8 @@ glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 NB. Read the current values and check the time stamp
 ww=. utFileGet glFilepath
 ww=. keyplan utKeyRead glFilepath,'_green'
+utKeyRead glFilepath,'_tee'
+((glTeHole=''$glGrHole)#glTeID) utKeyRead glFilepath,'_tee'
 
 NB. Throw error page if updated
 if. (-. glSimulate)  do.
@@ -255,13 +283,15 @@ end.
 
 glGrUpdateName=: ,<": getenv 'REMOTE_USER'
 glGrUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
+glTeUpdateName=: (#glTeID)$<": getenv 'REMOTE_USER'
+glTeUpdateTime=: (#glTeID)$< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 glGrTee=: ,>fromtee
 glGrFrontYards=: ,frontyards 
 glGrAlt=: ,alt
 glGrLength=: ,length
 glGrWidth=: ,width
 glGrDiam=: ,diam
-glGrDiam=: ,<. 0.5 + (0.5*length+width)
+if. 0=glGrDiam do. glGrDiam=: ,<. 0.5 + (0.5*length+width) end.
 glGrCircleConcept=: ,circleconcept
 glGrTiered=: ,tiered
 glGrFirmness=: ,firmness
@@ -289,9 +319,17 @@ glGrWaterSurrDist=: ,watersurrdist
 glGrWaterBehind=: ,waterbehind
 glGrWaterCart=: ,watercart
 glGrWaterPercent=: ,waterpercent
+for_t. glTeTee do.
+    for_g. i. 2 do.
+	for_ab. i. 2 do.
+	    glTeTree=: (". 'tree',t,(":g),(":ab)) (<t_index,g,ab)}glTeTree 
+	end.
+    end.
+end.
 
 NB. Write to files
 keyplan utKeyPut glFilepath,'_green'
+utKeyPut glFilepath,'_tee'
 if. all do.
     utKeyRead glFilepath,'_green'
     glGrStimp=: 18$ stimp

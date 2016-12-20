@@ -55,7 +55,7 @@ backtee=. ''${. ww # glTees
 
 if. 'P'=glPlanRecType do.
 	NB. Print the table of parameters
-	stdout LF,'<div class="span-12 last">'
+	stdout LF,'<div class="span-12 append-1">'
 	stdout LF,'<table><thead><tr><th>Landing Zone</th><th>Value</th></tr></thead><tbody>'
 
 	stdout LF,'<tr><td>Hole:</td><td>',(":1+ ; glPlanHole),'</td></tr>'
@@ -111,7 +111,7 @@ stdout LT2,'<input type="hidden" name="filename" value="',(;glFilename),'">'
 NB. Table of values - Common Values
 stdout LT1,'<h4>Common Measurements</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>Alt</th><th>FW Width</th><th>FW +/-W</th><th>Bunk LZ</th><th>Bunk in Line</th><th>Dist OB</th><th>Dist Tr</th><th>Dist Wat</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>Alt</th><th>FW Width</th><th>FW +/-W</th><th>Bunk LZ</th><th>Bunk in Line</th><th>Dist OB</th><th>Dist Tr</th><th>Dist Wat</th><th>Dogleg Neg</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td><input value="',(":;glPlanAlt),'" tabindex="1" ',(InputFieldnum 'alt'; 3),'>',LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanFWWidth),'" tabindex="2" ',(InputFieldnum 'fwwidth'; 3),'>',LT4,'</td>'
@@ -128,22 +128,27 @@ NB. stdout LT4,'<td>'
 NB. djwSelect 'treerecov' ; 7 ; glTreeRecovDesc ; glTreeRecovVal ; <''$glPlanTreeRecov
 NB. stdout LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanLatWaterDist),'" tabindex="8" ',(InputFieldnum 'latwaterdist'; 3),'>',LT4,'</td>'
+stdout LT4,'<td><input value="',(":;glPlanDoglegNeg),'" tabindex="9" ',(InputFieldnum 'doglegneg'; 3),'>',LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table>'
 
 NB. Table of values - Roll
 stdout LT1,'<h4>Roll</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>Level</th><th>Firmness</th><th>Twice</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>Level</th><th>Slope</th><th>Extreme</th><th>Twice</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td>'
 djwSelect 'rolllevel' ; 9 ; glRollLevelDesc ; glRollLevelVal ; <''$glPlanRollLevel
 stdout LT4,'</td>'
 stdout LT4,'<td>'
-djwSelect 'rollfirmness' ; 10 ; glRollFirmnessDesc ; glRollFirmnessVal ; <''$glPlanRollFirmness
+djwSelect 'rollslope' ; 10 ; glRollSlopeDesc ; glRollSlopeVal ; <''$glPlanRollSlope
 stdout LT4,'</td>'
-stdout LT4,'<td><input type="checkbox" id="rolltwice" name="rolltwice" value="1" '
-stdout ((''$glPlanRollTwice)#'checked'),' tabindex="11">',LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'rollextreme' ; 11 ; glRollExtremeDesc ; glRollExtremeVal ; <''$glPlanRollExtreme
+stdout LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'rolltwice' ; 12 ; glRollTwiceDesc ; glRollTwiceVal ; <''$glPlanRollTwice
+stdout LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table>'
 
@@ -160,7 +165,7 @@ stdout '</tbody></table>'
 NB. Table of values - Topography
 stdout LT1,'<h4>Topography and Shot FROM Landing Zone</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>Stance or Lie</th><th>Unpleasant Lie</th><th>Obstructed View</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>Stance or Lie</th><th>Unpleasant Lie</th><th>Obstructed Shot</th><th>Targ not Visible</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td>'
 djwSelect 'topogstance' ; 13 ; glTopogStanceDesc ; glTopogStanceVal ; <''$glPlanTopogStance
@@ -169,6 +174,9 @@ stdout LT4,'<td><input type="checkbox" id="fwunpleasant" name="fwunpleasant" val
 stdout ((''$glPlanFWUnpleasant)#'checked'),' tabindex="14">',LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="fwobstructed" name="fwobstructed" value="1" '
 stdout ((''$glPlanFWObstructed)#'checked'),' tabindex="15">',LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'fwtargvisible' ; 16 ; glTargVisibleDesc ; glTargVisibleVal ; <''$glPlanFWTargVisible
+stdout LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table>'
 
@@ -212,11 +220,10 @@ end.
 NB. Assign to variables
 bunklz=: 0
 bunkline=: 0
-rolltwice=: 0
 fwvisible=: 0
 fwunpleasant=: 0
 fwobstructed=: 0
-xx=. djwCGIPost y ; ' ' cut 'alt fwwidth bunklz bunkline oobdist treedist latwaterdist rolltwice fwvisible fwunpleasant fwobstructed'
+xx=. djwCGIPost y ; ' ' cut 'alt fwwidth bunklz bunkline oobdist treedist latwaterdist doglegneg fwvisible fwunpleasant fwobstructed'
 glFilename=: dltb ;filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
@@ -257,10 +264,13 @@ glPlanOOBDist=: ,oobdist
 glPlanTreeDist=: ,treedist
 NB. glPlanTreeRecov=: ,treerecov
 glPlanLatWaterDist=: , latwaterdist
+glPlanDoglegNeg=: ,doglegneg
 glPlanRollLevel=: ,rolllevel
-glPlanRollFirmness=: ,rollfirmness
+glPlanRollSlope=: ,rollslope
+glPlanRollExtreme=: ,rollextreme
 glPlanRollTwice=: ,rolltwice
 glPlanFWVisible=: ,fwvisible
+glPlanFWTargVisible=: ,fwtargvisible
 glPlanTopogStance=: ,topogstance
 glPlanFWUnpleasant=: ,fwunpleasant
 glPlanFWObstructed=: ,fwobstructed
