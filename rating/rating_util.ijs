@@ -10,7 +10,9 @@ NB. ==============================================
 glTreeVal=: (<''),':' cut '+2 P3 Mod:+3 P3 Sig:+4 P3 Ext:+1 P4 MP(-1):.:+3 P4 Mod(-1):+4 P4 Mod:+5 P4 Sig(-1):+6 P4 Sig:+7 P4 Ext(-1):+8 P4 Ext' NB. Need two defaults
 glTreeDesc=: ':' cut '+1 Par3 Min Prob:+2 Par3 Mod Prob:+3 Par3 Sig Prob:+4 Par3 Ext Prob:+1 Min Prob(-1):+2 Min Prob:+3 Mod Prob (-1):+4 Mod Prob:+5 Sig Prob (-1):+6 Sig Prob:+7 Ext Prob (-1):+8 Ext Prob'
 glTreePar=: 3 3 3 3 4 4 4 4 4 4 4 4 
-glTreeNum=: 1 2 3 4 1 2 3 4 5 6 7 8
+glTreeNum=: 1 2 3 4 2 2 4 4 6 6 8 8 
+glTreeSev=: ' ' cut 'Min Mod Sig Ext Min Min Mod Mod Sig Sig Ext Ext'
+glTreeTweener=: 0 0 0 0 _1 0 _1 0 _1 0 _1 0
 glRollLevelVal=: 1 0 2{ (<''),':' cut 'Down:Up'
 glRollLevelDesc=: ':' cut 'Downhill:Level:Uphill'
 glRollLevelNum=: ':' cut 'Down:Level:Up'

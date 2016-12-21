@@ -832,6 +832,107 @@ fname fappend~ write_input 9.2 25 ; 1.3; <glGrBunkDepth
 fname fappend~ write_cell 10.5 25 ; 0.5 ; <<'<b>D</b>'
 fw=. lookup_bunker_depth gender ; ''$(glBunkDepthVal i. glGrBunkDepth){glBunkDepthNum 
 fname fappend~ write_calc  11 25 ; 3 4 ; 2$fw
+fwtot=. fwtot + fw
+NB. In play twice
+fname fappend~ write_row_head 8 26 ; 2.5 0.5 ; '<i>Twice</i>' ; '<b>2</b>'
+fw=. 1< >+/each lz
+fname fappend~ write_calc  11 26 ; 3 4 ; fw
+fwtot=. fwtot + fw
+NB. Total
+fname fappend~ 'R' write_footer 8 27 ; 3 ; <<'Bunker Rating'
+fname fappend~ 'C' write_footer 11 27 ;  3 4 ; fwtot
+
+NB. ------------------------
+NB. OOB / Extreme Rough
+NB. ------------------------
+fname fappend~ LF,'// -------- OOB / Extreme Rough -------------'
+carryyards=. 'R' carry_yards hole; tee ; gender 
+oobdist=. (' ' cut 'glPlanOOBDist glGrOOBDist') matrix_pull hole ; tee ; gender
+fname fappend~ write_title 8 28 ; 3 1 ; '<b>OOB / Extreme R</b>' 
+ww=. ' ' cut 'S1 S2 S3 B1 B2 B3 B4'
+ww=. (<'<b>'), each ww, each (<'</b>')
+fname fappend~ 'C' write_cell 11 28 ; (7$1) ; <ww
+select. z=. j. / > #each carryyards
+    case. 0j0 do. sz=. _1 _1 _1, _1 _1 _1 _1
+    case. 0j1 do. sz=. _1 _1 _1,  1 _1 _1 _1
+    case. 1j1 do. sz=.  1 _1 _1,  1 _1 _1 _1
+    case. 1j2 do. sz=.  1 _1 _1,  1  1 _1 _1
+    case. 2j2 do. sz=.  1  1 _1,  1  1 _1 _1
+    case. 2j3 do. sz=.  1  1 _1,  1  1  1 _1
+    case. 3j3 do. sz=.  1  1  1,  1  1  1 _1
+    case. 3j4 do. sz=.  1  1  1,  1  1  1  1
+end.
+fname fappend~ 'R' write_cell 8 29 ; 3 ; '<i>Centre LZ to OOB/ER</i>' 
+fname fappend~ write_input 11 29 ; sz ; (;oobdist)
+fname fappend~ 'R' write_cell 8 30 ; 3 ; '<i>Yds to Carry Safely</i>' 
+fname fappend~ write_input 11 30 ; sz ; (;carryyards)
+fname fappend~ 'R' write_cell 8 31 ; 3 ; 'Table Value'
+fwtot=. lookup_oob gender ; hityards ; <oobdist
+fname fappend~ 'L' write_calc 11 31 ; sz ; <('bp' 8!:0 ;fwtot)
+fw=. lookup_carry_oob gender ; <carryyards
+fname fappend~ 'R' write_calc 11 31 ; sz ; <('bp' 8!:0 ;fw)
+fwtot=. fwtot >. each fw
+for_i. i. 7 do. 
+	if. _1 ~: i{sz do. fname fappend~ pdfDiag ((11.33+i), 31) ; 0.33 1  end.
+end.
+fname fappend~ 'R' write_cell 8 38  ; 3 ; 'Total Shot Value'
+fname fappend~ write_calc 11 38 ; sz ; (;fwtot)
+fname fappend~ 'R' write_cell 8 39  ; 3 ; 'Highest Shot Value'
+fname fappend~ write_calc 11 39 ; 3 4 ; (;>. / each fwtot)
+fname fappend~ 'R' write_footer 8 41  ; 3 ; 'OOB/ER Rating'
+fname fappend~ 'C' write_footer 11 41 ;  3 4 ; (;>./each fwtot)
+
+NB. ------------------------
+NB. Trees
+NB. ------------------------
+fname fappend~ LF,'// -------- Trees -------------'
+treedist=. (' ' cut 'glPlanTreeDist glGrTreeDist') matrix_pull hole ; tee ; gender
+fname fappend~ write_title 18 16; 3 1 ; '<b>Trees</b>' 
+ww=. ' ' cut 'S1 S2 S3 B1 B2 B3 B4'
+ww=. (<'<b>'), each ww, each (<'</b>')
+fname fappend~ 'C' write_cell 21 16 ; (7$1) ; <ww
+select. z=. j. / > #each treedist
+    case. 0j0 do. sz=. _1 _1 _1, _1 _1 _1 _1
+    case. 0j1 do. sz=. _1 _1 _1,  1 _1 _1 _1
+    case. 1j1 do. sz=.  1 _1 _1,  1 _1 _1 _1
+    case. 1j2 do. sz=.  1 _1 _1,  1  1 _1 _1
+    case. 2j2 do. sz=.  1  1 _1,  1  1 _1 _1
+    case. 2j3 do. sz=.  1  1 _1,  1  1  1 _1
+    case. 3j3 do. sz=.  1  1  1,  1  1  1 _1
+    case. 3j4 do. sz=.  1  1  1,  1  1  1  1
+end.
+fname fappend~ 'R' write_cell 18 17 ; 3 ; '<i>Centre LZ to Trees</i>' 
+fname fappend~ write_input 21 17 ; sz ; (;treedist)
+fname fappend~ write_cell 18 18 ; 3 ; <<'Severity:'
+fname fappend~ write_cell 21 18 ; _3 _4 ; 0$<''
+fname fappend~ write_cell 18 19 ; 3 ; <<'Min / Mod / Sig / Ext'
+fw=. (<0 ; gender ; 0 1) {glTeTree NB. Pick up the two elements
+fw=. glTreeVal i. fw
+fname fappend~ write_input 21 19 ; 3 4 ; <fw{glTreeSev
+fname fappend~ 'R' write_cell 18 20 ; 3 ; 'Table Value'
+fname fappend~ write_calc 21 20 ; 3 4 ; fw{glTreeNum
+fname fappend~ 'R' write_cell 18 21 ; 3 ; 'Tweener Adj'
+fname fappend~ write_calc 21 21 ; 3 4 ; fw{glTreeTweener
+fname fappend~ 'R' write_cell 18 22 ; 3 ; '<b>Adjusted Val</b>'
+fname fappend~ write_calc 21 22 ; 3 4 ; fw{glTreeTweener+glTreeNum
+fname fappend~ 'R' write_footer 18 27 ; 3 ; 'Tree Rating'
+fname fappend~ 'C' write_footer 21 27 ;  3 4 ; fw{glTreeTweener+glTreeNum
+ 
+NB. ------------------------
+NB. Green Surface
+NB. ------------------------
+fname fappend~ LF,'// -------- Green Surface -------------'
+fname fappend~ write_title 18 30 ; 3 1 ; '<b>Green Surface</b>' 
+fw=. ":<. glGrStimp NB. Convert to feet and inches
+fw=. fw,' Ft ',": <. 0.5 + 12 * 1|glGrStimp
+fw=. fw,' Ins'
+fname fappend~ write_input 21 30 ; 3 ; <<fw
+fname fappend~ write_input 24 30 ; 4 ; <(glGrContourVal i. glGrContour){glGrContourDesc
+fname fappend~ 'R' write_cell 18 31 ; 3 ; 'Table Value'
+fw=. lookup_green_surface glGrStimp ; glGrContourVal i. glGrContour
+fname fappend~ write_calc 21 31 ; 3 4 ; fw
+fname fappend~ 'R' write_footer 18 35 ; 3 ; 'Gr Surface Rating'
+fname fappend~ 'C' write_footer 21 35 ;  3 4 ; fw
 
 NB. -----------------------------
 NB. Altitude
@@ -1257,4 +1358,80 @@ else.
 end.
 col=. +/ bunkdepth >: col
 res=. col{mat
+)
+
+NB. =================================================
+NB. lookup_oob
+NB. =================================================
+NB. Usage
+NB.   lookup_oob gender ; shot ; dist
+NB. Returns table value
+lookup_oob=: 3 : 0
+'gender shot dist'=. y
+if. gender=0 do.
+	mat=. 7 5 $ 0 1 1 1 2, 0 1 2 2 3, 0 1 2 3 4, 0 1 2 4 5, 0 1 2 4 6, 0 2 3 5 7, 0 2 4 6 8
+	row=. 90 130 160 190 210 231 ,: 50 80 110 140 160 181
+	col=. 50 39 29 19 
+else.
+	mat=. 7 5 $ 0 1 1 1 2, 0 1 2 2 3, 0 1 2 3 4, 0 1 2 4 5, 0 1 2 4 6, 0 2 3 5 7, 0 2 4 6 8
+	row=. 70 100 125 150 175 191 ,: 40 70 85 100 115 131
+	col=. 50 39 29 19 
+end.
+
+res=. 0$<''
+for_ab. 0 1  do.
+	rr=. 0$0
+	for_sh. >ab{shot do.
+		r=. +/ sh >: (ab{row) 
+		c=. (sh_index{>ab{dist) 
+		c=. +/ (c + 999*c=0) <: col NB. If zero make maximum distance
+		rr=. rr, (<r, c){mat
+	end.
+	res=. res, <rr
+end.
+)
+NB. =================================================
+NB. lookup_carry_oob
+NB. =================================================
+NB. Usage
+NB.   lookup_carry_oob gender ; carry
+NB. Returns table value
+lookup_carry_oob=: 3 : 0
+'gender carry'=. y
+if. gender=0 do.
+	mat=. 0 1 2 3 4 5 6 0 ,: 0 2 3 4 5 6 7 0 
+	row=. 1 90 130 160 190 210 231 ,: 1 50 80 110 140 160 181
+else.
+	mat=. 0 1 2 3 4 6 8 0 ,: 0 2 3 5 6 8 9 0 
+	row=. 1 70 100 125 150 175 191 ,: 1 40 70 85 100 115 131
+end.
+
+res=. 0$<''
+for_ab. 0 1  do.
+	rr=. 0$0
+	for_sh. >ab{carry do.
+		r=. +/ sh >: (ab{row) 
+		rr=. rr, (<ab,r){mat
+	end.
+	res=. res, <rr
+end.
+)
+
+NB. =========================================================
+NB. lookup_green_surface
+NB. =========================================================
+NB. Usage
+NB.   lookup_green_surface stimp ; contour
+lookup_green_surface=: 3 : 0
+'stimp contour'=. y
+res=. 0$0
+row=. 7 8.5 10 11 12
+for_ab. 0 1 do.
+	if. ab=0 do.
+		mat=. 6 3$3 4 5, 4 5 6, 5 6 7, 6 7 8, 7 8 9, 8 9 10
+	else.
+		mat=. 6 3$ 3 4 5, 4 5 6, 5 6 8, 6 8 9, 7 9 10, 8 10 10
+	end.
+	res=. res, ( <(+/ (''$stimp) >: row), contour){mat
+end.
 )
