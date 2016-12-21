@@ -803,23 +803,8 @@ lay=. lookup_bunker_rating greenval ; (glBunkFractionVal i. glGrBunkFraction){gl
 fname fappend~ write_calc  11 18 ; 3 4 ; lay
 fwtot=. lay
 NB. Carry
-fname fappend~ LF,'$pdf->',pdfMulti 8 20 ; 2.5 1 ; '<i>Carry</i>' ; 1
-fname fappend~ LF,'$pdf->',pdfMulti 10.5 20 ; 0.5 1 ; '<b>C</b>'; 1
-fname fappend~ LF,'$pdf->SetFillColor(127, 127, 127);' NB. Grey out boxes
-fname fappend~ LF,'$pdf->',pdfMulti 11 20 ; 7 1 ; '' ; 1
-for_ab. 0 1 do.
-    for_sh. >ab_index { carryyards do.
-		if. sh>0 do.
-			fname fappend~ LF,'$pdf->SetFillColor(247, 253, 156);'
-			fname fappend~ LF,'$pdf->',pdfMulti (( 11 +(3* ab) + sh_index),20) ;  1 1   ; (":sh) ; 1
-			fname fappend~ LF,'$pdf->SetFillColor(255, 255, 255);'
-		else.
-			fname fappend~ LF,'$pdf->SetFillColor(127, 127, 127);'
-			fname fappend~ LF,'$pdf->',pdfMulti (( 11 +(3* ab) + sh_index),20) ;  1 1   ; '' ; 1
-			fname fappend~ LF,'$pdf->SetFillColor(255, 255, 255);'
-		end.	    
-    end.
-end.
+fname fappend~ write_row_head 8 20 ; 2.5 0.5 ; '<i>Carry</i>' ; '<b>C</b>'
+fname fappend~ 'L' write_input 11 20 ; sz ; (;carryyards)
 NB. Sub-Total
 fname fappend~ 'R' write_cell 8 22 ; 3 ; <<'Sum of <b><u>all</u></b> Values'
 fname fappend~ write_calc  11 22 ; 3 4 ; fwtot
@@ -837,7 +822,7 @@ fname fappend~ LF,'$pdf->',pdfMulti 10.5 23 ; 0.5 2 ; ('<b>N</b>') ; 1
 NB. Calculate Negative adjustment
 fw=. ((+. / >0{lz) {_1 0 ), ((+. / (>1{lz),(>1{lop)){_1 0) 
 fw=. _1 >. fw - 0=># each lz NB. Par 3
-fname fappend~ 'black' oN 'lightblue'
+fname fappend~ 'blue' oN 'lightblue'
 fname fappend~ LF,'$pdf->',pdfMulti 11 23 ; 3 2 ;  ('<span style="text-align: center">',(;(8!:0) 0{fw),'</span>') ; 1
 fname fappend~ LF,'$pdf->',pdfMulti 14 23 ; 4 2 ;  ('<span style="text-align: center">',(;(8!:0) 1{fw),'</span>') ; 1
 fwtot=. fwtot + fw
