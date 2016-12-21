@@ -14,7 +14,7 @@ pdfMulti=: 3 : 0
 offset=. glPDFoffset + offset * glPDFmult
 size=. size * glPDFmult
 NB. r=. 'MultiCell(',(":0{size),', ',(": 1{size),', ''',text,''', ',(":border),', ''J'', true, 0,',(":0{offset),', ',(":1{offset),', false, 0, true, true, ',(":0 * 1{size),',''M'',false);'
-r=. 'WriteHTMLCell(',(":0{size),', ',(": 1{size),', ',(":0{offset),', ',(":1{offset),', ''',text,''', ',(":border),', 0, true, false, ''',x,''', false);'
+r=. 'WriteHTMLCell(',(":0{size),', ',(": 1{size),', ',(":0{offset),', ',(":1{offset),', ''',text,''', ',(":border),', 0, true, true, ''',x,''', false);'
 )
 
 NB. =========================================================
@@ -841,7 +841,12 @@ fname fappend~ 'black' oN 'lightblue'
 fname fappend~ LF,'$pdf->',pdfMulti 11 23 ; 3 2 ;  ('<span style="text-align: center">',(;(8!:0) 0{fw),'</span>') ; 1
 fname fappend~ LF,'$pdf->',pdfMulti 14 23 ; 4 2 ;  ('<span style="text-align: center">',(;(8!:0) 1{fw),'</span>') ; 1
 fwtot=. fwtot + fw
-
+NB. Greenside depth
+fname fappend~ write_cell 8 25 ; 1.2 ; <<'Depth' 
+fname fappend~ write_input 9.2 25 ; 1.3; <glGrBunkDepth
+fname fappend~ write_cell 10.5 25 ; 0.5 ; <<'<b>D</b>'
+fw=. lookup_bunker_depth gender ; ''$(glBunkDepthVal i. glGrBunkDepth){glBunkDepthNum 
+fname fappend~ write_calc  11 25 ; 3 4 ; 2$fw
 
 NB. -----------------------------
 NB. Altitude
@@ -1249,4 +1254,22 @@ for_ab.  0 1  do.
 	r=. +/  (ab{greenval)  >: ab{row
     res=. res, (<r, bunkfraction){mat
 end.
+)
+
+NB. =================================================
+NB. lookup_bunker_depth
+NB. =================================================
+NB. Usage
+NB.   lookup_bunker_depth gender ; bunkdepth
+NB. Returns table value
+lookup_bunker_depth=: 3 : 0
+'gender bunkdepth'=. y
+mat=. 0 1 2 3 4
+if. gender=0 do.
+	col=. 3.01 6.01 10.01 15.01
+else.
+	col=. 2.01 5.01 8.01 12.01
+end.
+col=. +/ bunkdepth >: col
+res=. col{mat
 )
