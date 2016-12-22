@@ -555,6 +555,7 @@ label_shot.
 	glPlanSqueezeWidth=: ,0
 	glPlanCarryType=: ,' '
 	glPlanSqueezeType=: ,' '
+	glPlanBunkCarry=: ,<''
 	NB. Don't reset the layup stuff as it has just been entered
 	NB.	glPlanLayupCategory=: ,<''
 	NB.	glPlanLayupReason=: ,<''
@@ -642,6 +643,7 @@ glPlanRollSlope=: 1 1 {glPlanRollSlope
 glPlanRollExtreme=: 1 1 {glPlanRollExtreme
 glPlanRollTwice=: 1 1 {glPlanRollTwice
 glPlanDoglegNeg=: 1 1 {glPlanDoglegNeg
+glPlanBunkCarry=: 1 1 {glPlanBunkCarry
 
 utKeyPut glFilepath,'_plan'
 )
@@ -787,4 +789,5 @@ glPlanFWTargVisible=: ,(#glPlanID)$<''
 glPlanFWUnpleasant=: ,(#glPlanID)$0
 glPlanFWWidthAdj=: ,(#glPlanID)$<''
 glPlanDoglegNeg=: ,(#glPlanID)$0
+glPlanBunkCarry=: ,(#glPlanID)$<''
 )
