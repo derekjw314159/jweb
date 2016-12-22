@@ -406,8 +406,8 @@ fname fappend~ LF,'$pdf->',pdfMulti 5 0 ; 4.5 1 ; ('<b>COURSE</b>: ',(>gender{'/
 fname fappend~ LF,'$pdf->',pdfMulti 9.5 0 ; 1.5 1 ; ('<b>HOLE</b>: ',":1+hole); 1
 fname fappend~ LF,'$pdf->',pdfMulti 11 0 ; 2 1 ; ('<b>PAR</b>: ',":gender{,glTePar); 1
 fname fappend~ LF,'$pdf->',pdfMulti 13 0 ; 3 1 ; ('<b>LENGTH</b>: ',":(<t_index,hole){glTeesYards); 1
-fname fappend~ LF,'$pdf->',pdfMulti 16 0 ; 5 1 ; '<b>DATE RATED</b>:' ; 1
-fname fappend~ LF,'$pdf->',pdfMulti 21 0 ; 7 1 ; '<b>T/LEADER</b>:' ; 1
+fname fappend~ LF,'$pdf->',pdfMulti 16 0 ; 5 1 ; ('<b>DATE RATED</b>: ',glCourseDate) ; 1
+fname fappend~ LF,'$pdf->',pdfMulti 21 0 ; 7 1 ; ('<b>T/LEADER</b>: ',glCourseLead) ; 1
 
 NB. ---------------------------
 NB. Shots Played
@@ -574,23 +574,24 @@ fname fappend~ 'C' write_input 5 12 ; 1.5 ;  <(<"0 (0 ~: sh))#each ww
 NB. Layup Type
 sh=. 'glPlanLayupCategory' matrix_pull hole ; tee ; gender
 sh=. (<glLayupCategoryVal) i. each sh
-sh=. sh {each <glLayupCategoryDesc,<''
+sh=. sh {each <glLayupCategoryText,<''
 sh=. ('L'=each 'glPlanLayupType' matrix_pull hole ; tee ; gender) #each sh
 sh=. <>{. each sh
 fname fappend~ 'R' write_cell 0 13 ; 3 ; 'Layup Type'
-fname fappend~ 'C' write_input 3 13 ; 3   2   ; sh
+fname fappend~ 'C' write_input 3 13 ; 2 3 ; sh
 NB. Layup Reason
 sh=. 'glPlanLayupReason' matrix_pull hole ; tee ; gender
 sh=. ('L'=each 'glPlanLayupType' matrix_pull hole ; tee ; gender) #each sh
 sh=. <>{. each sh
 fname fappend~ 'R' write_cell 0 14 ; 3 ; 'Layup Reason'
-fname fappend~ 'C' write_input 3 14 ; 3   2   ; sh
+fname fappend~ 'C' write_input 3 14 ; 2 3 ; sh
 
 NB. ------------------------
 NB. Topography
 NB. ------------------------
 fname fappend~ LF,'// -------- Topography -------------'
 alt=. (' ' cut 'glPlanAlt glGrAlt') matrix_pull hole; tee ; gender
+alt=. (<glTeAlt),each alt NB. Add tee altitude to front for Par 3
 fname fappend~ write_title 0 15 ; 3 1 ; 'TOPOGRAPHY'
 alt=. >(-&-/) each _2 {. each alt
 NB. alt=. alt * 3<gender{glTePar
@@ -601,7 +602,7 @@ if. (gender{glTePar) = 3 do. alt=. _40 >. alt <. 40 end.
 fname fappend~ (' ' cut 'cell calc') write_row_head 3 15 ; 1.2  0.8 ; 'App S:' ; 0{alt
 fname fappend~ (' ' cut 'cell calc') write_row_head 5 15 ; 2 1 ; 'App Elev B:' ; 1{alt
 fname fappend~ 'R' write_cell 0 16 ; 3 ; '<i>(LZtoLZ or Appr)</i>'
-ww=. ' ' cut 'LZ1-2 Appr LZ1-1 LZ2-3 Appr'
+ww=. ' ' cut 'LZ1-2 Appr LZ1-2 LZ2-3 Appr'
 ww=. (<'<b>'), each ww, each <'</b>'
 fname fappend~ 'C' write_cell 3 16 ; 1 ; <ww
 NB. Topog Level
@@ -675,12 +676,14 @@ NB. ------------------------
 NB. Check distances to front of green
 NB. -------------------------
 fname fappend~ ('L';0) write_cell 0 45 ; 2 ; 'Check dist:'
-dist=. glGrFrontYards + -/(<(glTees i. tee ,glGrTee); 0){glTeesYards
+dist=. glGrFrontYards + -/(<(glTees i. tee ,glGrTee); hole){glTeesYards
 fname fappend~ ('C';0) write_input 2 45 ; 1 ; dist
 fname fappend~ ('L';0) write_cell 3 45 ; 1 ; '+0.5x'
 fname fappend~ ('L';0) write_calc 4 45 ; 1 ; glGrLength
 fname fappend~ ('C';0) write_cell 5 45 ; 0.5 ; '='
 fname fappend~ ('L';0) write_calc 5.5 45 ; 1 ; <.0.5 + (+/1 0.5 * dist,glGrLength)
+fname fappend~ ('C';0) write_cell 5 46 ; 0.5 ; 'vs'
+fname fappend~ ('L';0) write_cell 5.5 46 ; 1 ; (<t_index,hole){glTeesYards
 
 NB. ------------------------
 NB. Water
@@ -828,7 +831,7 @@ fname fappend~ LF,'$pdf->',pdfMulti 14 23 ; 4 2 ;  ('<span style="text-align: ce
 fwtot=. fwtot + fw
 NB. Greenside depth
 fname fappend~ write_cell 8 25 ; 1.2 ; <<'Depth' 
-fname fappend~ write_input 9.2 25 ; 1.3; <glGrBunkDepth
+fname fappend~ write_input 9.2 25 ; 1.3; <(glBunkDepthVal i. glGrBunkDepth){glBunkDepthText
 fname fappend~ write_cell 10.5 25 ; 0.5 ; <<'<b>D</b>'
 fw=. lookup_bunker_depth gender ; ''$(glBunkDepthVal i. glGrBunkDepth){glBunkDepthNum 
 fname fappend~ write_calc  11 25 ; 3 4 ; 2$fw
@@ -837,7 +840,7 @@ NB. In play twice
 fname fappend~ write_row_head 8 26 ; 2.5 0.5 ; '<i>Twice</i>' ; '<b>2</b>'
 fw=. 1< >+/each lz
 fname fappend~ write_calc  11 26 ; 3 4 ; fw
-fwtot=. fwtot + fw
+fwtot=. 0 >. fwtot + fw NB. Can't be negative
 NB. Total
 fname fappend~ 'R' write_footer 8 27 ; 3 ; <<'Bunker Rating'
 fname fappend~ 'C' write_footer 11 27 ;  3 4 ; fwtot
@@ -942,11 +945,14 @@ alt=. (' ' cut 'glPlanAlt glGrAlt') matrix_pull hole; tee ; gender
 fname fappend~ 'black' oN 'lightgrey'
 fname fappend~ LF,'$pdf->',pdfMulti 8 45 ; 3 1 ; '<b>Altimeter Readings</b>' ; 1
 fname fappend~ ('cell' ; 'input') write_row_head 11 45 ; 3 1 ; '<b>On Tee:</b>' ; ":glTeAlt
-if. glTePar>3 do.
+if. (1< #>0{alt) do.
 	fname fappend~ ('cell' ; 'input') write_row_head 15 45 ; 3 1 ; '<b>Scratch Approach:</b>' ; ":_2{>0{alt 
-	fname fappend~ ('cell' ; 'input') write_row_head 19 45 ; 3 1 ; '<b>Bogey Approach:</b>' ; ":_2{>1{alt 
 else.
 	fname fappend~ write_cell 15 45 ; 4 ; '<b>Scratch Approach:</b>' 
+end.
+if. (1< #>1{alt) do.
+	fname fappend~ ('cell' ; 'input') write_row_head 19 45 ; 3 1 ; '<b>Bogey Approach:</b>' ; ":_2{>1{alt 
+else.
 	fname fappend~ write_cell 19 45 ; 4 ; '<b>Bogey Approach:</b>' 
 end.
 fname fappend~ ('cell' ; 'input') write_row_head 23 45 ; 3 1 ; '<b>At Green:</b>' ; ":_1{>0{alt 
@@ -955,7 +961,7 @@ NB. End of Page
 fname fappend~ LF,'// -------- End of Page -------------'
 NB. fname fappend~ LF,'$pdf->SetXY(100,100);'
 NB. fname fappend~ LF,'$pdf->Write(10,''Return to plan'',''http://jw/rating/plannomap/',glFilename,'/',(":1+hole),''')'
-fname fappend~ LF,'$pdf->Output(''',shortname,'.pdf'', ''I'');'
+fname fappend~ LF,'$pdf->Output(''/var/www/tcpdf/rating/',shortname,'.pdf'', ''FI'');'
 fname fappend~ LF,'?>'
 
 stdout '</head><body onLoad="redirect(''/tcpdf/rating/',shortname,'.php'')"'
@@ -1063,6 +1069,31 @@ for_h. i. 18 do.
     end.
 end.
 res=. res
+)
+
+
+NB. ==============================================================
+NB. merge pdfs
+NB. ==============================================================
+NB. Usage:
+NB.   merge_pdfs
+NB.
+NB. Returns a LF delimited string of distances
+merge_pdfs=: 3 : 0
+res=. 'pdftk '
+utKeyRead glFilepath,'_tee'
+for_gender. 0 1 do.
+	for_t. i. # glTeID do.
+		if. 0=(<t,gender){glTeMeasured do. continue. end.
+		hole=. ''$t{glTeHole 
+		tee=. ''$t{glTeTee
+		shortname=. glFilename,'_',(;'r<0>2.0' 8!:0 (1+hole)),(gender{'MW'),tee
+		fname=. glDocument_Root,'/tcpdf/',glBasename,'/',shortname,'.pdf'
+		res=. res,' ',fname
+	end.
+end.
+res=. res, ' cat output ',glDocument_Root,'/tcpdf/',glBasename,'/',glFilename,'_all.pdf'
+2!:0 res
 )
 
 NB. ====================================================================
@@ -1305,11 +1336,11 @@ lookup_carry_rough=: 3 : 0
 'gender carryyards rrlength'=. y
 if. gender=0 do.
 	mat=. 2 4 $ 0 0 1 2, 0 1 3 4
-	row=. ,160
+	row=. ,161
 	col=. 2 3.01 4.01 
 else.
 	mat=. 2 4 $ 0 0 1 2, 0 1 3 4
-	row=. ,120
+	row=. ,121
 	col=. 2 2.51 3.51 
 end.
 
