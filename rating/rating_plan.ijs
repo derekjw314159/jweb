@@ -403,7 +403,7 @@ NB. Green Data
 
 stdout LF,'<div class="span-24 last">'
 stdout LT1,'<table><thead>'
-stdout LT3,'<tr><th>Green</th><th>From tee</th><th>To Front</th><th>Alt</th><th>Len</th><th>Wid</th><th>Diam</th><th>Tier</th><th>Firm</th><th>Contour</th><th>Stimp</th><th>Mounds</th><th>Bunk Frac</th><th>Bunk Dep</th><th>OOB Dist</th><th>Water Dist</th><th>Water Frac</th><th>Water SurrDist</th><th colspan="5">Other Variables</th></tr>'
+stdout LT3,'<tr><th>Green</th><th>From tee</th><th>To Front</th><th>Alt</th><th>Wid</th><th>Len</th><th>Diam</th><th>Tier</th><th>Firm</th><th>Contour</th><th>Stimp</th><th>Mounds</th><th>Bunk Frac</th><th>Bunk Dep</th><th>OOB Dist</th><th>Water Dist</th><th>Water Frac</th><th>Water SurrDist</th><th colspan="5">Other Variables</th></tr>'
 stdout LT2,'</thead><tbody><tr>'
 ww=. ''$glGrHole i. hole
 other=. ''
@@ -422,8 +422,8 @@ stdout LT4,'<td><a href="/jw/rating/green/e/',glFilename,'/',(>ww{glGrID),'">Edi
 stdout LT4,'<td>',(> (glTees i. ww{glGrTee){glTeesName),'</td>'
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 ww{glGrFrontYards),'</td>'
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 ww{glGrAlt),'</td>'
-stdout LT4,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 ww{glGrLength),'</td>'
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 ww{glGrWidth),'</td>'
+stdout LT4,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 ww{glGrLength),'</td>'
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 ww{glGrDiam),'</td>'
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(>(ww{glGrTiered){' ' cut '. y'),'</td>'
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(>ww{glGrFirmness),'</td>'

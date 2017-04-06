@@ -65,9 +65,9 @@ pdfColor=: 3 : 0
 'T' pdfColor y
 :
 NB. Keep record of old color to avoid too many lines being written
-if. _1 = 4!:0 <'glOldColor' do. glOldColor=: '' ; '' end.
+if. _1 = 4!:0 <'glOldColor' do. glOldColor=: '' ; '' ; '' end.
 NB. Is same color?
-if. y -: > ('TF' i. x) { glOldColor do.
+if. y -: > ('TFD' i. x) { glOldColor do.
     NB. No change
     res=. ''
 else.
@@ -79,9 +79,10 @@ else.
 	case. 'blue' do. res=. '( 35,  83, 216);'
 	case. 'lightyellow' do. res=. '(247, 253, 156);'
 	case. 'lightblue' do. res=. '(176, 224, 230);'
+	case. 'red' do. res=. '(255, 0, 0);'
     end.
-    glOldColor=: (<y) ('TF' i. x) } glOldColor
-    res=.LF,'$pdf->', (>('FT' i. x){' ' cut 'setFillColor setTextColor'),res
+    glOldColor=: (<y) ('TFD' i. x) } glOldColor
+    res=.LF,'$pdf->', (>('FT' i. x){' ' cut 'setFillColor setTextColor setDrawColor'),res
 end.
 )
 
@@ -555,6 +556,8 @@ fname fappend~ write_title 0 11 ; 3 1 ; 'ELEVATION'
 fname fappend~ write_cell 3 11 ; 3 ; 'Tee to Gr (<b>gt 10ft</b>)'
 sh=. glGrAlt - glTeAlt
 sh=. sh * 10<: |sh NB. Minimum 10ft
+sh=. (*sh) * 10 * <.0.5+ 0.1 * (| sh) NB. Round to nearest 10
+if. 3=gender{glTePar do. _40 >. sh <. 40 end.
 fname fappend~ 'R' write_input 6 11 ; 1 1 ; (0 >. sh),0 <. sh 
 
 NB. ------------------------
@@ -741,7 +744,7 @@ NB. ------------------------
 fname fappend~ LF,'// -------- Recoverability and Rough -------------'
 carryyards=. 'F' carry_yards hole; tee ; gender 
 fname fappend~ write_title 8 1 ; 3 1 ; '<b>RECOV & ROUGH</b>' 
-fname fappend~ ('cell' ; 'input') write_row_head 11 1 ; 5 2 ; '<i>Average Hole Rough Height:</i>' ; glGrRRRoughLength
+fname fappend~ ('cell' ; 'input') write_row_head 11 1 ; 5 2 ; '<i>Average Hole Rough Height:</i>' ; (":glGrRRRoughLength),'&quot;'
 fname fappend~ write_cell 8 2 ; 3 ; <<' '
 ww=. ' ' cut 'S1 S2 S3 B1 B2 B3 B4'
 ww=. (<'<b>'), each ww, each (<'</b>')
@@ -761,7 +764,7 @@ fname fappend~ 'C' write_input 11 6 ; sz ; (;lay)
 fwtot=. fwtot + > +/each lay
 NB. Carry
 fname fappend~ ('cell' ; 'input') write_row_head 8 8 ; 0.55 0.7 ; '<i>Y</i>' ; ":0{>0{carryyards
-fname fappend~ ('cell' ; 'input') write_row_head 9.25 8 ; 0.55 0.7 ; '<i>H</i>'; (":glGrRRRoughLength) 
+fname fappend~ ('cell' ; 'input') write_row_head 9.25 8 ; 0.5 0.75 ; '<i>H</i>'; (":glGrRRRoughLength),'&quot;' 
 lay=. lookup_carry_rough gender ; carryyards ; glGrRRRoughLength
 fname fappend~ 'R' write_cell 10.5 8 ; 0.5 ; '<b>C</b>'
 fname fappend~ 'C' write_calc 11 8 ; sz ; (;lay)
@@ -927,8 +930,8 @@ NB. ------------------------
 fname fappend~ LF,'// -------- Green Surface -------------'
 fname fappend~ write_title 18 30 ; 3 1 ; '<b>Green Surface</b>' 
 fw=. ":<. glGrStimp NB. Convert to feet and inches
-fw=. fw,' Ft ',": <. 0.5 + 12 * 1|glGrStimp
-fw=. fw,' Ins'
+fw=. fw,'&#39; ',": <. 0.5 + 12 * 1|glGrStimp
+fw=. fw,'&quot;'
 fname fappend~ write_input 21 30 ; 3 ; <<fw
 fname fappend~ write_input 24 30 ; 4 ; <(glGrContourVal i. glGrContour){glGrContourDesc
 fname fappend~ 'R' write_cell 18 31 ; 3 ; 'Table Value'
@@ -956,6 +959,29 @@ else.
 	fname fappend~ write_cell 19 45 ; 4 ; '<b>Bogey Approach:</b>' 
 end.
 fname fappend~ ('cell' ; 'input') write_row_head 23 45 ; 3 1 ; '<b>At Green:</b>' ; ":_1{>0{alt 
+
+NB. -------------------------------
+NB. Box in the sections
+NB. -------------------------------
+fname fappend~ 'D' pdfColor 'red'
+fname fappend~  LF,'$pdf->SetLineWidth(0.7);'
+fname fappend~ pdfBox 0 0 ; 28 1
+fname fappend~ pdfBox 0 1 ; 8 4  
+fname fappend~ pdfBox 0 5 ; 8 6
+fname fappend~ pdfBox 0 11 ; 8 1  
+fname fappend~ pdfBox 0 12 ; 8 3
+fname fappend~ pdfBox 0 15 ; 8 7  
+fname fappend~ pdfBox 0 22 ; 8 12 
+fname fappend~ pdfBox 0 35 ; 8 7  
+fname fappend~ pdfBox 0 42 ; 18 1
+fname fappend~ pdfBox 0 43 ; 11 1
+fname fappend~ pdfBox 11 43; 17 1 
+fname fappend~ pdfBox 8 1 ; 10 15 
+fname fappend~ pdfBox 8 16 ; 10 12 
+fname fappend~ pdfBox 8 28 ; 10 14 
+fname fappend~ pdfBox 18 1 ; 10 15 
+fname fappend~ pdfBox 18 16 ; 10 12
+fname fappend~ pdfBox 18 30 ; 10 6
 
 NB. End of Page
 fname fappend~ LF,'// -------- End of Page -------------'

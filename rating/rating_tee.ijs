@@ -95,8 +95,8 @@ stdout '</tbody></table></div>'
 NB. Submit buttons
 stdout LT1,'<div class="span-15 last">'
 
-stdout LF,'<input type="submit" name="control_calc" value="Calc" tabindex="',(":2),'">'
-stdout LF,'     <input type="submit" name="control_done" value="Done" tabindex="',(,":3),'">'
+stdout LF,'<input type="submit" name="control_calc" value="Calc" tabindex="',(":100),'">'
+stdout LF,'     <input type="submit" name="control_done" value="Done" tabindex="',(,":101),'">'
 stdout LF,'</div>' NB. end main container
 stdout '</body></html>'
 res=. 1
