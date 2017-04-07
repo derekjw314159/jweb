@@ -71,7 +71,7 @@ NB. Usage djwSelect name ; tabindex ; matdesc; matval ; default
 NB. --------------------------------------------------------
 djwSelect=: 3 : 0
 'name tabindex matdesc matval default'=. y
-stdout LT4,'<select name="',name,'" id="',name,'" tabindex="',(":;tabindex),'" style="font-size: 8pt; height: 16px;">'
+stdout LT4,'<select name="',name,'" id="',name,'" tabindex="',(":;tabindex),'" style="font-size: 8pt; height: 16px;" onfocus="inputpink(this)" onblur="inputwhite(this)">'
 for_ll. matval do.
 	stdout LT5,'<option value="',(>ll)
 	if. ll = default do.

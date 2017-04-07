@@ -140,16 +140,16 @@ stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
 stdout LT4,'<th>Level</th><th>Slope</th><th>Extreme</th><th>Twice</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td>'
-djwSelect 'rolllevel' ; 9 ; glRollLevelDesc ; glRollLevelVal ; <''$glPlanRollLevel
+djwSelect 'rolllevel' ; 11 ; glRollLevelDesc ; glRollLevelVal ; <''$glPlanRollLevel
 stdout LT4,'</td>'
 stdout LT4,'<td>'
-djwSelect 'rollslope' ; 10 ; glRollSlopeDesc ; glRollSlopeVal ; <''$glPlanRollSlope
+djwSelect 'rollslope' ; 12 ; glRollSlopeDesc ; glRollSlopeVal ; <''$glPlanRollSlope
 stdout LT4,'</td>'
 stdout LT4,'<td>'
-djwSelect 'rollextreme' ; 11 ; glRollExtremeDesc ; glRollExtremeVal ; <''$glPlanRollExtreme
+djwSelect 'rollextreme' ; 13 ; glRollExtremeDesc ; glRollExtremeVal ; <''$glPlanRollExtreme
 stdout LT4,'</td>'
 stdout LT4,'<td>'
-djwSelect 'rolltwice' ; 12 ; glRollTwiceDesc ; glRollTwiceVal ; <''$glPlanRollTwice
+djwSelect 'rolltwice' ; 14 ; glRollTwiceDesc ; glRollTwiceVal ; <''$glPlanRollTwice
 stdout LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table>'
@@ -160,7 +160,7 @@ stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
 stdout LT4,'<th>Landing Zone not Visible</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td><input type="checkbox" id="fwvisible" name="fwvisible" value="1" '
-stdout ((''$glPlanFWVisible)#'checked'),' tabindex="12">',LT4,'</td>'
+stdout ((''$glPlanFWVisible)#'checked'),' tabindex="15">',LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table>'
 
@@ -170,14 +170,14 @@ stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
 stdout LT4,'<th>Stance or Lie</th><th>Unpleasant Lie</th><th>Obstructed Shot</th><th>Targ not Visible</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td>'
-djwSelect 'topogstance' ; 13 ; glTopogStanceDesc ; glTopogStanceVal ; <''$glPlanTopogStance
+djwSelect 'topogstance' ; 16 ; glTopogStanceDesc ; glTopogStanceVal ; <''$glPlanTopogStance
 stdout LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="fwunpleasant" name="fwunpleasant" value="1" '
-stdout ((''$glPlanFWUnpleasant)#'checked'),' tabindex="14">',LT4,'</td>'
+stdout ((''$glPlanFWUnpleasant)#'checked'),' tabindex="17">',LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="fwobstructed" name="fwobstructed" value="1" '
-stdout ((''$glPlanFWObstructed)#'checked'),' tabindex="15">',LT4,'</td>'
+stdout ((''$glPlanFWObstructed)#'checked'),' tabindex="18">',LT4,'</td>'
 stdout LT4,'<td>'
-djwSelect 'fwtargvisible' ; 16 ; glTargVisibleDesc ; glTargVisibleVal ; <''$glPlanFWTargVisible
+djwSelect 'fwtargvisible' ; 19 ; glTargVisibleDesc ; glTargVisibleVal ; <''$glPlanFWTargVisible
 stdout LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table>'
@@ -187,8 +187,8 @@ stdout LT1,'</div>'
 NB. Submit buttons
 stdout LT1,'<div class="span-15 last">'
 
-stdout LF,'<input type="submit" name="control_calc" value="Calc" tabindex="',(":2),'">'
-stdout LF,'     <input type="submit" name="control_done" value="Done" tabindex="',(,":3),'">'
+stdout LF,'<input type="submit" name="control_calc" value="Calc" tabindex="',(":100),'">'
+stdout LF,'     <input type="submit" name="control_done" value="Done" tabindex="',(,":101),'">'
 if. 'M'=glPlanRecType do. NB. Only delete on measurement point
 	stdout LF,'     <input type="submit" name="control_delete" value="Delete this M/Point" tabindex="',(,":4),'"></form>'
 end.
