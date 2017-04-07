@@ -82,7 +82,7 @@ end.
 NB. Print tees and yardages
 user=. getenv 'REMOTE_USER'
 if. 0 -: user do. user=.'' end.
-stdout LF,'<h2>BB&O Nike U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>Prize Leaders</h3>'
+stdout LF,'<h2>BB&O U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>Prize Leaders</h3>'
 
 NB. Order by prize time and get unique entries
 ww=.  /: >glPlFirstName
@@ -94,7 +94,7 @@ ww=. ww /: (+/"1 (_9{."1 (glMax <. ww{glPlGross)))  NB. back one
 ww=. ww /: (+/"1 (glMax <. ww{glPlGross))  NB. Gross
 (ww{glPlID) utKeyRead glFilepath,'_player'
     
-stdout LF,'<div class="span-10">'
+stdout LF,'<div class="span-12">'
 stdout LT1,'<table>'
 stdout LT1,'<thead>',LT2,'<tr>'
 stdout LT3,'<th>Gross</th><th>Player</th><th>Score</th>'
@@ -134,7 +134,7 @@ ww=. ww /: (+/"1 (_9{."1  (glMax <. ww{glPlGross))) - (ww{glPlHCP)%2 NB. back on
 ww=. ww /: (+/"1 (glMax <. ww{glPlGross)) - ww{glPlHCP  NB. Gross
 (ww{glPlID) utKeyRead glFilepath,'_player'
     
-stdout LF,'<div class="span-10 prepend-1 last">'
+stdout LF,'<div class="span-12 prepend-1 append-3 last">' NB. Append to use the width
 stdout LT1,'<table>'
 stdout LT1,'<thead>',LT2,'<tr>'
 stdout LT3,'<th>Nett</th><th>Player</th><th>Score</th>'
@@ -179,9 +179,9 @@ for_p. i. #glPuttDesc do.
 	(ww{glPlID) utKeyRead glFilepath,'_player'
 
 	if. 0=p do.
-		stdout LF,'<div class="span-7">'
+		stdout LF,'<div class="span-8">'
 	else.
-		stdout LF,'<div class="span-7 prepend-1">'
+		stdout LF,'<div class="span-8 prepend-1">'
 	end.
 	stdout LT1,'<table>'
 	stdout LT1,'<thead>',LT2,'<tr>'

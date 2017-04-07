@@ -56,14 +56,14 @@ stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 if. scroll do.
-	NB. three quarters of a second per player, minimum of 10 seconds
-	tm=. ": <. 0.5+ (10000 >. (750*  # glPlID))
+	NB. three quarters of a second per player, minimum of 5 seconds
+	tm=. ": <. 0.5+ (5000 >. (750*  # glPlID))
 	stdout LF,'<script>setTimeout(function(){window.location.href=''/jw/u11/prizescroll/v/',glFilename,'''},',tm,');</script>'
 end.
 djwBlueprintCSS ''
 
 if. scroll do.
-	stdout LF,'</head>',LF,'<body onLoad="pageScroll()">'
+	stdout LF,'</head>',LF,'<body onLoad="leaderScroll()">'
 else.
 	stdout LF,'</head>',LF,'<body>'
 end.
@@ -78,7 +78,7 @@ end.
 NB. Print tees and yardages
 user=. getenv 'REMOTE_USER'
 if. 0 -: user do. user=.'' end.
-stdout LF,'<h2>BB&O Nike U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>Leaderboard</h3>'
+stdout LF,'<h2>BB&O U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>Leaderboard</h3>'
 
 NB. Order by leader time and get unique entries
 NB. Need to drop the last nine if a nine-hole competition
@@ -96,29 +96,48 @@ ww=: ww /: (+/"1 (drop }."1 (glMax <. ww{glPlGross)))  NB. Gross
 NB. Finally put withdrawals at the bottom
 ww=: ww /: (<'WD') =  ww{glPlStartTime
 (ww{glPlID) utKeyRead glFilepath,'_player'
-    
-stdout LF,'<div class="span-24 large">'
-stdout LT1,'<table>'
+grosslist=.  (+/"1 (drop }."1 (glMax <. glPlGross)))  NB. Gross
+
+
+
+NB. If scroll create two divs
+stdout LF,'<div class="span-24 large" style="line-height: 1.4em;width: 100%; margin-bottom: 2px;">'
+stdout LT1,'<table style="margin-bottom: 0px;">'
 stdout LT1,'<thead>',LT2,'<tr>'
-stdout LT3,'<th style="border-right: 2px solid lightgrey">Pos</th><th>Player</th><th>Gross</th><th>Nett</th>'
+stdout LT3,'<th style="border-right: 2px solid lightgrey; width: 10%">Pos</th>'
+stdout LT3,'<th style="width: 40%;">Player</th>'
+stdout LT3,'<th style="width: 10%;">Gross</th>'
+stdout LT3,'<th style="width: 10%;">Nett</th>'
 for_p. glPuttDesc do.
-	stdout LT3,'<th>',(>p),'</th>'
+	stdout LT3,'<th style="width: 10%;">',(>p),'</th>'
 end.
 stdout LT2,'</tr></thead><tbody>'
 NB. Loop round the leader times
 last=. _1
 for_ll. i. #glPlID do. NB. Start of person loop
+	NB. This is the major logic.  Create a second div after three elements and make the bottom part overflow
+	NB. and trigger the javascript
+	if. scroll *. (ll = 3) do.
+	    stdout LT1,'</tbody>'
+	    stdout LT1,'</table>'
+	    stdout LF,'</div>'
+	    stdout LF,'<div class="span-24 large" id="tablebody" style="line-height: 1.4em;width: 100%; height: 400px; overflow: auto;">'
+	    stdout LT1,'<table>'
+	    stdout LT1,'<tbody>'
+	end.
+
 	stdout LT2,'<tr>'
 	gr=. +/ drop }. (glMax<. ll{glPlGross)
 	if. (<'WD') = ll{glPlStartTime do.
-		stdout LT3,'<td>WD</td>'
-	elseif. gr = last do.
-		stdout LT3,'<td>=</td>'
+		stdout LT3,'<td style="width: 10%;">WD</td>'
+	NB. elseif. gr = last do.
+	NB.	stdout LT3,'<td style="width: 10%;">=</td>'
 	elseif. 1 do.
-		stdout LT3,'<td>',(": 1+ll_index),'</td>'
+		stdout LT3,'<td style="width: 10%;">',(": 1+ll{grosslist i. grosslist)
+		stdout ((1<+/grosslist=ll{grosslist)#'='),'</td>' NB. Logic for whether this is a tied rank
 	end.
 	last=. gr 
-	stdout LT3,'<td>'
+	stdout LT3,'<td style="width: 40%;">'
 	NB. Only drill if not scrolling
 	stdout (-. scroll) # LT3,'<a href="http://',(":getenv 'SERVER_NAME'),'/jw/u11/player/v/',(,glFilename),'/',(>ll{glPlID),'">'
 	stdout LT3,(>ll{glPlFirstName),' ',(>ll{glPlLastName)
@@ -128,19 +147,20 @@ for_ll. i. #glPlID do. NB. Start of person loop
 	stdout '<i>',(":>ll{glPlClub),'</i></td>'
 	gr=. ": gr
 	if. (<'WD') = ll{glPlStartTime do.
-	    stdout LT3,'<td>WD</td><td></td>'
-	    stdout ; (#glPuttDesc)#,: '<td></td>'
+	    stdout LT3,'<td style="width: 10%;">WD</td>'
+	    stdout LT3,'<td style="width: 10%;"></td>'
+	    stdout ; (#glPuttDesc)#,: '<td style="width: 10%;"></td>'
 	    continue.
 	elseif. *. / _ = drop }. ll{ glPlGross do.
 	    gr=. '-'
 	end.
-	stdout LT3,'<td>',gr,'</td>'
+	stdout LT3,'<td style="width: 10%;">',gr,'</td>'
 	nt=. ": (+/ drop }. (glMax <. ll{glPlGross)) - (1 - 0.5 * gl9Hole) * ll{glPlHCP
 
 	if. *. / _ = ll{ glPlGross do. nt=.'-' end.
-	stdout LT3,'<td>',nt,'</td>'
+	stdout LT3,'<td style="width: 10%;">',nt,'</td>'
 	for_p. i. #glPuttDesc do.
-		stdout LT3,'<td>',(": (<ll, p){glPlPutt),'</td>'
+		stdout LT3,'<td style="width: 10%;">',(": (<ll, p){glPlPutt),'</td>'
 	end.
 	stdout LT2,'</tr>'
 end. NB. End of person loop

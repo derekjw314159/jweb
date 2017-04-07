@@ -122,7 +122,7 @@ end.
 NB. Print tees and yardages
 user=. getenv 'REMOTE_USER'
 if. 0 -: user do. user=.'' end.
-stdout LF,'<h2>BB&O Nike U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>Start Sheet</h3>'
+stdout LF,'<h2>BB&O U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>Start Sheet</h3>'
 
 NB. Order by start time and get unique entries
 ww=:  /: >glPlFirstName
@@ -132,7 +132,7 @@ ww=: ww /: >ww{glPlStartTime
 
     
 stdout LF,'<div class="span-24 large">'
-stdout LT1,'<table>'
+stdout LT1,'<table style="line-height: 1.4em">'
 stdout LT1,'<thead>',LT2,'<tr>'
 stdout LT3,'<th style="border-right: 2px solid lightgrey">Start</th><th colspan="2" style="text-align:center;border-right: 2px solid lightgrey">Player 1</th><th colspan="2" style="text-align:center;border-right: 2px solid lightgrey">Player 2</th><th colspan="2" style="text-align:center;border-right: 2px solid lightgrey">Player 3</th></tr></thead><tbody>'
 NB. Loop round the start times

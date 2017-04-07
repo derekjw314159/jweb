@@ -48,7 +48,7 @@ end.
 NB. Print tees and yardages
 user=. getenv 'REMOTE_USER'
 if. 0 -: user do. user=.'' end.
-stdout LF,'<h2>BB&O Nike U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>All players</h3>'
+stdout LF,'<h2>BB&O U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>All players</h3>'
 
 NB. Order by player
 ww=:  /: >glPlFirstName
@@ -59,9 +59,9 @@ NB. Loop round in two halves
 for_hh. 0 1 do.
     
     if. hh=0 do.
-	stdout LF,'<div class="span-9">'
+	stdout LF,'<div class="span-11">'
     else.
-	stdout LF,'<div class="span-9 prepend-1">'
+	stdout LF,'<div class="span-11 prepend-1">'
     end.
 
     stdout LT1,'<table>'
@@ -85,12 +85,12 @@ for_hh. 0 1 do.
     stdout LF,'</tbody></table></div>'
 end. NB. End of half
 NB. Add the Edit Option
-stdout LF,'<div class="span-4 last">'
+stdout LF,'<div class="span-14 last">'
 stdout LF,'<a href="https://',(":,getenv 'SERVER_NAME'),'/jw/u11/player/a/',glFilename,'">Add new player</a>'
-stdout LF,'<br><br><a href="http://',(":,getenv 'SERVER_NAME'),'/jw/u11/start/v/',glFilename,'">Start sheet</a>'
-stdout LF,'<br><br><a href="http://',(":,getenv 'SERVER_NAME'),'/jw/u11/leader/v/',glFilename,'">Leaderboard</a>'
-stdout LF,'<br><br><a href="http://',(":,getenv 'SERVER_NAME'),'/jw/u11/prize/v/',glFilename,'">Prize Leaders</a><div>'
-stdout LF,'</div>' NB. main span
+stdout LF,EM,EM,' <a href="http://',(":,getenv 'SERVER_NAME'),'/jw/u11/start/v/',glFilename,'">Start sheet</a>'
+stdout LF,EM,EM,' <a href="http://',(":,getenv 'SERVER_NAME'),'/jw/u11/leader/v/',glFilename,'">Leaderboard</a>'
+stdout LF,EM,EM,' <a href="http://',(":,getenv 'SERVER_NAME'),'/jw/u11/prize/v/',glFilename,'">Prize Leaders</a><div>'
+stdout LF,'</div>' NB. Edit buttons span
 stdout LF,'<div class="span-24">'
 stdout LF,'<hr>'
 stdout LF,'</div>' NB. main span
@@ -136,7 +136,7 @@ end.
 NB. Print tees and yardages
 user=.  getenv 'REMOTE_USER'
 if. 0 -: user do. user=.'' end.
-stdout LF,'<h2>BB&O Nike U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>View details for :',(>glPlFirstName),' ',(>glPlLastName),'</h3>'
+stdout LF,'<h2>BB&O U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>View details for :',(>glPlFirstName),' ',(>glPlLastName),'</h3>'
 
 NB. Print scorecard and yardage
 stdout LF,'<div class="span-24 last">'
@@ -199,10 +199,11 @@ stdout LF,'<br><br><a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/u11/leader/
 stdout LF,'<hr></div>' NB. main span
 
 NB. Print the putting scores
+stdout LF,'<div class="span-7 last">'
 for_rr. glPuttDesc do.
     stdout '<br>',(>rr),' = ',":rr_index{,glPlPutt
 end.
-
+stdout LF,'</div>' NB. Putting scores
 stdout LF,'</div>' NB. container
 stdout '</body></html>'
 exit ''
@@ -254,7 +255,7 @@ end.
 NB. Print tees and yardages
 user=.  getenv 'REMOTE_USER'
 if. 0 -: user do. user=.'' end.
-stdout LF,'<h2>BB&O Nike U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2><h3>Edit details for :',(>glPlFirstName),' ',(>glPlLastName),'</h3>','<i>',user,'</i>'
+stdout LF,'<h2>BB&O U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2><h3>Edit details for :',(>glPlFirstName),' ',(>glPlLastName),'</h3>','<i>',user,'</i>'
 
 NB. Print scorecard and yardage
 stdout LF,'<div class="span-24 last">'
@@ -494,8 +495,8 @@ ww=. (i. 3+ >. / ww,0) -. ww
 ww=. ; 'r<0>4.0' 8!:0 {.ww
 utKeyClear glFilepath,'_player'
 glPlID=: ,< ww
-glPlFirstName=: ,<''
-glPlLastName=: ,<' New Player'
+glPlFirstName=: ,<'First Name'
+glPlLastName=: ,<' Last Name'
 glPlClub=: ,a:
 glPlGross=: 1 18$_
 glPlPutt=: 1 3$0 0 50
