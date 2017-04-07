@@ -165,6 +165,7 @@ for_ll. i. 6 <. #glPlID do. NB. Start of person loop
 end. NB. End of person loop
 stdout LT1,'</tbody></table></div>'
 
+stdout LF,'<hr>'
 
 for_p. i. #glPuttDesc do.
 	NB. Order by prize time and get unique entries

@@ -255,7 +255,7 @@ end.
 NB. Print tees and yardages
 user=.  getenv 'REMOTE_USER'
 if. 0 -: user do. user=.'' end.
-stdout LF,'<h2>BB&O U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2><h3>Edit details for :',(>glPlFirstName),' ',(>glPlLastName),'</h3>','<i>',user,'</i>'
+stdout LF,'<h2>BB&O U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2><h3>Edit details for :',(>glPlFirstName),' ',(>glPlLastName),EM,EM,'<span class="small"><i>',user,'</i></span></h3>'
 
 NB. Print scorecard and yardage
 stdout LF,'<div class="span-24 last">'
@@ -264,8 +264,8 @@ stdout LF, TAB,'<input type="hidden" name="filename" value="',glFilename,'">' NB
 stdout LF, TAB,'<input type="hidden" name="key" value="',(;key),'">'
 stdout LF, TAB,'<input type="hidden" name="prevtime" value="',(,>glPlUpdateTime),'">'
 stdout LF, TAB,'<input type="hidden" name="prevname" value="',(,>glPlUpdateName),'">'
-stdout LF,'<span class="span-3">Name</span><input name="firstname" value="',(,>glPlFirstName),'" tabindex="1" ',(InputField 20),'>'
-stdout LF,EM,'<input name="lastname" value="',(,>glPlLastName),'" tabindex="2" ',(InputField 20),'>'
+stdout LF,'<span class="span-3">First name</span><input name="firstname" value="',(,>glPlFirstName),'" tabindex="1" ',(InputField 20),'><br>'
+stdout LF,'<span class="span-3">Last name</span><input name="lastname" value="',(,>glPlLastName),'" tabindex="2" ',(InputField 20),'>'
 stdout LF,'<br><span class="span-3">Club</span><input name="club" value="',(,>glPlClub),'" tabindex="3" ',(InputField 25),'>'
 stdout LF,'<br><span class="span-3">Full Handicap</span><input value="',(": ,glPlHCPFull),'" tabindex="4" ',(InputFieldnum 'hcpfull'; 3),'>'
 stdout LF,'<br><span class="span-3">Handicap</span>',(": ,glPlHCP)
