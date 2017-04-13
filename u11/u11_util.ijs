@@ -71,6 +71,14 @@ if. fexist y,'.ijf' do.
 	    gl9Hole=: 0
 	    ww=. (<'gl9Hole') utFilePut y
 	end.
+	if. 0 ~: 4!:0 <'glPageDelay' do.
+		glPageDelay=: 7 15 7 NB. Start -> Leader -> Prize
+		ww=.(<'glPageDelay') utFilePut y
+	end.
+	if. 0 ~: 4!:0 <'glScrollParam' do.
+		glScrollParam=: 5 1 0.05 NB. Initial : ScrollPixels : ScrollTime
+		ww=.(<'glScrollParam') utFilePut y
+	end.
 	err=. ''
 else.
 	err=. 'No such course'

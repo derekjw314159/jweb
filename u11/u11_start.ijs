@@ -83,24 +83,18 @@ end.
 glFilename=: dltb > 0{ y
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
-if. fexist glFilepath,'.ijf' do.
-	xx=. utFileGet glFilepath
-	xx=. utKeyRead glFilepath,'_player'
-	err=. ''
-else.
-	err=. 'No such course'
-end.
+err=. ReadAll glFilepath
 
 stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 if. stay do.
 	NB. one quarter of a second per player, minimum of 30 seconds
-	tm=. ": <. 0.5+ (30000 >. (250 * # glPlID))
+	tm=. ": <. 0.5+ 1000 * 0{glPageDelay
 	stdout LF,'<script>setTimeout(function(){window.location.href=''/jw/u11/startsheet/v/',glFilename,'''},',tm,');</script>'
 elseif. scroll do.
 	NB. one quarter of a second per player, minimum of 10 seconds
-	tm=. ": <. 0.5+ (10000 >. (250 * # glPlID))
+	tm=. ": <. 0.5+ 1000 * 0{glPageDelay
 	stdout LF,'<script>setTimeout(function(){window.location.href=''/jw/u11/leaderscroll/v/',glFilename,'''},',tm,');</script>'
 end.
 

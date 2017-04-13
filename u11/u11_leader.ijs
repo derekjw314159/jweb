@@ -57,7 +57,7 @@ stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 if. scroll do.
 	NB. three quarters of a second per player, minimum of 5 seconds
-	tm=. ": <. 0.5+ (5000 >. (750*  # glPlID))
+	tm=. ": <. 0.5+ 1000 * 1{glPageDelay
 	stdout LF,'<script>setTimeout(function(){window.location.href=''/jw/u11/prizescroll/v/',glFilename,'''},',tm,');</script>'
 end.
 djwBlueprintCSS ''
@@ -67,7 +67,12 @@ if. scroll do.
 else.
 	stdout LF,'</head>',LF,'<body>'
 end.
-	
+
+NB. Hidden div to hold scroll parameters
+stdout LF,'<span class="small" id="initial" style="visibility:hidden; border: 0; padding: 0; margin:0; width:5px">',(":0{glScrollParam),'</span>'
+stdout LF,'<span class="small" id="scrollpixel" style="visibility:hidden; border: 0; padding: 0; margin:0; width:5px">',(":1{glScrollParam),'</span>'
+stdout LF,'<span class="small" id="scrolltime" style="visibility:hidden; border: 0; padding: 0; margin:0; width:5px">',(":2{glScrollParam),'</span>'
+
 stdout LF,'<div class="container">'
 
 NB. Error page - No such course
