@@ -69,9 +69,9 @@ else.
 end.
 
 NB. Hidden div to hold scroll parameters
-stdout LF,'<span class="small" id="initial" style="visibility:hidden; border: 0; padding: 0; margin:0; width:5px">',(":0{glScrollParam),'</span>'
-stdout LF,'<span class="small" id="scrollpixel" style="visibility:hidden; border: 0; padding: 0; margin:0; width:5px">',(":1{glScrollParam),'</span>'
-stdout LF,'<span class="small" id="scrolltime" style="visibility:hidden; border: 0; padding: 0; margin:0; width:5px">',(":2{glScrollParam),'</span>'
+stdout LF,'<span class="small" id="initial" style="display:none; border: 0; padding: 0; margin:0; width:5px">',(":0{glScrollParam),'</span>'
+stdout LF,'<span class="small" id="scrollpixel" style="display:none; border: 0; padding: 0; margin:0; width:5px">',(":1{glScrollParam),'</span>'
+stdout LF,'<span class="small" id="scrolltime" style="display:none; border: 0; padding: 0; margin:0; width:5px">',(":2{glScrollParam),'</span>'
 
 stdout LF,'<div class="container">'
 
@@ -106,7 +106,7 @@ grosslist=.  (+/"1 (drop }."1 (glMax <. glPlGross)))  NB. Gross
 
 
 NB. If scroll create two divs
-stdout LF,'<div class="span-24 large" style="line-height: 1.4em;width: 100%; margin-bottom: 2px;">'
+stdout LF,'<div class="span-24 large" id="tablehead" style="line-height: 1.4em;width: 100%; margin-bottom: 2px;">'
 stdout LT1,'<table style="margin-bottom: 0px;">'
 stdout LT1,'<thead>',LT2,'<tr>'
 stdout LT3,'<th style="border-right: 2px solid lightgrey; width: 10%">Pos</th>'
@@ -123,6 +123,7 @@ for_ll. i. #glPlID do. NB. Start of person loop
 	NB. This is the major logic.  Create a second div after three elements and make the bottom part overflow
 	NB. and trigger the javascript
 	if. scroll *. (ll = 3) do.
+
 	    stdout LT1,'</tbody>'
 	    stdout LT1,'</table>'
 	    stdout LF,'</div>'

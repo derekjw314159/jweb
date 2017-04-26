@@ -173,11 +173,12 @@ if. showmap do.
 end.
 
 stdout LF,'</head>',LF,'<body>'
+stdout LF,'<div class="container" width="100%">'
 NB. Control map display
 if. showmap do.
 	stdout LT1,'  <div id="map-canvas"></div>'
 end.
-stdout LF,'<div class="container" width="100%">'
+NB. stdout LF,'<div class="container" width="100%">'
 
 NB. Error page - No such course
 if. 0<#err do.
@@ -491,9 +492,13 @@ BuildMap=: 3 : 0
 hole=. ,y
 
 stdout LF,'<style>'
-stdout LF,'  html, body, #map-canvas {'
+NB. stdout LF,'  html, body, #map-canvas {'
+stdout LF,'  #map-canvas {'
 stdout LF,'  height: 480px;'
 stdout LF,'  width: 640px;'
+stdout LF,'  float: left;'
+stdout LF,'  margin-right: 5px;'
+stdout LF,'  margin-bottom: 5px;'
 stdout LF,'  }'
 stdout LF,'</style>'
 stdout LF,'<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>'
