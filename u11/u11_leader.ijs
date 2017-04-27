@@ -101,7 +101,7 @@ grosslist=.  (+/"1 (drop }."1 (glMax <. glPlGross)))  NB. Gross
 
 
 NB. If scroll create two divs
-stdout LF,'<div class="span-24 large" style="line-height: 1.4em;width: 100%; margin-bottom: 2px;">'
+stdout LF,'<div class="span-24 large" style="line-height: 1.4em;width: 98.5%; margin-bottom: 2px;">'
 stdout LT1,'<table style="margin-bottom: 0px;">'
 stdout LT1,'<thead>',LT2,'<tr>'
 stdout LT3,'<th style="border-right: 2px solid lightgrey; width: 10%">Pos</th>'
