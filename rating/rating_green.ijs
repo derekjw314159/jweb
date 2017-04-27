@@ -56,7 +56,7 @@ if. 0=glGrFrontYards do.
     glGrTee=: ,backtee
 end.
 
-stdout LF,'<div class="span-11 append-1">'
+stdout LF,'<div class="span-10 append-1">'
 stdout LF,'<table><thead><tr><th>Parameter</th><th>Value</th></tr></thead><tbody>'
 stdout LF,'<tr><td>Hole:</td><td>',(":1+ ; glGrHole),'</td></tr>'
 
@@ -74,7 +74,7 @@ stdout LT1,'<form action="/jw/rating/green/editpost/',(;glFilename),'" method="p
 NB. New tree variables
 stdout LT1,'<h4>Tree Difficulty</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>From Tee</th><th>Men/Women</th><th>Scratch</th><th>Bogey</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>From Tee</th><th>Men / Women</th><th>Scratch</th><th>Bogey</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 ind=. 0
 for_t. glTeTee do.
     for_g. i. 2 do.
@@ -99,7 +99,7 @@ stdout LT1,'</div>'
 
 NB. Hidden variables
 
-stdout LT1,'<div class="span-12 last">'
+stdout LT1,'<div class="span-11 last">'
 stdout LT2,'<input type="hidden" name="prevname" value="',(":;glGrUpdateName),'">'
 stdout LT2,'<input type="hidden" name="prevtime" value="',(;glGrUpdateTime),'">'
 stdout LT2,'<input type="hidden" name="keyplan" value="',(;keyy),'">'
@@ -163,7 +163,7 @@ stdout LT3,'<tr>'
 stdout LT4,'<th colspan="3">Green Surface</th><th colspan="3">Recoverability and Rough</th><th>Bunkers</th><th colspan="3">OOB/ER</th><th colspan="3">Water</th>'
 stdout LT3,'</tr>'
 stdout LT3,'<tr>'
-stdout LT4,'<th>Stimp</th><th>All</th><th>Unpleasant</th><th>Rough Inconsistent</th><th>Rise and Drop</th><th>Unpleasant</th><th>Extreme</th><th>Behind Green</th><th>Cart Path</th><th>%P</th><th>Behind Green</th><th>Cart Path</th><th>%P</th>'
+stdout LT4,'<th>Stimp</th><th>All</th><th>Unpleas</th><th>Rough Inconsistent</th><th>Rise and Drop</th><th>Unpleas</th><th>Extreme</th><th>Behind Green</th><th>Cart Path</th><th>%P</th><th>Behind Green</th><th>Cart Path</th><th>%P</th>'
 stdout LT3,'</tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td><input value="',(":;glGrStimp),'" tabindex="60" ',(InputFieldnum 'stimp'; 3),'>',LT4,'</td>'

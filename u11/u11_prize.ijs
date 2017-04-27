@@ -50,19 +50,14 @@ scroll=. x
 glFilename=: dltb > 0{ y
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
-if. fexist glFilepath,'.ijf' do.
-	xx=. utFileGet glFilepath
-	xx=. utKeyRead glFilepath,'_player'
-	err=. ''
-else.
-	err=. 'No such course'
-end.
+err=. ReadAll glFilepath
 
 stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 if. scroll do.
-	stdout LF,'<script>setTimeout(function(){window.location.href=''/jw/u11/startscroll/v/',glFilename,'''},10000);</script>'
+	tm=. ": <.0.5 + 1000 * 2{glPageDelay
+	stdout LF,'<script>setTimeout(function(){window.location.href=''/jw/u11/startscroll/v/',glFilename,'''},',tm,');</script>'
 end.
 djwBlueprintCSS ''
 

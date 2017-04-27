@@ -791,3 +791,64 @@ glPlanFWWidthAdj=: ,(#glPlanID)$<''
 glPlanDoglegNeg=: ,(#glPlanID)$0
 glPlanBunkCarry=: ,(#glPlanID)$<''
 )
+
+NB. =====================================================================
+NB. InitiateCourse
+NB. =====================================================================
+NB. Usage:
+NB.    InitiateCourse ''
+NB.
+NB. 1. Alter glCourseName, glCourseLead, glCourseDate and write to glFilepath
+NB. 2. Alter glTeesYards and write to glFilepath
+NB. 3. Run this function
+InitiateCourse=: 3 : 0
+utFileGet glFilepath
+NB. Clear out the plan records
+utKeyRead glFilepath,'_plan'
+((glPlanHole>:0)#glPlanID) utKeyDrop glFilepath,'_plan' NB. Ignore '_default'
+NB. Clear tee altitudes
+utKeyRead glFilepath,'_tee'
+glTeAlt=: 0 * glTeAlt
+glTeTree=: (($glTeAlt), 2 2)$<'.' NB. Dot, not blank.  Doesn't work for Par 3's
+utKeyPut glFilepath,'_tee'
+NB. Clear green 
+utKeyRead glFilepath,'_green'
+glGrAlt=: 0 * glGrAlt
+glGrLength=: ($glGrID)$0
+glGrWidth=: ($glGrWidth)$0
+glGrDiam=: ($glGrID)$0
+glGrCircleConcept=: ($glGrID)$0
+glGrVisibility=: ($glGrID)$<''
+glGrObstructed=: ($glGrID)$0
+glGrTiered=: ($glGrID)$0
+glGrFirmness=: ($glGrID)$<''
+glGrWaterPercent=: ($glGrID)$<''
+glGrWaterDist=: ($glGrID)$0
+glGrContour=: ($glGrID)$<''
+glGrTee=: ($glGrID)$'W'
+glGrOOBDist=: ($glGrID)$0
+glGrTreeDist=: ($glGrID)$0
+glGrTreeRecov=: ($glGrID)$<''
+glGrFrontYards=: ($glGrID)$0
+glGrSurfaceUnpleasant=: ($glGrID)$0
+glGrRRUnpleasant=: ($glGrID)$0
+glGrTree=: ($glGrID)$<''
+glGrTreeTween=: ($glGrID)$0
+glGrRRInconsistent=: ($glGrID)$<''
+glGrRRMounds=: ($glGrID)$0
+glGrRRRiseDrop=: ($glGrID)$<''
+glGrBunkFraction=: ($glGrID)$<''
+glGrBunkDepth=: ($glGrID)$<''
+glGrBunkExtreme=: ($glGrID)$<''
+glGrOOBBehind=: ($glGrID)$0
+glGrOOBCart=: ($glGrID)$<''
+glGrOOBPercent=: ($glGrID)$<''
+glGrWaterBehind=: ($glGrID)$0
+glGrWaterCart=: ($glGrID)$<''
+glGrWaterPercent=: ($glGrID)$<''
+glGrWaterFraction=: ($glGrID)$<''
+glGrWaterSurrDist=: ($glGrID)$<''
+utKeyPut glFilepath,'_green'
+AugmentGPS i. 18
+BuildPlan i. 18
+)
