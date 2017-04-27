@@ -798,8 +798,10 @@ NB. =====================================================================
 NB. Usage:
 NB.    InitiateCourse ''
 NB.
-NB. Alter glCourseName, glCourseLead, glCourseDate and write to glFilepath
-NB. Alter glTeesYards and write to glFilepath
+NB. 1. Alter glCourseName, glCourseLead, glCourseDate and write to glFilepath
+NB. 2. Alter glTeesYards and write to glFilepath
+NB. 3. Run this function
+InitiateCourse=: 3 : 0
 utFileGet glFilepath
 NB. Clear out the plan records
 utKeyRead glFilepath,'_plan'
@@ -807,7 +809,7 @@ utKeyRead glFilepath,'_plan'
 NB. Clear tee altitudes
 utKeyRead glFilepath,'_tee'
 glTeAlt=: 0 * glTeAlt
-glTeTree=: (($glTeAlt), 2 2)$<''
+glTeTree=: (($glTeAlt), 2 2)$<'.' NB. Dot, not blank.  Doesn't work for Par 3's
 utKeyPut glFilepath,'_tee'
 NB. Clear green 
 utKeyRead glFilepath,'_green'
@@ -834,9 +836,19 @@ glGrTree=: ($glGrID)$<''
 glGrTreeTween=: ($glGrID)$0
 glGrRRInconsistent=: ($glGrID)$<''
 glGrRRMounds=: ($glGrID)$0
-
-
-
-
-
+glGrRRRiseDrop=: ($glGrID)$<''
+glGrBunkFraction=: ($glGrID)$<''
+glGrBunkDepth=: ($glGrID)$<''
+glGrBunkExtreme=: ($glGrID)$<''
+glGrOOBBehind=: ($glGrID)$0
+glGrOOBCart=: ($glGrID)$<''
+glGrOOBPercent=: ($glGrID)$<''
+glGrWaterBehind=: ($glGrID)$0
+glGrWaterCart=: ($glGrID)$<''
+glGrWaterPercent=: ($glGrID)$<''
+glGrWaterFraction=: ($glGrID)$<''
+glGrWaterSurrDist=: ($glGrID)$<''
+utKeyPut glFilepath,'_green'
+AugmentGPS i. 18
+BuildPlan i. 18
 )
