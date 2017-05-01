@@ -279,8 +279,6 @@ res=. res, <. 0.5 + glMY * radius
 
 )
 
-
-
 NB. =============================================
 NB. AugmentGPS
 NB. =============================================
@@ -347,6 +345,50 @@ end. NB. End of hole loop <h>
 
 utFilePut glFilepath
 )
+
+NB. =====================================================
+NB. Check_dogleg
+NB. =====================================================
+Check_dogleg=: 3 : 0
+'hole tee gender ability'=. y
+i=. <(>'r<0>2.0' 8!:0 (1+hole)),'P1'
+i=. glGPSName i. i
+if. i >: #glGPSName do. NB. No Pivot point
+	res=. ''
+	return.
+end.
+gps_t=. LatLontoFullOS (glGPSName i. <(>'r<0>2.0' 8!:0 (1+hole)),'T',tee) { glGPSLatLon
+gps_p=. LatLontoFullOS (glGPSName i. <(>'r<0>2.0' 8!:0 (1+hole)),'P1') { glGPSLatLon
+gps_g=. LatLontoFullOS (glGPSName i. <(>'r<0>2.0' 8!:0 (1+hole)),'GC') { glGPSLatLon
+dist=. (<gender,ability){glPlayerDistances
+NB. Convert to metres
+dist=. dist % glMY
+if. (0{dist) >: |gps_p - gps_t do.
+	NB. Hit beyond pivot point
+	res=. 'Tee shot restricted to ',": <. 0.5 + glMY * |gps_p - gps_t
+	return.
+else.
+	NB. Have to calculate complex second shot
+	res=. 'Tee shot normal ',": <. 0.5 + glMY*0{dist
+	NB. Calculate pivot point 
+	gps_lay=. gps_t + ((0{dist) % (|gps_p-gps_t)) * (gps_p - gps_t)
+	NB. Angle between lines on fairway using scalar product
+	theta=. (gps_p - gps_t), (gps_g - gps_p)
+	theta=. ( */(0.5 * theta + +theta) ) - (*/ 0.5 * theta - +theta)
+	theta=. theta % (|gps_p - gps_t) * (|gps_g - gps_p) 
+	theta=. _2 o. theta NB. arccos
+	theta=. (o. 1) - theta
+	NB. Sin rule for next angle
+	bit1=. (|gps_p - gps_t) - 0{dist
+	alpha=. _1 o.  (1 o. theta) * bit1 % 1{dist
+	beta=. (o. 1) - (theta+alpha)
+	NB. Sin rule again
+	bit2=. (1 o. beta) * (1{dist) % 1 o. theta
+	res=. res, LF, 'second shot ', ": <. 0.5 + glMY * bit1 + bit2
+	res=. res, LF, 'extra ',": <. 0.5 + glMY * bit1 + bit2 - 1{dist
+end.
+)
+
 
 NB. =====================================================
 NB. BuildPlan
@@ -802,6 +844,7 @@ NB. 1. Alter glCourseName, glCourseLead, glCourseDate and write to glFilepath
 NB. 2. Alter glTeesYards and write to glFilepath
 NB. 3. Run this function
 InitiateCourse=: 3 : 0
+if. y ~: 3.14159 do. return. end.
 utFileGet glFilepath
 NB. Clear out the plan records
 utKeyRead glFilepath,'_plan'
