@@ -500,7 +500,7 @@ fwtot=. 0$<''
 for_ab. 0 1 do.
     fw=. 0$0
     for_sh. >ab{wid do.
-	fw=. fw, lookup_fairway_rating gender ; ab ; (+/>ab{hityards) ; sh 
+		fw=. fw, lookup_fairway_rating gender ; ab ; (+/>ab{hityards) ; sh 
     end.
     fwtot=. fwtot, <fw
 end.

@@ -102,7 +102,7 @@ end.
 stdout LT1,'<form action="/jw/rating/landing/editpost/',(;glFilename),'" method="post">'
 
 NB. Hidden variables
-stdout LT1,'<div class="span-15 last">'
+stdout LT1,'<div class="span-17 last">'
 stdout LT2,'<input type="hidden" name="prevname" value="',(":;glPlanUpdateName),'">'
 stdout LT2,'<input type="hidden" name="prevtime" value="',(;glPlanUpdateTime),'">'
 stdout LT2,'<input type="hidden" name="keyplan" value="',(;keyy),'">'
@@ -111,7 +111,7 @@ stdout LT2,'<input type="hidden" name="filename" value="',(;glFilename),'">'
 NB. Table of values - Common Values
 stdout LT1,'<h4>Common Measurements</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>Alt</th><th>FW Width</th><th>FW +/-W</th><th>Bunk LZ</th><th>Bunk in Line</th><th>Dist OB</th><th>Dist Tr</th><th>Dist Wat</th><th>Mounds</th><th>Dogleg Neg</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>Alt</th><th>FW Width</th><th>FW +/-W</th><th>Bunk LZ</th><th>Bunk in Line</th><th>Dist OB</th><th>OOB %age</th><th>Dist Tr</th><th>Dist Wat</th><th>Wat LoP</th><th>Mounds</th><th>Dogleg Neg</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td><input value="',(":;glPlanAlt),'" tabindex="1" ',(InputFieldnum 'alt'; 3),'>',LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanFWWidth),'" tabindex="2" ',(InputFieldnum 'fwwidth'; 3),'>',LT4,'</td>'
@@ -123,11 +123,16 @@ stdout ((''$glPlanBunkLZ)#'checked'),' tabindex="4">',LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="bunkline" name="bunkline" value="1" '
 stdout ((''$glPlanBunkLine)#'checked'),' tabindex="5">',LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanOOBDist),'" tabindex="6" ',(InputFieldnum 'oobdist'; 3),'>',LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'oobpercent' ; 7 ; glOOBPercentDesc ; glOOBPercentVal ; <''$glPlanOOBPercent
+stdout LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanTreeDist),'" tabindex="7" ',(InputFieldnum 'treedist'; 3),'>',LT4,'</td>'
 NB. stdout LT4,'<td>'
 NB. djwSelect 'treerecov' ; 7 ; glTreeRecovDesc ; glTreeRecovVal ; <''$glPlanTreeRecov
 NB. stdout LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanLatWaterDist),'" tabindex="8" ',(InputFieldnum 'latwaterdist'; 3),'>',LT4,'</td>'
+stdout LT4,'<td><input type="checkbox" id="waterline" name="waterline" value="1" '
+stdout ((''$glPlanWaterLine)#'checked'),' tabindex="6">',LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="rrmounds" name="rrmounds" value="1" '
 stdout ((''$glPlanRRMounds)#'checked'),' tabindex="9">',LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanDoglegNeg),'" tabindex="10" ',(InputFieldnum 'doglegneg'; 3),'>',LT4,'</td>'
@@ -226,7 +231,8 @@ fwvisible=: 0
 fwunpleasant=: 0
 fwobstructed=: 0
 rrmounds=: 0
-xx=. djwCGIPost y ; ' ' cut 'alt fwwidth bunklz bunkline oobdist treedist latwaterdist doglegneg fwvisible fwunpleasant fwobstructed rrmounds'
+waterline=: 0
+xx=. djwCGIPost y ; ' ' cut 'alt fwwidth bunklz bunkline oobdist treedist latwaterdist doglegneg fwvisible fwunpleasant fwobstructed waterline rrmounds'
 glFilename=: dltb ;filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
@@ -264,9 +270,11 @@ glPlanFWWidthAdj=: ,widthadj
 glPlanBunkLZ=: ,bunklz
 glPlanBunkLine=: ,bunkline
 glPlanOOBDist=: ,oobdist
+glPlanOOBPercent=: ,oobpercent
 glPlanTreeDist=: ,treedist
 NB. glPlanTreeRecov=: ,treerecov
 glPlanLatWaterDist=: , latwaterdist
+glPlanWaterLine=: ,waterline
 glPlanDoglegNeg=: ,doglegneg
 glPlanRollLevel=: ,rolllevel
 glPlanRollSlope=: ,rollslope

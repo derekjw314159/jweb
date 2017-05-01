@@ -226,7 +226,7 @@ tees=. (glTees e. ww) # glTees
 for_t. tees do.
 	stdout '<th>',(>(glTees i. t){glTeesName),'</th>'
 end.
-stdout '<th>Player Shot</th><th>Hit / Layup</th><th>ToGreen</th><th>Edits</th><th>Alt</th><th>F/width</th><th>Bunk in LZ</th><th>Bunk LoP</th><th>Dist OB</th><th>OOB %age</th><th>Dist Tr</th><th>Dist Wat</th><th>Roll U/L/D</th><th>Mi/Mo /Sig</th><th>MP/MA SA/EA</th><th>F/w +/-W</th><th colspan="3">Other Variables</th></tr></thead><tbody>'
+stdout '<th>Player Shot</th><th>Hit / Layup</th><th>ToGreen</th><th>Edits</th><th>Alt</th><th>F/width</th><th>Bunk in LZ</th><th>Bunk LoP</th><th>Dist OB</th><th>OOB %age</th><th>Dist Tr</th><th>Dist Wat</th><th>Wat LoP</th><th>Roll U/L/D</th><th>Mi/Mo /Sig</th><th>MP/MA SA/EA</th><th>F/w +/-W</th><th colspan="3">Other Variables</th></tr></thead><tbody>'
 NB. Sort the records and re-read
 rr=. I. glPlanHole=hole
 rr=. rr /: rr { glPlanShot
@@ -295,11 +295,11 @@ for_rr. i. #glPlanID do.
 		    stdout LT3,'<td style="border-right: 1px solid lightgray">',((rr{glPlanBunkLZ){'-y'),'</td>'
 		    stdout LT3,'<td style="border-right: 1px solid lightgray">',((rr{glPlanBunkLine){'-y'),'</td>'
 		    stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanOOBDist),'</td>'
-NB.		    stdout LT3,'<td style="border-right: 1px solid lightgray">',(>rr{glPlanOOBPercent),'</td>'
-		    stdout LT3,'<td style="border-right: 1px solid lightgray">','.','</td>'
+		    stdout LT3,'<td style="border-right: 1px solid lightgray">',(>rr{glPlanOOBPercent),'</td>'
 		    stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanTreeDist),'</td>'
 		    NB.	stdout LT3,'<td>',(;(glTreeRecovVal i. rr{glPlanTreeRecov){glTreeRecovDesc),'</td>'
 		    stdout LT3, '<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanLatWaterDist),'</td>'
+		    stdout LT3, '<td style="border-right: 1px solid lightgray">',((rr{glPlanWaterLine){'-y'),'</td>'
 		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanRollLevel),'</td>'
 		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (3{. ":  ,>rr{glPlanRollSlope),'</td>'
 		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanTopogStance),'</td>'
@@ -343,11 +343,11 @@ NB.		    stdout LT3,'<td style="border-right: 1px solid lightgray">',(>rr{glPlan
 		stdout LT3,'<td style="border-right: 1px solid lightgray">',((rr{glPlanBunkLZ){'-y'),'</td>'
 		stdout LT3,'<td style="border-right: 1px solid lightgray">',((rr{glPlanBunkLine){'-y'),'</td>'
 	    stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanOOBDist),'</td>'
-NB.		stdout LT3,'<td style="border-right: 1px solid lightgray">',(>rr{glPlanOOBPercent),'</td>'
-		stdout LT3,'<td style="border-right: 1px solid lightgray">','.','</td>'
+		stdout LT3,'<td style="border-right: 1px solid lightgray">',(>rr{glPlanOOBPercent),'</td>'
 		stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanTreeDist),'</td>'
 		NB. stdout LT3,'<td>',(;(glTreeRecovVal i. rr{glPlanTreeRecov){glTreeRecovDesc),'</td>'
 		stdout LT3, '<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanLatWaterDist),'</td>'
+	    stdout LT3, '<td style="border-right: 1px solid lightgray">',((rr{glPlanWaterLine){'-y'),'</td>'
 		stdout LT3, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanRollLevel),'</td>'
 		stdout LT3, '<td style="border-right: 1px solid lightgray">', (3{. ":  ,>rr{glPlanRollSlope),'</td>'
 		stdout LT3, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanTopogStance),'</td>'

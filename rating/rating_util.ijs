@@ -45,8 +45,8 @@ glBunkExtremeVal=: (<''),':' cut '+1:+2'
 glBunkExtremeDesc=: ':' cut 'Zero:+1:+2'
 glOOBCartVal=: (<''),':' cut '+1:-1'
 glOOBCartDesc=: ':' cut 'None:+1 Bounce away:-1 Bounce towards'
-glOOBPercentVal=: (<''),':' cut '20%:40%:60%:80%'
-glOOBPercentDesc=: ':' cut '100%:20%:40%:60%:80%'
+glOOBPercentVal=: (<''),':' cut '20%:40%:60%:80%:100%'
+glOOBPercentDesc=: ':' cut '0%:20%:40%:60%:80%:100%'
 glRRInconsistentVal=: (<''),':' cut '+1:-1'
 glRRInconsistentDesc=: ':' cut 'None:+1 Harder:-1 Easier'
 glWaterFractionVal=: (<''),':' cut '1/4-<1/2:>1/2'
@@ -389,7 +389,6 @@ else.
 end.
 )
 
-
 NB. =====================================================
 NB. BuildPlan
 NB. -----------------------------------------------------
@@ -581,6 +580,7 @@ label_shot.
 	glPlanBunkLZ=: ,0
 	glPlanBunkLine=: ,0
 	glPlanLatWaterDist=: ,0
+	glPlanWaterLine=: ,0
 	if. (glPlanLayupType='L') *. (glPlanLayupCategory ~: <'choice') do.
 	    glPlanDefaultHit=: ,defaulthit
 	else.
@@ -627,8 +627,6 @@ end. NB. end of holes loop
 CleanupPlan holes ; tees ; genders ; abilities
 )
 
-
-
 NB. =============================================================
 NB. EnKey
 NB. -------------------------------------------------------------
@@ -661,11 +659,13 @@ from=. y
 glPlanAlt=: 1 1 { glPlanAlt
 glPlanFWWidth=: 1 1 { glPlanFWWidth
 glPlanOOBDist=: 1 1 { glPlanOOBDist
+glPlanOOBPercent=: 1 1 { glPlanOOBPercent
 glPlanTreeDist=: 1 1 { glPlanTreeDist
 glPlanTreeRecov=: 1 1 { glPlanTreeRecov
 glPlanBunkLZ=: 1 1 { glPlanBunkLZ
 glPlanBunkLine=: 1 1 { glPlanBunkLine
 glPlanLatWaterDist=: 1 1{glPlanLatWaterDist
+glPlanWaterLine=: 1 1 { glPlanWaterLine
 glPlanRRMounds=: 1 1 { glPlanRRMounds
 glPlanRRRiseDrop=: 1 1 { glPlanRRRiseDrop
 glPlanRRUnpleasant=: 1 1 { glPlanRRUnpleasant
@@ -810,11 +810,13 @@ glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 glPlanMeasDist=: ,0
 glPlanCarryDist=: ,<' '
 glPlanOOBDist=: ,0
+glPlanOOBPercent=: ,<''
 glPlanTreeDist=: ,0
 glPlanAlt=: ,0
 glPlanBunkLZ=: ,0
 glPlanBunkLine=: ,0
 glPlanLatWaterDist=: ,0
+glPlanWaterLine=: ,0
 glPlanDefaultHit=: ,0
 glPlanRRHeight=: ,0
 glPlanRRInconsistent=:,0
@@ -895,3 +897,23 @@ utKeyPut glFilepath,'_green'
 AugmentGPS i. 18
 BuildPlan i. 18
 )
+
+NB. ========================================================
+NB. CheckPlanFile
+NB. ========================================================
+NB. Safe read of plan and checks for new variables
+CheckPlanFile=: 3 : 0
+utKeyRead y
+dict=. >keyread y ; '_dictionary'
+if. ( -. (<'glPlanOOBPercent') e. dict ) do.
+	(,<'glPlanOOBPercent') utKeyAddColumn y
+	glPlanOOBPercent=: (#glPlanID)$<''
+	utKeyPut y
+end.
+if. ( -. (<'glPlanWaterLine') e. dict ) do.
+	(,<'glPlanWaterLine') utKeyAddColumn y
+	glPlanWaterLine=: (#glPlanID)$0
+	utKeyPut y
+end.
+)
+
