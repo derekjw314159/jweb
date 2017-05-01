@@ -1042,16 +1042,16 @@ box=. 0< L. ". x1
 res=. 0$a:
 for_ab. i. 2 do.
     if. box do.
-	rr=. 0$a:
+		rr=. 0$a:
     else.
-	rr=. ''
+		rr=. ''
     end.
     for_sh. i. 4 do.
-	ww1=. I. (ab = glPlanAbility) *. (sh = glPlanShot) 
-	if. 0<#ww1 do.
-	    rr=. rr, ww1{ ".x1
-	end.
-
+		ww1=. I. (ab = glPlanAbility) *. (sh = glPlanShot) *. hole = glPlanHole
+NB.		ww1=. I. (ab = glPlanAbility) *. (sh = glPlanShot) 
+		if. 0<#ww1 do.
+			rr=. rr, ww1{ ".x1
+		end.
     end.
     NB. Drop the last and pull the tee variable if both variables were requested
     if. 0<#x2 do.
@@ -1073,25 +1073,33 @@ NB. Returns a LF delimited string of distances
 distance_report=: 3 : 0
 res=. ''
 for_h. i. 18 do.
-
     for_t. glTees do.
-	dist=. 'glPlanHitYards' matrix_pull h ; t ; 0 
-	lay=. 'glPlanLayupType' matrix_pull h ; t ; 0
-	if. 0<# >0{dist do.
-	    res=. res, LF, 'Hole ',(":1+h),' Men '
-	    res=. res, >(glTees i. t){glTeesName
-	    res=. res, ' Scratch: '
-	    for_sh. >0{dist do.
-		res=. res, , ": sh_index{>(0{dist)
-		res=. res, sh_index{>0{lay
-		res=. res, ' '
-	    end.
-	    res=. res, ' Bogey: '
-	    for_sh. >1{dist do.
-		res=. res, ": sh_index{>(1{dist)
-		res=. res, sh_index{>1{lay
-	    end.
-	end.
+		utKeyRead glFilepath,'_plan'
+		ww=. glPlanHole = h
+		ww=. ww *. glPlanTee=t
+		ww=. ww *. glPlanRecType='P'
+		ww=. ww *. glPlanGender = 0
+		(ww#glPlanID) utKeyRead glFilepath,'_plan'
+		dist=. 'glPlanHitYards' matrix_pull h ; t ; 0 
+		lay=. 'glPlanLayupType' matrix_pull h ; t ; 0
+		utKeyRead glFilepath,'_tee'
+		ww=. I. (glTeHole =h ) *. glTeTee=t
+		if. 0=#ww do. continue. end.
+		if. 0<# >0{dist do.
+			res=. res, LF, 'Hole ',(":1+h),' Men '
+			res=. res, >(glTees i. t){glTeesName
+			res=. res, ' Scratch: '
+			for_sh. >0{dist do.
+				res=. res, , ": sh_index{>(0{dist)
+				res=. res, sh_index{>0{lay
+				res=. res, ' '
+			end.
+			res=. res, ' Bogey: '
+			for_sh. >1{dist do.
+				res=. res, ": sh_index{>(1{dist)
+				res=. res, sh_index{>1{lay
+			end.
+		end.
     end.
 end.
 res=. res
