@@ -1202,6 +1202,8 @@ NB. Usage
 NB.   lookup_green_target gender ; abilty ; yards ; width
 NB. Returns table value
 lookup_fairway_rating=: 3 :  0
+0 lookup_fairway_rating y
+:
 'gender ab yards width'=. y
 if. gender=0 do. NB. Men
     row=. 340 380 426 
@@ -1212,9 +1214,15 @@ else.
     col=. 35 30 25 20 19   
     mat=. 4 6 $ 1 1 2 3 4 5, 1 2 3 3 5 6, 2 3 4 4 6 7, 2 3 4 5 7 8
 end.
-row=. + / yards >: row
-col=. + / width <: col
-res=. (<row,col) { mat
+if. x do. NB. Print matrix
+	res=. <"0 mat
+	res=. ((<'>='),each ":each <"0 (_999,row)),. res
+	res=. ((<'Fairway'), (<'<='),each ": each <"0 (999,col)), res
+else. NB. else lookup value
+	row=. + / yards >: row
+	col=. + / width <: col
+	res=. (<row,col) { mat
+end.
 )
 
 NB. =================================================
