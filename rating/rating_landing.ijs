@@ -55,7 +55,7 @@ backtee=. ''${. ww # glTees
 
 if. 'P'=glPlanRecType do.
 	NB. Print the table of parameters
-	stdout LF,'<div class="span-12 append-1">'
+	stdout LF,'<div class="span-8 append-1">'
 	stdout LF,'<table><thead><tr><th>Landing Zone</th><th>Value</th></tr></thead><tbody>'
 
 	stdout LF,'<tr><td>Hole:</td><td>',(":1+ ; glPlanHole),'</td></tr>'
@@ -83,7 +83,7 @@ if. 'P'=glPlanRecType do.
 	stdout LT4,'<tr><td>Shot:</td><td>',(":1+glPlanShot),'</td></tr>'
 	stdout LT2,'</tbody></table></div>'
 elseif. 'M'=glPlanRecType do.
-	stdout LF,'<div class="span-12 last">'
+	stdout LF,'<div class="span-8 last">'
 	stdout LF,'<table><thead><tr><th>Measurement Point</th><th>Value</th></tr></thead><tbody>'
 
 	stdout LF,'<tr><td>Hole:</td><td>',(":1+ ; glPlanHole),'</td></tr>'
@@ -102,7 +102,7 @@ end.
 stdout LT1,'<form action="/jw/rating/landing/editpost/',(;glFilename),'" method="post">'
 
 NB. Hidden variables
-stdout LT1,'<div class="span-17 last">'
+stdout LT1,'<div class="span-19 last">'
 stdout LT2,'<input type="hidden" name="prevname" value="',(":;glPlanUpdateName),'">'
 stdout LT2,'<input type="hidden" name="prevtime" value="',(;glPlanUpdateTime),'">'
 stdout LT2,'<input type="hidden" name="keyplan" value="',(;keyy),'">'
@@ -111,7 +111,7 @@ stdout LT2,'<input type="hidden" name="filename" value="',(;glFilename),'">'
 NB. Table of values - Common Values
 stdout LT1,'<h4>Common Measurements</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>Alt</th><th>FW Width</th><th>FW +/-W</th><th>Bunk LZ</th><th>Bunk in Line</th><th>Dist OB</th><th>OOB %age</th><th>Dist Tr</th><th>Dist Wat</th><th>Wat LoP</th><th>Mounds</th><th>Dogleg Neg</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>Alt</th><th>FW Width</th><th>FW +/-W</th><th>Bunk LZ</th><th>Bunk LoP</th><th>Dist OB</th><th>OOB %age</th><th>OOB LoP</th><th>Dist Tr</th><th>Dist Wat</th><th>Water %age</th><th>Wat LoP</th><th>Mounds</th><th>Dogleg Neg</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td><input value="',(":;glPlanAlt),'" tabindex="1" ',(InputFieldnum 'alt'; 3),'>',LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanFWWidth),'" tabindex="2" ',(InputFieldnum 'fwwidth'; 3),'>',LT4,'</td>'
@@ -126,11 +126,16 @@ stdout LT4,'<td><input value="',(":;glPlanOOBDist),'" tabindex="6" ',(InputField
 stdout LT4,'<td>'
 djwSelect 'oobpercent' ; 7 ; glOOBPercentDesc ; glOOBPercentVal ; <''$glPlanOOBPercent
 stdout LT4,'</td>'
+stdout LT4,'<td><input type="checkbox" id="oobline" name="oobline" value="1" '
+stdout ((''$glPlanOOBLine)#'checked'),' tabindex="6">',LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanTreeDist),'" tabindex="7" ',(InputFieldnum 'treedist'; 3),'>',LT4,'</td>'
 NB. stdout LT4,'<td>'
 NB. djwSelect 'treerecov' ; 7 ; glTreeRecovDesc ; glTreeRecovVal ; <''$glPlanTreeRecov
 NB. stdout LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanLatWaterDist),'" tabindex="8" ',(InputFieldnum 'latwaterdist'; 3),'>',LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'waterpercent' ; 9 ; glWaterPercentDesc ; glWaterPercentVal ; <''$glPlanWaterPercent
+stdout LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="waterline" name="waterline" value="1" '
 stdout ((''$glPlanWaterLine)#'checked'),' tabindex="6">',LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="rrmounds" name="rrmounds" value="1" '
@@ -232,7 +237,8 @@ fwunpleasant=: 0
 fwobstructed=: 0
 rrmounds=: 0
 waterline=: 0
-xx=. djwCGIPost y ; ' ' cut 'alt fwwidth bunklz bunkline oobdist treedist latwaterdist doglegneg fwvisible fwunpleasant fwobstructed waterline rrmounds'
+oobline=: 0
+xx=. djwCGIPost y ; ' ' cut 'alt fwwidth bunklz bunkline oobdist treedist latwaterdist doglegneg fwvisible fwunpleasant fwobstructed waterline rrmounds oobline'
 glFilename=: dltb ;filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
@@ -271,9 +277,11 @@ glPlanBunkLZ=: ,bunklz
 glPlanBunkLine=: ,bunkline
 glPlanOOBDist=: ,oobdist
 glPlanOOBPercent=: ,oobpercent
+glPlanOOBLine=: ,oobline
 glPlanTreeDist=: ,treedist
 NB. glPlanTreeRecov=: ,treerecov
 glPlanLatWaterDist=: , latwaterdist
+glPlanWaterPercent=: ,waterpercent
 glPlanWaterLine=: ,waterline
 glPlanDoglegNeg=: ,doglegneg
 glPlanRollLevel=: ,rolllevel
@@ -423,4 +431,3 @@ stdout '</head><body onLoad="redirect(''/jw/rating/plannomap/v/',glFilename,'/',
 stdout LF,'</body></html>'
 exit ''
 )
-

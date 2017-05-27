@@ -45,8 +45,9 @@ glBunkExtremeVal=: (<''),':' cut '+1:+2'
 glBunkExtremeDesc=: ':' cut 'Zero:+1:+2'
 glOOBCartVal=: (<''),':' cut '+1:-1'
 glOOBCartDesc=: ':' cut 'None:+1 Bounce away:-1 Bounce towards'
-glOOBPercentVal=: (<''),':' cut '20%:40%:60%:80%:100%'
-glOOBPercentDesc=: ':' cut '0%:20%:40%:60%:80%:100%'
+glOOBPercentVal=: (<''),':' cut '25%:50%:75%:100%'
+glOOBPercentDesc=: ':' cut '-:-25%:-50%:-75%:-100%'
+glOOBPercentNum=: 0 0.25 0.5 0.75 1
 glRRInconsistentVal=: (<''),':' cut '+1:-1'
 glRRInconsistentDesc=: ':' cut 'None:+1 Harder:-1 Easier'
 glWaterFractionVal=: (<''),':' cut '1/4-<1/2:>1/2'
@@ -59,8 +60,9 @@ glWaterSurrDistNum=: 0 3 2 1 0
 glWaterSurrDistText=: (<''),':' cut '1&#39;-4&#39;:5&#39;-10&#39;:11&#39;-20&#39;:&gt;20&#39;'
 glWaterCartVal=: (<''),':' cut '+1:-1'
 glWaterCartDesc=: ':' cut 'None:+1 Bounce away:-1 Bounce towards'
-glWaterPercentVal=: (<''),':' cut '20%:40%:60%:80%'
-glWaterPercentDesc=: ':' cut '100%:20%:40%:60%:80%'
+glWaterPercentVal=: (<''),':' cut '25%:50%:75%:100%'
+glWaterPercentDesc=: ':' cut '-:-25%:-50%:-75%:-100%'
+glWaterPercentNum=: 0 0.25 0.5 0.75 1
 glTargVisibleVal=: (<''),':' cut '+1:+2'
 glTargVisibleDesc=: (<''),':' cut '+1 gt Half Green:+2 Flag'
 glGrFirmnessVal=: (<''),':' cut 'firm:soft'
@@ -574,6 +576,7 @@ label_shot.
 	glPlanCarryDist=: ,<' '
 	glPlanFWWidth=: ,0
 	glPlanOOBDist=: ,0
+	glPlanOOBLine=: ,0
 	glPlanTreeDist=: ,0
 	glPlanAlt=: ,0
 	glPlanTopogStance=: ,<''
@@ -660,11 +663,13 @@ glPlanAlt=: 1 1 { glPlanAlt
 glPlanFWWidth=: 1 1 { glPlanFWWidth
 glPlanOOBDist=: 1 1 { glPlanOOBDist
 glPlanOOBPercent=: 1 1 { glPlanOOBPercent
+glPlanOOBLine=: 1 1 { glPlanOOBLine
 glPlanTreeDist=: 1 1 { glPlanTreeDist
 glPlanTreeRecov=: 1 1 { glPlanTreeRecov
 glPlanBunkLZ=: 1 1 { glPlanBunkLZ
 glPlanBunkLine=: 1 1 { glPlanBunkLine
 glPlanLatWaterDist=: 1 1{glPlanLatWaterDist
+glPlanWaterPercent=: 1 1{glPlanWaterPercent
 glPlanWaterLine=: 1 1 { glPlanWaterLine
 glPlanRRMounds=: 1 1 { glPlanRRMounds
 glPlanRRRiseDrop=: 1 1 { glPlanRRRiseDrop
@@ -811,11 +816,13 @@ glPlanMeasDist=: ,0
 glPlanCarryDist=: ,<' '
 glPlanOOBDist=: ,0
 glPlanOOBPercent=: ,<''
+glPlanOOBLine=: ,0
 glPlanTreeDist=: ,0
 glPlanAlt=: ,0
 glPlanBunkLZ=: ,0
 glPlanBunkLine=: ,0
 glPlanLatWaterDist=: ,0
+glPlanWaterPercent=: ,<''
 glPlanWaterLine=: ,0
 glPlanDefaultHit=: ,0
 glPlanRRHeight=: ,0
@@ -842,9 +849,13 @@ NB. =====================================================================
 NB. Usage:
 NB.    InitiateCourse ''
 NB.
-NB. 1. Alter glCourseName, glCourseLead, glCourseDate and write to glFilepath
-NB. 2. Alter glTeesYards and write to glFilepath
-NB. 3. Run this function
+NB. 1. Add seven files from the latest one
+NB. 2. Alter glCourseName, glCourseLead, glCourseDate and write to glFilepath
+NB. 3. Alter glTeesYards and write to glFilepath
+NB. 4. Write pars:  glTePar=: 54 2$,|:6 18$4 4 5 3 4 ... and write to '.._tee'
+NB. 5. Create kml file in GoogleEarth
+NB. 6. Use gpsbabel to convert to unicsv
+NB. 7. Run this function InitiateCourse pi (for safety)
 InitiateCourse=: 3 : 0
 if. y ~: 3.14159 do. return. end.
 utFileGet glFilepath
@@ -910,9 +921,19 @@ if. ( -. (<'glPlanOOBPercent') e. dict ) do.
 	glPlanOOBPercent=: (#glPlanID)$<''
 	utKeyPut y
 end.
+if. ( -. (<'glPlanWaterPercent') e. dict ) do.
+	(,<'glPlanWaterPercent') utKeyAddColumn y
+	glPlanWaterPercent=: (#glPlanID)$<''
+	utKeyPut y
+end.
 if. ( -. (<'glPlanWaterLine') e. dict ) do.
 	(,<'glPlanWaterLine') utKeyAddColumn y
 	glPlanWaterLine=: (#glPlanID)$0
+	utKeyPut y
+end.
+if. ( -. (<'glPlanOOBLine') e. dict ) do.
+	(,<'glPlanOOBLine') utKeyAddColumn y
+	glPlanOOBLine=: (#glPlanID)$0
 	utKeyPut y
 end.
 )

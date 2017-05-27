@@ -226,7 +226,7 @@ tees=. (glTees e. ww) # glTees
 for_t. tees do.
 	stdout '<th>',(>(glTees i. t){glTeesName),'</th>'
 end.
-stdout '<th>Player Shot</th><th>Hit / Layup</th><th>ToGreen</th><th>Edits</th><th>Alt</th><th>F/width</th><th>Bunk in LZ</th><th>Bunk LoP</th><th>Dist OB</th><th>OOB %age</th><th>Dist Tr</th><th>Dist Wat</th><th>Wat LoP</th><th>Roll U/L/D</th><th>Mi/Mo /Sig</th><th>MP/MA SA/EA</th><th>F/w +/-W</th><th colspan="3">Other Variables</th></tr></thead><tbody>'
+stdout '<th>Player Shot</th><th>Hit / Layup</th><th>ToGreen</th><th>Edits</th><th>Alt</th><th>F/width</th><th>Bunk in LZ</th><th>Bunk LoP</th><th>Dist OB</th><th>OOB %age</th><th>OOB LoP</th><th>Dist Tr</th><th>Dist Wat</th><th>Wat LoP</th><th>Roll U/L/D</th><th>Mi/Mo /Sig</th><th>MP/MA SA/EA</th><th>F/w +/-W</th><th colspan="3">Other Variables</th></tr></thead><tbody>'
 NB. Sort the records and re-read
 rr=. I. glPlanHole=hole
 rr=. rr /: rr { glPlanShot
@@ -288,6 +288,7 @@ for_rr. i. #glPlanID do.
 		    other=. other, (rr{glPlanFWObstructed)#' FW:O'
 		    other=. other, (0<#>rr{glPlanFWTargVisible)#' Targ:',;>rr{glPlanFWTargVisible
 		    other=. other, (rr{glPlanRRMounds)#' RR:M'
+			other=. other, (0<#>rr{glPlanWaterPercent)#' Wat%:',;>rr{glPlanWaterPercent
 		    stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">E</a> <a href="/jw/rating/landingcopy/e/',(glFilename),'/',(;rr{glPlanID),'">C</a>'
 
 		    stdout '<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanAlt),'</td>'
@@ -296,6 +297,7 @@ for_rr. i. #glPlanID do.
 		    stdout LT3,'<td style="border-right: 1px solid lightgray">',((rr{glPlanBunkLine){'-y'),'</td>'
 		    stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanOOBDist),'</td>'
 		    stdout LT3,'<td style="border-right: 1px solid lightgray">',(>rr{glPlanOOBPercent),'</td>'
+		    stdout LT3,'<td style="border-right: 1px solid lightgray">',((rr{glPlanOOBLine){'-y'),'</td>'
 		    stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanTreeDist),'</td>'
 		    NB.	stdout LT3,'<td>',(;(glTreeRecovVal i. rr{glPlanTreeRecov){glTreeRecovDesc),'</td>'
 		    stdout LT3, '<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanLatWaterDist),'</td>'
@@ -307,7 +309,7 @@ for_rr. i. #glPlanID do.
 		    stdout LT3,'<td colspan="3">',(}.other),'</td>'
 		    
 		else.
-		    stdout LT4,'<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td colspan=3></td>' NB. At green
+		    stdout LT4,'<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td colspan=3></td>' NB. At green
 		end.
 		    stdout LT3,'</tr>'
 
@@ -337,6 +339,7 @@ for_rr. i. #glPlanID do.
 		other=. other, (rr{glPlanFWUnpleasant)#' FW:U'
 		other=. other, (rr{glPlanFWObstructed)#' FW:O'
 		other=. other, (rr{glPlanRRMounds)#' RR:M'
+		other=. other, (0<#>rr{glPlanWaterPercent)#' Wat%:',;>rr{glPlanWaterPercent
 		stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">E</a> <a href="/jw/rating/landing/d/',glFilename,'/',(;rr{glPlanID),'">D</a>'
 		stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanAlt),'</td>'
 		stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanFWWidth),'</td>'
@@ -344,6 +347,7 @@ for_rr. i. #glPlanID do.
 		stdout LT3,'<td style="border-right: 1px solid lightgray">',((rr{glPlanBunkLine){'-y'),'</td>'
 	    stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanOOBDist),'</td>'
 		stdout LT3,'<td style="border-right: 1px solid lightgray">',(>rr{glPlanOOBPercent),'</td>'
+		stdout LT3,'<td style="border-right: 1px solid lightgray">',((rr{glPlanOOBLine){'-y'),'</td>'
 		stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanTreeDist),'</td>'
 		NB. stdout LT3,'<td>',(;(glTreeRecovVal i. rr{glPlanTreeRecov){glTreeRecovDesc),'</td>'
 		stdout LT3, '<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanLatWaterDist),'</td>'
@@ -376,6 +380,7 @@ for_rr. i. #glPlanID do.
 		stdout LT3,'<td></td>'
 		stdout LT3,'<td></td>'
 		stdout LT3,'<td></td>'
+		stdout LT3,'<td></td>'
 		stdout LT3, '<td colspan=3></td></tr>'
 	elseif. 'Q' = rr{glPlanRecType do.
 		stdout '<tr>'
@@ -388,6 +393,8 @@ for_rr. i. #glPlanID do.
 		stdout '<td colspan="3"><i>Squeeze/Chute : ',(;('TWBR' i. rr{glPlanSqueezeType){'/' cut 'Trees/Water/Bunkers/Extreme Rough'),' width=',(": rr{glPlanSqueezeWidth),'</i></td>'
 		NB. stdout LT3,'<td>',(": rr{glPlanRemGroundYards),'</td>'
 		stdout LT4,'<td><a href="/jw/rating/squeeze/e/',(glFilename),'/',(;rr{glPlanID),'">E</a> <a href="/jw/rating/squeeze/d/',glFilename,'/',(;rr{glPlanID),'">D</a>'
+		stdout LT3,'<td></td>'
+		stdout LT3,'<td></td>'
 		stdout LT3,'<td></td>'
 		stdout LT3,'<td></td>'
 		stdout LT3,'<td></td>'

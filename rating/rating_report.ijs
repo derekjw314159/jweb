@@ -722,6 +722,18 @@ fwtot=. fwtot >. each fw
 for_i. i. 7 do. 
 	if. _1 ~: i{sz do. fname fappend~ pdfDiag ((21.33+i), 4) ; 0.33 1  end.
 end.
+NB. Percent reduction
+fname fappend~ write_row_head 18 6 ; 2.5 0.5 ; '<i>Percent</i>' ; '<b>P</b>'
+percent=.  'glPlanWaterPercent' matrix_pull hole ; tee ; gender
+percent=. (<glWaterPercentVal) i. each percent
+fw=. (;percent) { glWaterPercentDesc
+fname fappend~ 'C' write_input 21 6 ; sz ; <fw 
+fw=. (percent) { each <1- glWaterPercentNum
+fw=. <. each (<0.5) + each fwtot * each fw
+fw=. fw - each fwtot
+NB. fname fappend~ 'R' write_calc 21 6 ; sz ; <('bm<(>n<)>' 8!:0 ;fw)
+fwtot=. fwtot + each fw
+
 rr=. (glWaterFractionVal i. glGrWaterFraction)
 cc=. (glWaterSurrDistVal i. glGrWaterSurrDist)
 fname fappend~ 'C' write_input 18 11; 1.25 ;  <rr{glWaterFractionText
@@ -735,8 +747,15 @@ fname fappend~ 'R' write_cell 18 12 ; 3 ; 'Total Shot Value'
 fname fappend~ write_calc 21 12 ; sz ; (;fwtot)
 fname fappend~ 'R' write_cell 18 13 ; 3 ; 'Highest Shot Value'
 fname fappend~ write_calc 21 13 ; 3 4 ; (;>. / each fwtot)
+NB. OOB anywhere
+fname fappend~ 'L' write_cell 18 14 ; 3 ; '<i>On Line of Play</i>' 
+waterline=. 'glPlanWaterLine' matrix_pull hole ; tee ; gender
+fname fappend~ 'C' write_input 21 14 ; sz ; <<"0 (;waterline){' y'
+NB. Overall rating
 fname fappend~ 'R' write_footer 18 15 ; 3 ; 'Water Rating'
-fname fappend~ 'C' write_footer 21 15 ;  3 4 ; (;>./each fwtot)
+fwtot=. (;>./each fwtot) NB. max value
+fwtot=. fwtot + (0=fwtot) * +. / ; waterline 
+fname fappend~ 'C' write_footer 21 15 ;  3 4 ; fwtot
 
 NB. ------------------------
 NB. Recoverability and Rough
@@ -828,6 +847,7 @@ fname fappend~ LF,'$pdf->',pdfMulti 10.5 23 ; 0.5 2 ; ('<b>N</b>') ; 1
 NB. Calculate Negative adjustment
 fw=. ((+. / >0{lz) {_1 0 ), ((+. / (>1{lz),(>1{lop)){_1 0) 
 fw=. _1 >. fw - 0=># each lz NB. Par 3
+fw=. fw * 0 ~: fwtot NB. Don't apply -1 adjustment if no bunkers at all
 fname fappend~ 'blue' oN 'lightblue'
 fname fappend~ LF,'$pdf->',pdfMulti 11 23 ; 3 2 ;  ('<span style="text-align: center">',(;(8!:0) 0{fw),'</span>') ; 1
 fname fappend~ LF,'$pdf->',pdfMulti 14 23 ; 4 2 ;  ('<span style="text-align: center">',(;(8!:0) 1{fw),'</span>') ; 1
@@ -881,12 +901,30 @@ fwtot=. fwtot >. each fw
 for_i. i. 7 do. 
 	if. _1 ~: i{sz do. fname fappend~ pdfDiag ((11.33+i), 31) ; 0.33 1  end.
 end.
+NB. Percent reduction
+fname fappend~ write_row_head 8 33 ; 2.5 0.5 ; '<i>Percent</i>' ; '<b>P</b>'
+oobpercent=.  'glPlanOOBPercent' matrix_pull hole ; tee ; gender
+oobpercent=. (<glOOBPercentVal) i. each oobpercent
+fw=. (;oobpercent) { glOOBPercentDesc
+fname fappend~ 'C' write_input 11 33 ; sz ; <fw 
+fw=. (oobpercent) { each <1- glOOBPercentNum
+fw=. <. each (<0.5) + each fwtot * each fw
+fw=. fw - each fwtot
+NB. fname fappend~ 'R' write_calc 11 33 ; sz ; <('bm<(>n<)>' 8!:0 ;fw)
+fwtot=. fwtot + each fw
 fname fappend~ 'R' write_cell 8 38  ; 3 ; 'Total Shot Value'
 fname fappend~ write_calc 11 38 ; sz ; (;fwtot)
 fname fappend~ 'R' write_cell 8 39  ; 3 ; 'Highest Shot Value'
 fname fappend~ write_calc 11 39 ; 3 4 ; (;>. / each fwtot)
+NB. OOB anywhere
+fname fappend~ 'L' write_cell 8 40 ; 3 ; '<i>On Line of Play</i>' 
+oobline=. 'glPlanOOBLine' matrix_pull hole ; tee ; gender
+fname fappend~ 'C' write_input 11 40 ; sz ; <<"0 (;oobline){' y'
+NB. Overall rating
 fname fappend~ 'R' write_footer 8 41  ; 3 ; 'OOB/ER Rating'
-fname fappend~ 'C' write_footer 11 41 ;  3 4 ; (;>./each fwtot)
+fwtot=. (;>./each fwtot) NB. max value
+fwtot=. fwtot + (0=fwtot) * +. / ; oobline 
+fname fappend~ 'C' write_footer 11 41 ;  3 4 ; fwtot
 
 NB. ------------------------
 NB. Trees
@@ -1204,12 +1242,12 @@ end.
 )
 
 NB. =================================================
-NB. lookup_fairway_rating
+NB. lookup_fairway_rating_old (before tweener adj)
 NB. =================================================
 NB. Usage
 NB.   lookup_green_target gender ; abilty ; yards ; width
 NB. Returns table value
-lookup_fairway_rating=: 3 :  0
+lookup_fairway_rating_old=: 3 :  0
 0 lookup_fairway_rating y
 :
 'gender ab yards width'=. y
@@ -1221,6 +1259,36 @@ else.
     row=. 270 310 356 
     col=. 35 30 25 20 19   
     mat=. 4 6 $ 1 1 2 3 4 5, 1 2 3 3 5 6, 2 3 4 4 6 7, 2 3 4 5 7 8
+end.
+if. x do. NB. Print matrix
+	res=. <"0 mat
+	res=. ((<'>='),each ":each <"0 (_999,row)),. res
+	res=. ((<'Fairway'), (<'<='),each ": each <"0 (999,col)), res
+else. NB. else lookup value
+	row=. + / yards >: row
+	col=. + / width <: col
+	res=. (<row,col) { mat
+end.
+)
+
+NB. =================================================
+NB. lookup_fairway_rating
+NB. =================================================
+NB. Usage
+NB.   lookup_green_target gender ; abilty ; yards ; width
+NB. Returns table value
+lookup_fairway_rating=: 3 :  0
+0 lookup_fairway_rating y
+:
+'gender ab yards width'=. y
+if. gender=0 do. NB. Men
+    row=. 340 380 426 
+    col=. 50 39 29 25 24 23 19   
+    mat=. 4 8 $ 1 1 2 3 3 4 4 5, 1 2 3 3 4 4 5 6, 2 3 4 4 5 5 6 7, 2 3 4 5 6 6 7 8
+else.
+    row=. 270 310 356 
+    col=. 45 34 29 25 24 23 19
+    mat=. 4 8 $ 1 1 2 3 3 4 4 5, 1 2 3 3 4 4 5 6, 2 3 4 4 5 5 6 7, 2 3 4 5 6 6 7 8
 end.
 if. x do. NB. Print matrix
 	res=. <"0 mat
