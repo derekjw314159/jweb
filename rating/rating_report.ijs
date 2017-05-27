@@ -733,6 +733,13 @@ fw=. <. each (<0.5) + each fwtot * each fw
 fw=. fw - each fwtot
 NB. fname fappend~ 'R' write_calc 21 6 ; sz ; <('bm<(>n<)>' 8!:0 ;fw)
 fwtot=. fwtot + each fw
+NB. Behind
+fname fappend~ write_row_head 18 7 ; 2.5 0.5 ; '<i>Behind</i>' ; ''
+behind=. (' ' cut 'glPlanLayupReason glGrWaterBehind') matrix_pull hole ; tee ; gender
+behind=. (<glWaterBehindVal) i. each behind
+fw=. behind { each <glWaterBehindNum,0
+fname fappend~ 'C' write_input 21 7 ; sz ; <'b' 8!:0 ;fw 
+fwtot=. fwtot + each fw
 
 rr=. (glWaterFractionVal i. glGrWaterFraction)
 cc=. (glWaterSurrDistVal i. glGrWaterSurrDist)
@@ -911,6 +918,13 @@ fw=. (oobpercent) { each <1- glOOBPercentNum
 fw=. <. each (<0.5) + each fwtot * each fw
 fw=. fw - each fwtot
 NB. fname fappend~ 'R' write_calc 11 33 ; sz ; <('bm<(>n<)>' 8!:0 ;fw)
+fwtot=. fwtot + each fw
+NB. Behind
+fname fappend~ write_row_head 8 34 ; 2.5 0.5 ; '<i>Behind</i>' ; ''
+behind=. (' ' cut 'glPlanLayupReason glGrOOBBehind') matrix_pull hole ; tee ; gender
+behind=. (<glOOBBehindVal) i. each behind
+fw=. behind { each <glOOBBehindNum,0
+fname fappend~ 'C' write_input 11 34 ; sz ; <'b' 8!:0 ;fw 
 fwtot=. fwtot + each fw
 fname fappend~ 'R' write_cell 8 38  ; 3 ; 'Total Shot Value'
 fname fappend~ write_calc 11 38 ; sz ; (;fwtot)

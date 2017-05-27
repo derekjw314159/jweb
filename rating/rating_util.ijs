@@ -48,6 +48,9 @@ glOOBCartDesc=: ':' cut 'None:+1 Bounce away:-1 Bounce towards'
 glOOBPercentVal=: (<''),':' cut '25%:50%:75%:100%'
 glOOBPercentDesc=: ':' cut '-:-25%:-50%:-75%:-100%'
 glOOBPercentNum=: 0 0.25 0.5 0.75 1
+glOOBBehindVal=: (<''),':' cut '-1:-2'
+glOOBBehindDesc=: ':' cut '-:-1 Behind:-2 Behind'
+glOOBBehindNum=: 0 _1 _2
 glRRInconsistentVal=: (<''),':' cut '+1:-1'
 glRRInconsistentDesc=: ':' cut 'None:+1 Harder:-1 Easier'
 glWaterFractionVal=: (<''),':' cut '1/4-<1/2:>1/2'
@@ -63,6 +66,9 @@ glWaterCartDesc=: ':' cut 'None:+1 Bounce away:-1 Bounce towards'
 glWaterPercentVal=: (<''),':' cut '25%:50%:75%:100%'
 glWaterPercentDesc=: ':' cut '-:-25%:-50%:-75%:-100%'
 glWaterPercentNum=: 0 0.25 0.5 0.75 1
+glWaterBehindVal=: (<''),':' cut '-1:-2'
+glWaterBehindDesc=: ':' cut '-:-1 Behind:-2 Behind'
+glWaterBehindNum=: 0 _1 _2
 glTargVisibleVal=: (<''),':' cut '+1:+2'
 glTargVisibleDesc=: (<''),':' cut '+1 gt Half Green:+2 Flag'
 glGrFirmnessVal=: (<''),':' cut 'firm:soft'
@@ -938,3 +944,29 @@ if. ( -. (<'glPlanOOBLine') e. dict ) do.
 end.
 )
 
+NB. ========================================================
+NB. CheckGreenFile
+NB. ========================================================
+NB. Safe read of plan and checks for new variables
+CheckGreenFile=: 3 : 0
+utKeyRead y
+dict=. >keyread y ; '_dictionary'
+if. ( -. (<'glGrOOBBehind') e. dict ) do.
+	(,<'glGrOOBBehind') utKeyAddColumn y
+	glGrOOBBehind=: (#glGrID)$<''
+	utKeyPut y
+end.
+if. ( 32 ~: 3!:0 glGrOOBBehind ) do.
+	glGrOOBBehind=: glGrOOBBehind { glOOBBehindVal
+	utKeyPut y
+end.
+if. ( -. (<'glGrWaterBehind') e. dict ) do.
+	(,<'glGrWaterBehind') utKeyAddColumn y
+	glGrWaterBehind=: (#glGrID)$<''
+	utKeyPut y
+end.
+if. ( 32 ~: 3!:0 glGrWaterBehind ) do.
+	glGrWaterBehind=: glGrWaterBehind { glWaterBehindVal
+	utKeyPut y
+end.
+)

@@ -182,16 +182,18 @@ stdout ((''$glGrRRUnpleasant)#'checked'),' tabindex="65">',LT4,'</td>'
 stdout LT4,'<td>'
 djwSelect 'bunkextreme' ; 66 ; glBunkExtremeDesc ; glBunkExtremeVal ; <''$glGrBunkExtreme
 stdout LT4,'</td>'
-stdout LT4,'<td><input type="checkbox" id="oobbehind" name="oobbehind" value="1" '
-stdout ((''$glGrOOBBehind)#'checked'),' tabindex="67">',LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'oobbehind' ; 67 ; glOOBBehindDesc ; glOOBBehindVal ; <''$glGrOOBBehind
+stdout LT4,'</td>'
 stdout LT4,'<td>'
 djwSelect 'oobcart' ; 68 ; glOOBCartDesc ; glOOBCartVal ; <''$glGrOOBCart
 stdout LT4,'</td>'
 stdout LT4,'<td>'
 djwSelect 'oobpercent' ; 69 ; glOOBPercentDesc ; glOOBPercentVal ; <''$glGrOOBPercent
 stdout LT4,'</td>'
-stdout LT4,'<td><input type="checkbox" id="waterbehind" name="waterbehind" value="1" '
-stdout ((''$glGrWaterBehind)#'checked'),' tabindex="70">',LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'waterbehind' ; 70 ; glWaterBehindDesc ; glWaterBehindVal ; <''$glGrWaterBehind
+stdout LT4,'</td>'
 stdout LT4,'<td>'
 djwSelect 'watercart' ; 71 ; glWaterCartDesc ; glWaterCartVal ; <''$glGrWaterCart
 stdout LT4,'</td>'
@@ -240,9 +242,7 @@ all=: 0
 surfaceunpleasant=: 0
 rrmounds=: 0
 rrunpleasant=: 0
-oobbehind=: 0
-waterbehind=: 0
-xx=. djwCGIPost y ; ' ' cut 'all frontyards length width diam circleconcept tiered alt oobdist treedist waterdist stimp all surfaceunpleasant rrmounds rrunpleasant oobbehind waterbehind'
+xx=. djwCGIPost y ; ' ' cut 'all frontyards length width diam circleconcept tiered alt oobdist treedist waterdist stimp all surfaceunpleasant rrmounds rrunpleasant'
 glFilename=: dltb ;filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
@@ -339,4 +339,3 @@ NB. Choose page based on what was pressed
 stdout LF,'</body></html>'
 exit ''
 )
-
