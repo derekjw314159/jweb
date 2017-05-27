@@ -724,7 +724,7 @@ for_i. i. 7 do.
 end.
 NB. Percent reduction
 fname fappend~ write_row_head 18 6 ; 2.5 0.5 ; '<i>Percent</i>' ; '<b>P</b>'
-percent=.  'glPlanWaterPercent' matrix_pull hole ; tee ; gender
+percent=. (' ' cut 'glPlanWaterPercent glGrWaterPercent') matrix_pull hole ; tee ; gender
 percent=. (<glWaterPercentVal) i. each percent
 fw=. (;percent) { glWaterPercentDesc
 fname fappend~ 'C' write_input 21 6 ; sz ; <fw 
@@ -903,7 +903,7 @@ for_i. i. 7 do.
 end.
 NB. Percent reduction
 fname fappend~ write_row_head 8 33 ; 2.5 0.5 ; '<i>Percent</i>' ; '<b>P</b>'
-oobpercent=.  'glPlanOOBPercent' matrix_pull hole ; tee ; gender
+oobpercent=.  (' ' cut 'glPlanOOBPercent glGrOOBPercent') matrix_pull hole ; tee ; gender
 oobpercent=. (<glOOBPercentVal) i. each oobpercent
 fw=. (;oobpercent) { glOOBPercentDesc
 fname fappend~ 'C' write_input 11 33 ; sz ; <fw 
