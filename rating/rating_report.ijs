@@ -597,6 +597,8 @@ alt=. (' ' cut 'glPlanAlt glGrAlt') matrix_pull hole; tee ; gender
 alt=. (<glTeAlt),each alt NB. Add tee altitude to front for Par 3
 fname fappend~ write_title 0 15 ; 3 1 ; 'TOPOGRAPHY'
 alt=. >(-&-/) each _2 {. each alt
+NB. If less than 10 feet either way, ignore
+alt=. alt * 10 <: |alt
 NB. alt=. alt * 3<gender{glTePar
 NB. Alt has to be multiples of 10ft, and rounding is incorrect for negatives
 alt=. (*alt) * 10 * <. 0.5 + 0.1*(|alt)
@@ -616,7 +618,7 @@ select. z=. j. / > #each wid
 		wid=. (2$,<,<'Par3') NB. Append special value for Par 3
     case. 0j1 do. sz=. 2, _1 _1  1 NB. Append special value for Par 3
 		wid=. (<,<'Par3'),}.wid NB. Append special value for Par 3
-    case. 1j1 do. sz=. _1  1,  1 _1 _1
+    case. 1j1 do. sz=. _1  1,  _1 _1 1
     case. 1j2 do. sz=. _1  1,  1 _1  1
     case. 2j2 do. sz=.  1  1 , 1 _1  1
     case. 2j3 do. sz=.  1  1 , 1  1  1
@@ -691,8 +693,8 @@ fname fappend~ ('L';0) write_cell 5.5 46 ; 1 ; (<t_index,hole){glTeesYards
 NB. ------------------------
 NB. Notes
 NB. -------------------------
-fname fappend~ ('L';0) write_cell 0 47 ; 2 ; 'Notes:'
-fname fappend~ ('L';0) write_input 1.5 47 ; 25 ; ;glGrNotes
+fname fappend~ ('L';0) write_cell 8 46 ; 2 ; 'Notes:'
+fname fappend~ ('L';0) write_input 9.5 46 ; 18.5 ;  (;glGrNotes)
 
 NB. ------------------------
 NB. Water

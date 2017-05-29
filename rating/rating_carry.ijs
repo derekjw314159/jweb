@@ -156,9 +156,9 @@ stdout '</tbody></table></div>'
 NB. Submit buttons
 stdout LT1,'<div class="span-15 last">'
 
-stdout LF,'<input type="submit" name="control_calc" value="Calc" tabindex="',(":2),'">'
-stdout LF,'     <input type="submit" name="control_done" value="Done" tabindex="',(,":3),'">'
-stdout LF,'     <input type="submit" name="control_delete" value="Delete this Carry" tabindex="',(,":4),'"></form>'
+stdout LF,'<input type="submit" name="control_calc" value="Calc" tabindex="',(":4),'">'
+stdout LF,'     <input type="submit" name="control_done" value="Done" tabindex="',(,":5),'">'
+stdout LF,'     <input type="submit" name="control_delete" value="Delete this Carry" tabindex="',(,":6),'"></form>'
 stdout LF,'</div>' NB. end main container
 stdout '</body></html>'
 exit ''
