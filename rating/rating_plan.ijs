@@ -459,13 +459,13 @@ head=. ''
 row=. ''
 for_t. glTeTee do.
     for_g. i. 2 do.
-	if. (<t_index,g){glTeMeasured do.
-		for_ab. i. 2 do.
-			head=. head,'<th style="border-right: 1px solid lightgray">',(>(glTees i. t){glTeesName),' ',(>g{' ' cut 'Men Women'),' ',(>ab{' 'cut 'Scr Bgy'),'</th>'
-			row=. row,'<td style="border-right: 1px solid lightgray">',(>(<t_index,g,ab){glTeTree),'</td>'
-		end.
+		if. (<t_index,g){glTeMeasured do.
+			for_ab. i. 2 do.
+				head=. head,'<th style="border-right: 1px solid lightgray">',(>(glTees i. t){glTeesName),' ',(>g{' ' cut 'Men Women'),' ',(>ab{' 'cut 'Scr Bgy'),'</th>'
+				row=. row,'<td style="border-right: 1px solid lightgray">',(>(<t_index,g,ab){glTeTree),'</td>'
+			end.
 
-	end.
+		end.
     end.
 end.
 stdout LF,'<div class="span-24">'
@@ -477,6 +477,8 @@ stdout LT3,'</tr></thead><tbody>'
 stdout LT3,'<tr>'
 stdout LT4,row
 stdout LT3,'</tr></tbody></table>'
+NB. Notes field
+stdout LT2,'Notes:',EM,;ww{glGrNotes
 stdout LF,'</div>' NB. main span
 
 stdout LF,'        '

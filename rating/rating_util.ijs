@@ -969,4 +969,9 @@ if. ( 32 ~: 3!:0 glGrWaterBehind ) do.
 	glGrWaterBehind=: glGrWaterBehind { glWaterBehindVal
 	utKeyPut y
 end.
+if. ( -. (<'glGrNotes') e. dict ) do.
+	(,<'glGrNotes') utKeyAddColumn y
+	glGrNotes=: (#glGrID)$<''
+	utKeyPut y
+end.
 )

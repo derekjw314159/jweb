@@ -111,55 +111,58 @@ stdout LT2,'<input type="hidden" name="filename" value="',(;glFilename),'">'
 NB. Table of values - Common Values
 stdout LT1,'<h4>Common Measurements</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>Alt</th><th>FW Width</th><th>FW +/-W</th><th>Bunk LZ</th><th>Bunk LoP</th><th>Dist OB</th><th>OOB %age</th><th>OOB LoP</th><th>Dist Tr</th><th>Dist Wat</th><th>Water %age</th><th>Wat LoP</th><th>Mounds</th><th>Dogleg Neg</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>Alt</th><th>FW Width</th><th>Bunk LZ</th><th>Bunk LoP</th><th>Dist OB</th><th>OOB %age</th><th>OOB LoP</th><th>Dist Tr</th><th>Dist Wat</th><th>Water %age</th><th>Wat LoP</th><th>Mounds</th><th>Dogleg Neg</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td><input value="',(":;glPlanAlt),'" tabindex="1" ',(InputFieldnum 'alt'; 3),'>',LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanFWWidth),'" tabindex="2" ',(InputFieldnum 'fwwidth'; 3),'>',LT4,'</td>'
-stdout LT4,'<td>'
-djwSelect 'widthadj' ; 3 ; glFWWidthAdjDesc ; glFWWidthAdjVal ; <''$glPlanFWWidthAdj
-stdout LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="bunklz" name="bunklz" value="1" '
-stdout ((''$glPlanBunkLZ)#'checked'),' tabindex="4">',LT4,'</td>'
+stdout ((''$glPlanBunkLZ)#'checked'),' tabindex="3">',LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="bunkline" name="bunkline" value="1" '
-stdout ((''$glPlanBunkLine)#'checked'),' tabindex="5">',LT4,'</td>'
-stdout LT4,'<td><input value="',(":;glPlanOOBDist),'" tabindex="6" ',(InputFieldnum 'oobdist'; 3),'>',LT4,'</td>'
+stdout ((''$glPlanBunkLine)#'checked'),' tabindex="4">',LT4,'</td>'
+stdout LT4,'<td><input value="',(":;glPlanOOBDist),'" tabindex="5" ',(InputFieldnum 'oobdist'; 3),'>',LT4,'</td>'
 stdout LT4,'<td>'
-djwSelect 'oobpercent' ; 7 ; glOOBPercentDesc ; glOOBPercentVal ; <''$glPlanOOBPercent
+djwSelect 'oobpercent' ; 6 ; glOOBPercentDesc ; glOOBPercentVal ; <''$glPlanOOBPercent
 stdout LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="oobline" name="oobline" value="1" '
-stdout ((''$glPlanOOBLine)#'checked'),' tabindex="6">',LT4,'</td>'
-stdout LT4,'<td><input value="',(":;glPlanTreeDist),'" tabindex="7" ',(InputFieldnum 'treedist'; 3),'>',LT4,'</td>'
+stdout ((''$glPlanOOBLine)#'checked'),' tabindex="7">',LT4,'</td>'
+stdout LT4,'<td><input value="',(":;glPlanTreeDist),'" tabindex="8" ',(InputFieldnum 'treedist'; 3),'>',LT4,'</td>'
 NB. stdout LT4,'<td>'
 NB. djwSelect 'treerecov' ; 7 ; glTreeRecovDesc ; glTreeRecovVal ; <''$glPlanTreeRecov
 NB. stdout LT4,'</td>'
-stdout LT4,'<td><input value="',(":;glPlanLatWaterDist),'" tabindex="8" ',(InputFieldnum 'latwaterdist'; 3),'>',LT4,'</td>'
+stdout LT4,'<td><input value="',(":;glPlanLatWaterDist),'" tabindex="9" ',(InputFieldnum 'latwaterdist'; 3),'>',LT4,'</td>'
 stdout LT4,'<td>'
 djwSelect 'waterpercent' ; 9 ; glWaterPercentDesc ; glWaterPercentVal ; <''$glPlanWaterPercent
 stdout LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="waterline" name="waterline" value="1" '
-stdout ((''$glPlanWaterLine)#'checked'),' tabindex="6">',LT4,'</td>'
+stdout ((''$glPlanWaterLine)#'checked'),' tabindex="10">',LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="rrmounds" name="rrmounds" value="1" '
-stdout ((''$glPlanRRMounds)#'checked'),' tabindex="9">',LT4,'</td>'
-stdout LT4,'<td><input value="',(":;glPlanDoglegNeg),'" tabindex="10" ',(InputFieldnum 'doglegneg'; 3),'>',LT4,'</td>'
+stdout ((''$glPlanRRMounds)#'checked'),' tabindex="11">',LT4,'</td>'
+stdout LT4,'<td><input value="',(":;glPlanDoglegNeg),'" tabindex="12" ',(InputFieldnum 'doglegneg'; 3),'>',LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table>'
 
 NB. Table of values - Roll
 stdout LT1,'<h4>Roll</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>Level</th><th>Slope</th><th>Extreme</th><th>Twice</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>Level</th><th>Slope</th><th>Stance or Lie</th><th>FW +/-W</th><th>Extreme</th><th>Twice</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td>'
-djwSelect 'rolllevel' ; 11 ; glRollLevelDesc ; glRollLevelVal ; <''$glPlanRollLevel
+djwSelect 'rolllevel' ; 13 ; glRollLevelDesc ; glRollLevelVal ; <''$glPlanRollLevel
 stdout LT4,'</td>'
 stdout LT4,'<td>'
-djwSelect 'rollslope' ; 12 ; glRollSlopeDesc ; glRollSlopeVal ; <''$glPlanRollSlope
+djwSelect 'rollslope' ; 14 ; glRollSlopeDesc ; glRollSlopeVal ; <''$glPlanRollSlope
 stdout LT4,'</td>'
 stdout LT4,'<td>'
-djwSelect 'rollextreme' ; 13 ; glRollExtremeDesc ; glRollExtremeVal ; <''$glPlanRollExtreme
+djwSelect 'topogstance' ; 15 ; glTopogStanceDesc ; glTopogStanceVal ; <''$glPlanTopogStance
 stdout LT4,'</td>'
 stdout LT4,'<td>'
-djwSelect 'rolltwice' ; 14 ; glRollTwiceDesc ; glRollTwiceVal ; <''$glPlanRollTwice
+djwSelect 'widthadj' ; 16 ; glFWWidthAdjDesc ; glFWWidthAdjVal ; <''$glPlanFWWidthAdj
+stdout LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'rollextreme' ; 17 ; glRollExtremeDesc ; glRollExtremeVal ; <''$glPlanRollExtreme
+stdout LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'rolltwice' ; 18 ; glRollTwiceDesc ; glRollTwiceVal ; <''$glPlanRollTwice
 stdout LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table>'
@@ -170,24 +173,21 @@ stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
 stdout LT4,'<th>Landing Zone not Visible</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td><input type="checkbox" id="fwvisible" name="fwvisible" value="1" '
-stdout ((''$glPlanFWVisible)#'checked'),' tabindex="15">',LT4,'</td>'
+stdout ((''$glPlanFWVisible)#'checked'),' tabindex="19">',LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table>'
 
 NB. Table of values - Topography
 stdout LT1,'<h4>Topography and Shot FROM Landing Zone</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>Stance or Lie</th><th>Unpleasant Lie</th><th>Obstructed Shot</th><th>Targ not Visible</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>Unpleasant Lie</th><th>Obstructed Shot</th><th>Targ not Visible</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
-stdout LT4,'<td>'
-djwSelect 'topogstance' ; 16 ; glTopogStanceDesc ; glTopogStanceVal ; <''$glPlanTopogStance
-stdout LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="fwunpleasant" name="fwunpleasant" value="1" '
-stdout ((''$glPlanFWUnpleasant)#'checked'),' tabindex="17">',LT4,'</td>'
+stdout ((''$glPlanFWUnpleasant)#'checked'),' tabindex="20">',LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="fwobstructed" name="fwobstructed" value="1" '
-stdout ((''$glPlanFWObstructed)#'checked'),' tabindex="18">',LT4,'</td>'
+stdout ((''$glPlanFWObstructed)#'checked'),' tabindex="21">',LT4,'</td>'
 stdout LT4,'<td>'
-djwSelect 'fwtargvisible' ; 19 ; glTargVisibleDesc ; glTargVisibleVal ; <''$glPlanFWTargVisible
+djwSelect 'fwtargvisible' ; 22 ; glTargVisibleDesc ; glTargVisibleVal ; <''$glPlanFWTargVisible
 stdout LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table>'

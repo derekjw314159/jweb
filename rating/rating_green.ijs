@@ -206,6 +206,8 @@ stdout '</tbody></table></div>'
 
 NB. Submit buttons
 stdout LT1,'<div class="span-24 last">'
+stdout LT1,'Notes:',EM
+stdout LT4,'<input name="notes" value="',(;glGrNotes),'" tabindex="73" ',(InputField 100),'>',LT4,'</br>'
 
 stdout LF,'<input type="submit" name="control_calc" value="Calc" tabindex="',(":100),'">'
 stdout LF,'     <input type="submit" name="control_done" value="Done" tabindex="',(,":101),'">'
@@ -310,6 +312,7 @@ glGrWaterSurrDist=: ,watersurrdist
 glGrWaterBehind=: ,waterbehind
 glGrWaterCart=: ,watercart
 glGrWaterPercent=: ,waterpercent
+glGrNotes=: ,<dltb >notes
 for_t. glTeTee do.
     for_g. i. 2 do.
 	for_ab. i. 2 do.

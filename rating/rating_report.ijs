@@ -689,6 +689,12 @@ fname fappend~ ('C';0) write_cell 5 46 ; 0.5 ; 'vs'
 fname fappend~ ('L';0) write_cell 5.5 46 ; 1 ; (<t_index,hole){glTeesYards
 
 NB. ------------------------
+NB. Notes
+NB. -------------------------
+fname fappend~ ('L';0) write_cell 0 47 ; 2 ; 'Notes:'
+fname fappend~ ('L';0) write_input 1.5 47 ; 25 ; ;glGrNotes
+
+NB. ------------------------
 NB. Water
 NB. ------------------------
 NB. Need to do before R&R as there is a dependency
@@ -870,8 +876,9 @@ NB. In play twice
 fname fappend~ write_row_head 8 26 ; 2.5 0.5 ; '<i>Twice</i>' ; '<b>2</b>'
 fw=. 1< >+/each lz
 fname fappend~ write_calc  11 26 ; 3 4 ; fw
-fwtot=. 0 >. fwtot + fw NB. Can't be negative
 NB. Total
+fwtot=. 0 >. fwtot + fw NB. Can't be negative
+fwtot=. fwtot >. +./ ;lz,lop NB. Must be a minimum of one if it exists
 fname fappend~ 'R' write_footer 8 27 ; 3 ; <<'Bunker Rating'
 fname fappend~ 'C' write_footer 11 27 ;  3 4 ; fwtot
 
