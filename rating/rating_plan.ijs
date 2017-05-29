@@ -308,10 +308,15 @@ for_rr. i. #glPlanID do.
 		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (6{. ":  ,>rr{glPlanFWWidthAdj),'</td>'
 		    stdout LT3,'<td colspan="3">',(}.other),'</td>'
 		    
-		else.
-		    stdout LT4,'<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td colspan=3></td>' NB. At green
+		else. NB. Truncated row when at hole
+		    other=. ''
+		    other=. other, (rr{glPlanFWVisible)#' LZ:V'
+		    other=. other, (rr{glPlanFWObstructed)#' FW:O'
+		    stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">E</a>'
+		    stdout LT4,'<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>' NB. At green
+		    stdout LT4,'<td colspan="3">',(}.other),'</td>'
 		end.
-		    stdout LT3,'</tr>'
+	    stdout LT3,'</tr>'
 
 	elseif. 'M' = rr{glPlanRecType do.
 		stdout '<tr>'
