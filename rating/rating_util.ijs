@@ -859,8 +859,9 @@ NB. 2. Alter glCourseName, glCourseLead, glCourseDate and write to glFilepath
 NB. 3. Alter glTeesYards and write to glFilepath
 NB. 4. Write pars:  glTePar=: 54 2$,|:6 18$4 4 5 3 4 ... and write to '.._tee'
 NB. 5. Create kml file in GoogleEarth
-NB. 6. Use gpsbabel to convert to unicsv
-NB. 7. Run this function InitiateCourse pi (for safety)
+NB. 6. Use gpsbabel to convert to unicsv, saving as ".txt" file
+NB. 7. Run ReadGPS and save to glFilepath
+NB. 8. Run this function InitiateCourse pi (for safety)
 InitiateCourse=: 3 : 0
 if. y ~: 3.14159 do. return. end.
 utFileGet glFilepath
