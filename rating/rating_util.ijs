@@ -164,7 +164,7 @@ res=. res { glGPSLatLon
 )
 
 NB. ============================================
-NB. InterceptPath
+NB. InterceptPathold
 NB. --------------------------------------------
 NB. A fairly complicated bit of trig and vector
 NB. stuff to calculate where a shot of a given
@@ -226,7 +226,6 @@ path=. start, dist{. path
 length=. +/ (|(}. path) - }:path)
 length=. length + b
 res=. res, glMY*length 
-
 )
 
 NB. ============================================
@@ -346,11 +345,8 @@ for_h. y do. NB. Start of hole loop <h>
 	    xx=. <(>'r<0>2.0' 8!:0 (1+h)),'T',t
 	    xx=. glGPSName i. xx
 	    glGPSLatLon=: latlon (xx)} glGPSLatLon
-    
     end. NB. End of tee loop	
-
 end. NB. End of hole loop <h>	
-
 utFilePut glFilepath
 )
 
@@ -446,27 +442,26 @@ if. -.  (<ww,g) {glTeMeasured do. NB. Dead tee
     ww=. ww *. glPlanTee = t
     ww=. I. ww *. glPlanGender = g
     if. 0<#ww do.
-	NB. Write out measurement points with existing values
-	key=. ww{glPlanID
-	key utKeyRead glFilepath,'_plan'
-	newkey=. 'r<0>2.0' 8!:0 glPlanHole
-	newkey=. newkey ,each <'-'
-	newkey=. newkey ,each 'r<0>3.0' 8!:0 glPlanRemGroundYards
-	glPlanHitYards=: (#key) $0
-	glPlanUpdateName=: (#key)$<": getenv 'REMOTE_USER'
-	glPlanUpdateTime=: (#key)$< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
-	glPlanLayupType=: (#key)$,' '
-	glPlanRecType=: (#key)$,'M'
-	glPlanCarryType=: (#key)$,' '
-	glPlanSqueezeType=: (#key)$,' '
-	glPlanSqueezeWidth=: (#key)$0
-	glPlanID=: newkey
-	utKeyPut glFilepath,'_plan'
-	key utKeyDrop glFilepath,'_plan' 
+		NB. Write out measurement points with existing values
+		key=. ww{glPlanID
+		key utKeyRead glFilepath,'_plan'
+		newkey=. 'r<0>2.0' 8!:0 glPlanHole
+		newkey=. newkey ,each <'-'
+		newkey=. newkey ,each 'r<0>3.0' 8!:0 glPlanRemGroundYards
+		glPlanHitYards=: (#key) $0
+		glPlanUpdateName=: (#key)$<": getenv 'REMOTE_USER'
+		glPlanUpdateTime=: (#key)$< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
+		glPlanLayupType=: (#key)$,' '
+		glPlanRecType=: (#key)$,'M'
+		glPlanCarryType=: (#key)$,' '
+		glPlanSqueezeType=: (#key)$,' '
+		glPlanSqueezeWidth=: (#key)$0
+		glPlanID=: newkey
+		utKeyPut glFilepath,'_plan'
+		key utKeyDrop glFilepath,'_plan' 
     end.
     continue. NB. Loop to next gender
 end.
-
 
 for_ab. abilities do.
     shot=. _1
@@ -508,7 +503,6 @@ label_shot.
 	    glPlanLayupReason=: ,<''
     elseif. 1=$ww do.
 	    ww utKeyRead glFilepath,'_plan'
-
 	    NB. player on this tee
 	    NB. Should only be one record
 	    NB. Write out a Measurement Point
@@ -570,14 +564,19 @@ label_shot.
 	start=. 0{ww
 	NB. Measurepoint is in middle of roll
 	if. glPlanRecType ~: 'P' do.
-		glPlanMeasDist=: glPlanRemGroundYards
+		glPlanMeasDist=: glPlanRemGroundYards NB. Should not get here
 	elseif. glPlanLayupType =  'R' do. NB. Roll
-		midpoint=. 10 + <. 0.5 * glPlanHitYards - defaulthit
-		glPlanMeasDist=: glPlanRemGroundYards + midpoint
+		NB. midpoint=. 10 + <. 0.5 * glPlanHitYards - defaulthit
+		NB. glPlanMeasDist=: glPlanRemGroundYards + midpoint
+		NB. New logic to use roll variable
+		glPlanMeasDist=: <. 0.5 + glPlanRemGroundYards + 0.5 * glPlanRollDist
 	elseif. glPlanRemGroundYards = 0 do. NB. Fly all the way there
 		glPlanMeasDist=: ,0
+		glPlanRollDist=: ,0
 	elseif. 1 do. NB. Normal stroke
-		glPlanMeasDist=: glPlanRemGroundYards + 10
+		NB. glPlanMeasDist=: glPlanRemGroundYards + 10
+		glPlanRollDist=: ,20
+		glPlanMeasDist=: <. 0.5 + glPlanRemGroundYards + 0.5 * glPlanRollDist
 	end.
 	glPlanCarryDist=: ,<' '
 	glPlanFWWidth=: ,0
@@ -607,7 +606,7 @@ label_shot.
 	glPlanCarryType=: ,' '
 	glPlanSqueezeType=: ,' '
 	glPlanBunkCarry=: ,<''
-	NB. Don't reset the layup stuff as it has just been entered
+	NB. Don't reset the layup or roll stuff as it has just been entered
 	NB.	glPlanLayupCategory=: ,<''
 	NB.	glPlanLayupReason=: ,<''
 
@@ -794,7 +793,6 @@ for_h. holes do.
     glPlanCarryType=: ,'F'
     utKeyPut glFilepath,'_plan'
 end.
-
 )
 
 NB. ===========================================================
@@ -819,6 +817,7 @@ glPlanSqueezeWidth=: ,0
 glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
 glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 glPlanMeasDist=: ,0
+NB. glPlanRollDist=: ,0
 glPlanCarryDist=: ,<' '
 glPlanOOBDist=: ,0
 glPlanOOBPercent=: ,<''
@@ -855,7 +854,7 @@ NB. =====================================================================
 NB. Usage:
 NB.    InitiateCourse ''
 NB.
-NB. 1. Add seven files from the latest one
+NB. 1. Copy seven files from the latest one
 NB. 2. Alter glCourseName, glCourseLead, glCourseDate and write to glFilepath
 NB. 3. Alter glTeesYards and write to glFilepath
 NB. 4. Write pars:  glTePar=: 54 2$,|:6 18$4 4 5 3 4 ... and write to '.._tee'
@@ -940,6 +939,11 @@ end.
 if. ( -. (<'glPlanOOBLine') e. dict ) do.
 	(,<'glPlanOOBLine') utKeyAddColumn y
 	glPlanOOBLine=: (#glPlanID)$0
+	utKeyPut y
+end.
+if. ( -. (<'glPlanRollDist') e. dict ) do.
+	(,<'glPlanRollDist') utKeyAddColumn y
+	glPlanRollDist=: 2 * glPlanMeasDist - glPlanRemGroundYards NB. Should default to 20
 	utKeyPut y
 end.
 )

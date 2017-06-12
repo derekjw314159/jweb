@@ -177,7 +177,7 @@ stdout LF,'<div class="container" width="100%">'
 NB. Control map display
 if. showmap do.
 	stdout LT1,'  <div id="map-canvas"></div>'
-end.
+end.e
 NB. stdout LF,'<div class="container" width="100%">'
 
 NB. Error page - No such course
@@ -209,7 +209,7 @@ for_t.  i. #glTees do.
 		stdout LT3,'<td>-</td>'
 	    end.
 	end.
-	
+e	
 	stdout LT3,'<td>',(": ;(glGrHole=hole)#glGrRRRoughLength),'</td>'
 	stdout '</tr>'
 end.
@@ -222,6 +222,10 @@ utKeyRead glFilepath,'_tee' NB. Just read for this hole
 ww=. I. glTeHole = hole
 ww=. (+. /"1 ww{glTeMeasured ) # ww{glTeTee NB. Either gender
 tees=. (glTees e. ww) # glTees
+
+NB. Store path for back tee in order to show crow's flight
+backpath=. PathTeeToGreen hole ; 0{tees
+backstart=. 0{backpath
 
 for_t. tees do.
 	stdout '<th>',(>(glTees i. t){glTeesName),'</th>'
@@ -258,14 +262,25 @@ for_rr. i. #glPlanID do.
 				stdout '</td>'
 			end.
 		else.
-			for_t. tees do.
+			for_t. tees do. NB. Write out the distances and crow's flight distance
 				stdout '<td>'
 				holelength=. (<(glTees i. t),hole){glTeesYards
-				holelength=. ": <. 0.5+ holelength - (rr{glPlanMeasDist) 
-				if. (t=rr{glPlanTee) do.
+				holelength=. <. 0.5+ holelength - (rr{glPlanMeasDist) 
+			    ww=. InterceptPath backpath ; backstart ; holelength
+				ww=. <. 0.5 + glMY * |-/LatLontoFullOS backstart, 0{ww
+				if. holelength ~: ww do.
+					ww=. ' [',(":ww),']'
+				else.
+					ww=. ''
+				end.
+				holelength=. ":holelength
+				
+				if. (t=rr{glPlanTee) *. (0=t_index) do.
+					stdout '<b>',holelength,ww,'</b>'
+				elseif. (t=rr{glPlanTee) do.
 					stdout '<b>',holelength,'</b>'
 				elseif. t_index = 0. do.
-					stdout '<i>',holelength,'</i>'
+					stdout '<i>',holelength,ww,'</i>'
 				elseif. 1 do.
 				end.
 				stdout '</td>'
@@ -343,6 +358,7 @@ for_rr. i. #glPlanID do.
 		other=. other, (rr{glPlanFWVisible)#' LZ:V'
 		other=. other, (rr{glPlanFWUnpleasant)#' FW:U'
 		other=. other, (rr{glPlanFWObstructed)#' FW:O'
+		other=. other, (0<#>rr{glPlanFWTargVisible)#' Targ:',;>rr{glPlanFWTargVisible
 		other=. other, (rr{glPlanRRMounds)#' RR:M'
 		other=. other, (0<#>rr{glPlanWaterPercent)#' Wat%:',;>rr{glPlanWaterPercent
 		stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">E</a> <a href="/jw/rating/landing/d/',glFilename,'/',(;rr{glPlanID),'">D</a>'

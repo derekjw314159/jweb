@@ -364,11 +364,12 @@ NB. Look for measurement point at the nearest distance
 hole=. ix{glPlanHole
 ww=. I. glPlanHole = hole
 ww=. ww -. ix NB. can't be self
-ww=.  ( 0< ww { glPlanAlt + glPlanFWWidth + glPlanBunkLZ - glPlanBunkLine + glPlanOOBDist + glPlanTreeDist ) # ww
+ww=.  ( 0< ww { glPlanAlt + glPlanFWWidth + glPlanBunkLZ + glPlanBunkLine + glPlanOOBDist + glPlanTreeDist ) # ww
 
 if. 0<#ww do.
 
-    diff=. |(ww { glPlanRemGroundYards) - ix{glPlanRemGroundYards
+    NB. diff=. |(ww { glPlanRemGroundYards) - ix{glPlanRemGroundYards
+    diff=. |(ww { glPlanMeasDist) - ix{glPlanMeasDist
     ww=. (diff i. <. / diff) { ww
     diff=. <. / diff
 

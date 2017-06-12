@@ -1166,7 +1166,6 @@ end.
 res=. res
 )
 
-
 NB. ==============================================================
 NB. merge pdfs
 NB. ==============================================================
@@ -1188,6 +1187,24 @@ for_gender. 0 1 do.
 	end.
 end.
 res=. res, ' cat output ',glDocument_Root,'/tcpdf/',glBasename,'/',glFilename,'_all.pdf'
+2!:0 res
+)
+
+NB. ==============================================================
+NB. merge sheets
+NB. ==============================================================
+NB. Usage:
+NB.   merge_sheets
+NB.
+NB. Returns a LF delimited string of distances
+merge_sheets=: 3 : 0
+res=. 'pdftk '
+for_hole. i. 18 do.
+		shortname=. glFilename,'_',(;'r<0>2.0' 8!:0 (1+hole))
+		fname=. '/home/user/Downloads/',shortname,'.pdf'
+		res=. res,' ',fname
+end.
+res=. res, ' cat output /home/user/Downloads/',glFilename,'_sheets.pdf'
 2!:0 res
 )
 

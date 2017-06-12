@@ -60,7 +60,6 @@ if. 0=#ix do.
     djwErrorPage err ; ('No such hole combination : ',}. ; (<'/'),each y) ; ('/jw/rating/plan/v/',filename,'/',":1+hole) ; 'Back to rating plan'
 end.
 
-glPlanMeasDist=: ,yards
 ww=. ix utKeyRead glFilepath,'_plan' NB. Read one record only
 
 NB. New item check
@@ -190,11 +189,14 @@ NB. Second table is simple roll logic
 	t_index=. glTees i. tee
 	stdout LT4,'<tr>',LT4,'<td><b>From ',>t_index { glTeesName
 	stdout ' tee</b></td>'
-	stdout LT4,'<td>',": ((<t_index,hole){glTeesYards) - glPlanRemGroundYards + glPlanHitYards
-	prevroll=. glPlanHitYards 
-	stdout '</td><td>',(,": defaulthit-20),'</td>',LT4,'<td>', (;'p<+>m<->' 8!:0 prevroll-defaulthit-20),'</td>'
-	stdout LT4,'<td><input  value="',(":,prevroll),'" tabindex="',(":3+extraline),'" ',(InputFieldnum 'roll'; 4),'>'
+	stdout LT4,'<td>',": ((<t_index,hole){glTeesYards) - glPlanRemGroundYards + glPlanHitYards NB. Previous yards covered
+	prevroll=. glPlanHitYards
+	prevrollroll=. glPlanRollDist
+	stdout '</td><td>',(,": prevroll - prevrollroll),'</td>' NB. Carry
+	stdout LT4,'<td><input value="',(": prevrollroll),'" tabindex="',(":3+extraline),'" ',(InputFieldnum 'rollroll';4),'></td>'
+	stdout LT4,'<td><input value="',(":,prevroll),'" tabindex="',(":3+extraline),'" ',(InputFieldnum 'roll'; 4),'>'
 	stdout '<input type="hidden" name="prevroll" value="',(":,prevroll),'">'
+	stdout '<input type="hidden" name="prevrollroll" value="',(":,prevrollroll),'">'
 	stdout '</td><td>',(,":glPlanRemGroundYards),'</td>',LT3,'</tr>'
 	NB. Backtee different from tee in question
 	stdout LT2,'</tbody></table></div>'
@@ -237,7 +239,7 @@ NB. Assign to variables
 NB. cumbackyards may not exist
 cumbackyards=: 0
 prevcumbackyards=: 0
-xx=. djwCGIPost y ; ' ' cut 'defaulthit cumbackyards prevcumbackyards hityards prevhityards cumyards prevcumyards remyards prevremyards roll prevroll'
+xx=. djwCGIPost y ; ' ' cut 'defaulthit cumbackyards prevcumbackyards hityards prevhityards cumyards prevcumyards remyards prevremyards roll prevroll rollroll prevrollroll'
 keyplan=: ; keyplan
 glFilename=: dltb ;filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
@@ -294,10 +296,11 @@ elseif. remyards ~: prevremyards do.
  	glPlanLayupType=: ,'L'
  	glPlanHitYards=: glPlanHitYards + prevremyards - remyards
  	NB. All the others will be recalculated
-elseif. roll ~: prevroll do.
+elseif. (roll ~: prevroll) +. (rollroll ~: prevrollroll) do.
  	changed=. 1
  	glPlanLayupType=: ,'R'
  	glPlanHitYards=: ,roll 
+	glPlanRollDist=: ,rollroll
  	NB. All the others will be recalculated
 end.
 
@@ -320,6 +323,7 @@ NB. Choose page based on what was pressed
 	if. (0= 4!:0 <'control_delete') +. deletelayup do.
 		NB. Delete the layup record
 		glPlanHitYards=: ,defaulthit
+		NB. glPlanRollDist=: ,20
 		glPlanRecType=: ,'P'
 		glPlanLayupType=: ,' '
 		(<keyplan) utKeyPut glFilepath,'_plan'
