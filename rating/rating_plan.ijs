@@ -188,7 +188,7 @@ end.
 NB. Print course yardage and measurements
 stdout LF,'<h2>Course : ', glCourseName,'</h2><h3>Hole : ',(":1+ ; hole),'</h3>'
 stdout LF,'<a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/rating/plan',(showmap#'nomap'),'/v/',glFilename,'/',(": 1+hole),'">',(>showmap{'/' cut 'Show Map/Suppress map'),'</a>'
-stdout LF,TAB,'<div class="span-8 last">'
+stdout LF,TAB,'<div class="span-10 last">'
 
 stdout LF,'<table><thead>'
 stdout '<tr><th>Tee</th><th>Card</th><th>Par M/W</th><th>Alt</th><th>Mn</th><th>Wn</th><th>Rough Length</th></tr>'
@@ -196,7 +196,9 @@ stdout '</thead><tbody>'
 utKeyRead glFilepath,'_green'
 for_t.  i. #glTees do.
 	stdout LF,'<tr><td><a href="/jw/rating/tee/e/',glFilename,'/',(1 1 0 0 1#5{.>EnKey hole ; '' ; (t{glTees) ; 0 ; 0 ; 0),'">',(>t{glTeesName),'</td>'
-	stdout '<td>',(": <. 0.5 + (<t,hole){glTeesYards),'</td>'
+	backpath=. PathTeeToGreen hole ; t{glTees
+	crow=. <. 0.5 + glMY * |-/LatLontoFullOS 0 _1{backpath NB. Crows flight distance
+	stdout '<td>',(": <. 0.5 + (<t,hole){glTeesYards),' [',(":crow),']</td>'
 	utKeyRead glFilepath,'_tee'
 	ww=. (glTeHole=hole) *. glTeTee=t{glTees
 	(ww # glTeID) utKeyRead glFilepath,'_tee'
@@ -291,7 +293,8 @@ for_rr. i. #glPlanID do.
 		stdout ;": 1+rr{glPlanHole
 		stdout (;rr{glPlanTee),'/'
 		stdout ((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),(": 1+rr{glPlanShot),'">'
-		stdout (": rr{glPlanHitYards),' ',(rr{glPlanLayupType),' '
+		stdout (": rr{glPlanHitYards),( rr{glPlanHitYards ~: glPlanCrowDist)#' [',(": rr{glPlanCrowDist),']'
+		stdout (rr{glPlanLayupType)
 		stdout (('L'=rr{glPlanLayupType)#(3{.": >rr{glPlanLayupCategory)),'</a></td><td>', (": <. 0.5 + rr{glPlanRemGroundYards),'</td>' 
 		if. 0<rr{glPlanRemGroundYards do.
 		    other=. ''

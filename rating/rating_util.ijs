@@ -449,6 +449,7 @@ if. -.  (<ww,g) {glTeMeasured do. NB. Dead tee
 		newkey=. newkey ,each <'-'
 		newkey=. newkey ,each 'r<0>3.0' 8!:0 glPlanRemGroundYards
 		glPlanHitYards=: (#key) $0
+		glPlanCrowDist=: (#key) $0
 		glPlanUpdateName=: (#key)$<": getenv 'REMOTE_USER'
 		glPlanUpdateTime=: (#key)$< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 		glPlanLayupType=: (#key)$,' '
@@ -509,6 +510,7 @@ label_shot.
 	    newkey=. EnKey h ; glPlanMeasDist ; t ; g ;ab ; shot
 	    newkey=. <6 {. >newkey NB. Just need first six characters
 	    glPlanHitYards=: ,0
+		glPlanCrowDist=: ,0
 	    glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
 	    glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 	    glPlanLayupType=: ,' '
@@ -561,6 +563,7 @@ label_shot.
 	glPlanSqueezeType=: ,' '
 	glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
 	glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
+	glPlanCrowDist=: ,<.0.5 + glMY * | -/LatLontoFullOS start, 0{ww
 	start=. 0{ww
 	NB. Measurepoint is in middle of roll
 	if. glPlanRecType ~: 'P' do.
@@ -808,6 +811,7 @@ NB. glPlanAbility=: ,ab
 NB. glPlanShot=: ,shot
 NB. glPlanRecType
 glPlanHitYards=: , 0
+glPlanCrowDist=: ,0
 glPlanCumGroundYards=: ,0
 glPlanLatLon=: , 0
 glPlanRemGroundYards=: ,0
@@ -910,6 +914,7 @@ glGrWaterCart=: ($glGrID)$<''
 glGrWaterPercent=: ($glGrID)$<''
 glGrWaterFraction=: ($glGrID)$<''
 glGrWaterSurrDist=: ($glGrID)$<''
+glGrNotes=: ($glGrID)$<''
 utKeyPut glFilepath,'_green'
 AugmentGPS i. 18
 BuildPlan i. 18
@@ -945,6 +950,11 @@ end.
 if. ( -. (<'glPlanRollDist') e. dict ) do.
 	(,<'glPlanRollDist') utKeyAddColumn y
 	glPlanRollDist=: 2 * glPlanMeasDist - glPlanRemGroundYards NB. Should default to 20
+	utKeyPut y
+end.
+if. ( -. (<'glPlanCrowDist') e. dict ) do.
+	(,<'glPlanCrowDist') utKeyAddColumn y
+	glPlanCrowDist=: (#glPlanID)$0
 	utKeyPut y
 end.
 )
