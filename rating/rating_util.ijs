@@ -593,6 +593,8 @@ label_shot.
 	glPlanTopogStance=: ,<''
 	glPlanBunkLZ=: ,0
 	glPlanBunkLine=: ,0
+	glPlanBunkLZCarry=: ,0
+	glPlanBunkTargCarry=: ,0
 	glPlanLatWaterDist=: ,0
 	glPlanWaterLine=: ,0
 	if. (glPlanLayupType='L') *. (glPlanLayupCategory ~: <'choice') do.
@@ -680,6 +682,8 @@ glPlanTreeDist=: 1 1 { glPlanTreeDist
 glPlanTreeRecov=: 1 1 { glPlanTreeRecov
 glPlanBunkLZ=: 1 1 { glPlanBunkLZ
 glPlanBunkLine=: 1 1 { glPlanBunkLine
+glPlanBunkLZCarry=: 1 1 { glPlanBunkLZCarry
+glPlanBunkTargCarry=: 1 1 { glPlanBunkTargCarry
 glPlanLatWaterDist=: 1 1{glPlanLatWaterDist
 glPlanWaterPercent=: 1 1{glPlanWaterPercent
 glPlanWaterLine=: 1 1 { glPlanWaterLine
@@ -838,6 +842,8 @@ glPlanTreeDist=: ,0
 glPlanAlt=: ,0
 glPlanBunkLZ=: ,0
 glPlanBunkLine=: ,0
+glPlanBunkLZCarry=: ,0
+glPlanBunkTargCarry=: ,0
 glPlanLatWaterDist=: ,0
 glPlanWaterPercent=: ,<''
 glPlanWaterLine=: ,0
@@ -981,6 +987,16 @@ end.
 if. ( -. (<'glPlanTreeLZObstructed') e. dict ) do.
 	(,<'glPlanTreeLZObstructed') utKeyAddColumn y
 	glPlanTreeLZObstructed=: (#glPlanID)$0
+	utKeyPut y
+end.
+if. ( -. (<'glPlanBunkLZCarry') e. dict ) do.
+	(,<'glPlanBunkLZCarry') utKeyAddColumn y
+	glPlanBunkLZCarry=: (#glPlanID)$0
+	utKeyPut y
+end.
+if. ( -. (<'glPlanBunkTargCarry') e. dict ) do.
+	(,<'glPlanBunkTargCarry') utKeyAddColumn y
+	glPlanBunkTargCarry=: (#glPlanID)$0
 	utKeyPut y
 end.
 )

@@ -306,6 +306,8 @@ for_rr. i. #glPlanID do.
 		    other=. other, (rr{glPlanFWObstructed)#' FW:O'
 		    other=. other, (rr{glPlanTreeTargObstructed)#' Targ:TreeObs'
 		    other=. other, (rr{glPlanTreeLZObstructed)#' LZ:TreeObs'
+		    other=. other, (rr{glPlanBunkLZCarry)#' LZ:BunkCarry'
+		    other=. other, (rr{glPlanBunkTargCarry)#' Targ:BunkCarry'
 		    other=. other, (0<#>rr{glPlanFWTargVisible)#' Targ:',;>rr{glPlanFWTargVisible
 		    other=. other, (rr{glPlanRRMounds)#' RR:M'
 			other=. other, (0<#>rr{glPlanWaterPercent)#' Wat%:',;>rr{glPlanWaterPercent
@@ -334,6 +336,8 @@ for_rr. i. #glPlanID do.
 		    other=. other, (rr{glPlanFWObstructed)#' FW:O'
 		    other=. other, (rr{glPlanTreeTargObstructed)#' Targ:TreeObs'
 		    other=. other, (rr{glPlanTreeLZObstructed)#' LZ:TreeObs'
+		    other=. other, (rr{glPlanBunkLZCarry)#' LZ:BunkCarry'
+		    other=. other, (rr{glPlanBunkTargCarry)#' Targ:BunkCarry'
 		    stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">E</a>'
 		    stdout LT4,'<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>' NB. At green
 		    stdout LT4,'<td colspan="3">',(}.other),'</td>'
@@ -365,6 +369,8 @@ for_rr. i. #glPlanID do.
 		other=. other, (rr{glPlanFWVisible)#' LZ:V'
 		other=. other, (rr{glPlanFWUnpleasant)#' FW:U'
 		other=. other, (rr{glPlanFWObstructed)#' FW:O'
+	    other=. other, (rr{glPlanBunkLZCarry)#' LZ:BunkCarry'
+	    other=. other, (rr{glPlanBunkTargCarry)#' Targ:BunkCarry'
 	    other=. other, (rr{glPlanTreeTargObstructed)#' Targ:TreeObs'
 	    other=. other, (rr{glPlanTreeLZObstructed)#' LZ:TreeObs'
 		other=. other, (0<#>rr{glPlanFWTargVisible)#' Targ:',;>rr{glPlanFWTargVisible

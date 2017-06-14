@@ -866,8 +866,15 @@ lay=. lookup_bunker_rating greenval ; (glBunkFractionVal i. glGrBunkFraction){gl
 fname fappend~ write_calc  11 18 ; 3 4 ; lay
 fwtot=. lay
 NB. Carry
+bunkcarry=. ('glPlanBunkLZCarry') matrix_pull hole ; tee ; gender NB. Shot TO landing zone
+bunkcarry=. bunkcarry +.each }:each (<0),each ('glPlanBunkTargCarry') matrix_pull hole ; tee ; gender NB. OR shot FROM LZ, shifted
 fname fappend~ write_row_head 8 20 ; 2.5 0.5 ; '<i>Carry</i>' ; '<b>C</b>'
+fname fappend~ 'R' write_input 11 20 ; sz ; (;bunkcarry) 
 fname fappend~ 'L' write_input 11 20 ; sz ; (;carryyards)
+for_i. i. 7 do. 
+	if. _1 ~: i{sz do. fname fappend~ pdfDiag ((11.33+i), 20) ; 0.33 1  end. NB. Diagonal line
+end.
+fwtot=. fwtot + ; +/ each bunkcarry
 NB. Sub-Total
 fname fappend~ 'R' write_cell 8 22 ; 3 ; <<'Sum of <b><u>all</u></b> Values'
 fname fappend~ write_calc  11 22 ; 3 4 ; fwtot
