@@ -290,7 +290,17 @@ glGrAlt=: ,alt
 glGrLength=: ,length
 glGrWidth=: ,width
 glGrDiam=: ,diam
-if. 0=glGrDiam do. glGrDiam=: ,<. 0.5 + (0.5*length+width) end.
+if. 0=circleconcept do.
+	NB. Calculate diameter automatically
+	dim=. length,width
+	dim=. dim /: dim NB. Sort
+	ratio=. (_1{dim) % (0{dim) + 0=0{dim NB. Avoid zero divide
+	if. (ratio > 2) *. (ratio <: 3) do. diam=. (+/ 2 1 * dim) % 3
+	elseif. (ratio >3) do. diam=. (+/3 1 * dim) % 4
+	elseif. 1 do. diam=. 0.5 * +/dim
+	end.
+	glGrDiam=: ,<. 0.5 + diam
+end.
 glGrCircleConcept=: ,circleconcept
 glGrTiered=: ,tiered
 glGrFirmness=: ,firmness

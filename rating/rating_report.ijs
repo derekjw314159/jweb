@@ -1500,12 +1500,12 @@ res=. ((-&#)each shot) {. each res
 )
 
 NB. =================================================
-NB. lookup_recoverability
+NB. lookup_recoverabilityold
 NB. =================================================
 NB. Usage
 NB.   lookup_recoverability gender ; greenval ; rrlength
 NB. Returns table value
-lookup_recoverability=: 3 : 0
+lookup_recoverabilityold=: 3 : 0
 'gender greenval rrlength'=. y
 if. gender=0 do.
 	mat=. 5 5 $ 1 3 4 6 7 , 2 4 5 7 8 , 3 5 6 8 9 , 4 6 7 9 10, 5 7 8 10 10 
@@ -1523,6 +1523,35 @@ for_ab. 0 1  do.
     res=. res, (<r, +/(''$rrlength) >: col){mat
 end.
 )
+
+NB. =================================================
+NB. lookup_recoverability (with tweener)
+NB. =================================================
+NB. Usage
+NB.   lookup_recoverability gender ; greenval ; rrlength
+NB. Returns table value
+lookup_recoverability=: 3 : 0
+'gender greenval rrlength'=. y
+if. gender=0 do.
+	mat=. 5 7 $ 1 2 3 4 5 6 7 , 2 3 4 5 6 7 8 , 3 4 5 6 7 8 9 , 4 5 6 7 8 9 10, 5 6 7 8 9 10 10 
+	row=. 4 5 7 9 ,: 3 4 6 8
+	col=. 1.5 2 3.001 3.751 4.251
+else.
+	mat=. 5 7 $ 1 2 3 4 5 6 7 , 2 3 4 5 6 7 8 , 3 4 5 6 7 8 9 , 4 5 6 7 8 9 10, 5 6 7 8 9 10 10 
+	row=. 4 5 7 9 ,: 3 4 6 8 
+	col=. 1.5 2 2.50 3.251 3.751 5.001
+end.
+
+res=. 0$0
+for_ab. 0 1  do.
+    r=. +/ (ab{greenval) >: (ab{row) 
+    res=. res, (<r, +/(''$rrlength) >: col){mat
+end.
+)
+
+
+
+
 
 NB. =================================================
 NB. lookup_carry_rough
