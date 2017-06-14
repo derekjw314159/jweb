@@ -400,13 +400,14 @@ rollslope=. 'glPlanRollSlope' matrix_pull hole ; tee ; gender
 NB. Title row
 fname fappend~ LF,'// -------- Title Row -------------'
 fname fappend~ 'black' oN 'white'
-fname fappend~ LF,'$pdf->',pdfMulti 0 0 ; 5 1 ; ('<b>CLUB</b>: ',glCourseName); 1
+fname fappend~ LF,'$pdf->',pdfMulti 0 0 ; 4.75 1 ; ('<b>CLUB</b>: ',glCourseName); 1
 NB. Need to work out which tees this is serving
 meas=. gender{;glTeMeasured
-fname fappend~ LF,'$pdf->',pdfMulti 5 0 ; 4.5 1 ; ('<b>COURSE</b>: ',(>gender{'/' cut '/Men /Women '),>((glTees i. tee){glTeesName)); 1
+fname fappend~ LF,'$pdf->',pdfMulti 4.75 0 ; 2.25 1 ; ('<b>TEE</b>: ',(>(glTees i. tee){glTeesName)); 1
+fname fappend~ LF,'$pdf->',pdfMulti 7 0 ; 2.5 1 ; ('<b>GENDER</b>: ',>gender{'/' cut '/Men/Women'); 1
 fname fappend~ LF,'$pdf->',pdfMulti 9.5 0 ; 1.5 1 ; ('<b>HOLE</b>: ',":1+hole); 1
-fname fappend~ LF,'$pdf->',pdfMulti 11 0 ; 2 1 ; ('<b>PAR</b>: ',":gender{,glTePar); 1
-fname fappend~ LF,'$pdf->',pdfMulti 13 0 ; 3 1 ; ('<b>LENGTH</b>: ',":(<t_index,hole){glTeesYards); 1
+fname fappend~ LF,'$pdf->',pdfMulti 11 0 ; 3 1 ; ('<b>LENGTH</b>: ',":(<t_index,hole){glTeesYards); 1
+fname fappend~ LF,'$pdf->',pdfMulti 14 0 ; 2 1 ; ('<b>PAR</b>: ',":gender{,glTePar); 1
 fname fappend~ LF,'$pdf->',pdfMulti 16 0 ; 5 1 ; ('<b>DATE RATED</b>: ',glCourseDate) ; 1
 fname fappend~ LF,'$pdf->',pdfMulti 21 0 ; 7 1 ; ('<b>T/LEADER</b>: ',glCourseLead) ; 1
 
@@ -653,10 +654,14 @@ fwtot=. greenval
 fname fappend~ write_row_head 0 37 ; 2.5 0.5 ; ' ' cut '<i>Visibility</i> <b>V</b>'
 fname fappend~ write_input 3 37 ; 2.5 2.5 ; > _1 { each targvisible
 greenval=. greenval + > _1 { each targvisible
-fw=. >_2 { each 0, each 'glPlanFWObstructed' matrix_pull hole ; tee ; gender NB. Push to the shot after
+NB. Target obstructed
+treeobs=. ('glPlanTreeLZObstructed') matrix_pull hole ; tee ; gender NB. Shot TO landing zone
+treeobs=. treeobs +.each }:each (<0),each ('glPlanTreeTargObstructed') matrix_pull hole ; tee ; gender NB. OR shot FROM LZ, shifted
+fw=. ; _1 { each treeobs
 fname fappend~ write_row_head 0 38 ; 2.5 0.5 ; ' ' cut '<i>Obstructed</i> <b>O</b>'
 fname fappend~ write_input 3 38 ; 2.5 2.5 ; fw
 greenval=. greenval + fw
+NB. Tiered green
 fname fappend~ write_row_head 0 39 ; 2.5 0.5 ; ' ' cut '<i>Tiered</i> <b>T</b>'
 fname fappend~ write_input 3 39 ; 2.5 2.5 ; 2$glGrTiered
 greenval=. greenval + 2$glGrTiered
@@ -748,6 +753,8 @@ behind=. (<glWaterBehindVal) i. each behind
 fw=. behind { each <glWaterBehindNum,0
 fname fappend~ 'C' write_input 21 7 ; sz ; <'b' 8!:0 ;fw 
 fwtot=. fwtot + each fw
+NB. Two Ways
+fname fappend~ write_row_head 18 10 ; 2.5 0.5 ; '<i>Two Ways</i>' ; 'Y'
 
 rr=. (glWaterFractionVal i. glGrWaterFraction)
 cc=. (glWaterSurrDistVal i. glGrWaterSurrDist)
@@ -762,15 +769,19 @@ fname fappend~ 'R' write_cell 18 12 ; 3 ; 'Total Shot Value'
 fname fappend~ write_calc 21 12 ; sz ; (;fwtot)
 fname fappend~ 'R' write_cell 18 13 ; 3 ; 'Highest Shot Value'
 fname fappend~ write_calc 21 13 ; 3 4 ; (;>. / each fwtot)
-NB. OOB anywhere
-fname fappend~ 'L' write_cell 18 14 ; 3 ; '<i>On Line of Play</i>' 
+NB. In Play Twice
+fname fappend~ write_row_head 18 14 ; 2.5 0.5 ; '<i>In Play Twice</i>' ; '2'
 waterline=. 'glPlanWaterLine' matrix_pull hole ; tee ; gender
 fname fappend~ 'C' write_input 21 14 ; sz ; <<"0 (;waterline){' y'
+NB. OOB anywhere
+fname fappend~ 'L' write_cell 18 15 ; 3 ; '<i>On Line of Play</i>' 
+waterline=. 'glPlanWaterLine' matrix_pull hole ; tee ; gender
+fname fappend~ 'C' write_input 21 15 ; sz ; <<"0 (;waterline){' y'
 NB. Overall rating
-fname fappend~ 'R' write_footer 18 15 ; 3 ; 'Water Rating'
+fname fappend~ 'R' write_footer 18 16 ; 3 ; 'Water Rating'
 fwtot=. (;>./each fwtot) NB. max value
 fwtot=. fwtot + (0=fwtot) * +. / ; waterline 
-fname fappend~ 'C' write_footer 21 15 ;  3 4 ; fwtot
+fname fappend~ 'C' write_footer 21 16 ;  3 4 ; fwtot
 
 NB. ------------------------
 NB. Recoverability and Rough
@@ -890,7 +901,7 @@ NB. ------------------------
 fname fappend~ LF,'// -------- OOB / Extreme Rough -------------'
 carryyards=. 'R' carry_yards hole; tee ; gender 
 oobdist=. (' ' cut 'glPlanOOBDist glGrOOBDist') matrix_pull hole ; tee ; gender
-fname fappend~ write_title 8 28 ; 3 1 ; '<b>OOB / Extreme R</b>' 
+fname fappend~ write_title 8 28 ; 3 1 ; '<b>OUT of BOUNDS / ER</b>' 
 ww=. ' ' cut 'S1 S2 S3 B1 B2 B3 B4'
 ww=. (<'<b>'), each ww, each (<'</b>')
 fname fappend~ 'C' write_cell 11 28 ; (7$1) ; <ww
@@ -954,10 +965,12 @@ NB. Trees
 NB. ------------------------
 fname fappend~ LF,'// -------- Trees -------------'
 treedist=. (' ' cut 'glPlanTreeDist glGrTreeDist') matrix_pull hole ; tee ; gender
-fname fappend~ write_title 18 16; 3 1 ; '<b>Trees</b>' 
+treeobs=. ('glPlanTreeLZObstructed') matrix_pull hole ; tee ; gender NB. Shot TO landing zone
+treeobs=. treeobs +.each }:each (<0),each ('glPlanTreeTargObstructed') matrix_pull hole ; tee ; gender NB. OR shot FROM LZ, shifted
+fname fappend~ write_title 18 18; 3 1 ; '<b>TREES</b>' 
 ww=. ' ' cut 'S1 S2 S3 B1 B2 B3 B4'
 ww=. (<'<b>'), each ww, each (<'</b>')
-fname fappend~ 'C' write_cell 21 16 ; (7$1) ; <ww
+fname fappend~ 'C' write_cell 21 18 ; (7$1) ; <ww
 select. z=. j. / > #each treedist
     case. 0j0 do. sz=. _1 _1 _1, _1 _1 _1 _1
     case. 0j1 do. sz=. _1 _1 _1,  1 _1 _1 _1
@@ -968,28 +981,34 @@ select. z=. j. / > #each treedist
     case. 3j3 do. sz=.  1  1  1,  1  1  1 _1
     case. 3j4 do. sz=.  1  1  1,  1  1  1  1
 end.
-fname fappend~ 'R' write_cell 18 17 ; 3 ; '<i>Centre LZ to Trees</i>' 
-fname fappend~ write_input 21 17 ; sz ; (;treedist)
-fname fappend~ write_cell 18 18 ; 3 ; <<'Severity:'
-fname fappend~ write_cell 21 18 ; _3 _4 ; 0$<''
-fname fappend~ write_cell 18 19 ; 3 ; <<'Min / Mod / Sig / Ext'
+fname fappend~ 'R' write_cell 18 19 ; 3 ; '<i>Centre LZ to Trees</i>' 
+fname fappend~ write_input 21 19 ; sz ; (;treedist)
+fname fappend~ write_cell 18 20 ; 3 ; <<'Severity:'
+fname fappend~ write_cell 21 20 ; _3 _4 ; 0$<''
+fname fappend~ write_cell 18 21 ; 3 ; <<'Min / Mod / Sig / Ext'
 fw=. (<0 ; gender ; 0 1) {glTeTree NB. Pick up the two elements
 fw=. glTreeVal i. fw
-fname fappend~ write_input 21 19 ; 3 4 ; <fw{glTreeSev
-fname fappend~ 'R' write_cell 18 20 ; 3 ; 'Table Value'
-fname fappend~ write_calc 21 20 ; 3 4 ; fw{glTreeNum
-fname fappend~ 'R' write_cell 18 21 ; 3 ; 'Tweener Adj'
-fname fappend~ write_calc 21 21 ; 3 4 ; fw{glTreeTweener
-fname fappend~ 'R' write_cell 18 22 ; 3 ; '<b>Adjusted Val</b>'
-fname fappend~ write_calc 21 22 ; 3 4 ; fw{glTreeTweener+glTreeNum
+fname fappend~ write_input 21 21 ; 3 4 ; <fw{glTreeSev
+fname fappend~ 'R' write_cell 18 22 ; 3 ; 'Table Value'
+fname fappend~ write_calc 21 22 ; 3 4 ; fw{glTreeNum
+fname fappend~ 'R' write_cell 18 23 ; 3 ; 'Tweener Adj'
+fname fappend~ write_calc 21 23 ; 3 4 ; fw{glTreeTweener
+fname fappend~ 'R' write_cell 18 24 ; 3 ; '<b>Adjusted Val</b>'
+fname fappend~ write_calc 21 24 ; 3 4 ; fw{glTreeTweener+glTreeNum
+NB. Tree obstructed
+fname fappend~ write_row_head 18 25 ; 2.5 0.5; '<i>Obstruct</i>'; '<b>O</b>'
+fname fappend~ write_input 21 25 ; sz ; (;treeobs)
+NB. Tree squeeze (not yet implemented)
+fname fappend~ write_row_head 18 26 ; 2.5 0.5; '<i>Squeeze</i>'; '<b>Q</b>'
+fname fappend~ write_input 21 26 ; sz ; 0 * ;treeobs
 fname fappend~ 'R' write_footer 18 27 ; 3 ; 'Tree Rating'
-fname fappend~ 'C' write_footer 21 27 ;  3 4 ; fw{glTreeTweener+glTreeNum
+fname fappend~ 'C' write_footer 21 27 ;  3 4 ; (> (>. / each treeobs)) + fw{glTreeTweener+glTreeNum
  
 NB. ------------------------
 NB. Green Surface
 NB. ------------------------
 fname fappend~ LF,'// -------- Green Surface -------------'
-fname fappend~ write_title 18 30 ; 3 1 ; '<b>Green Surface</b>' 
+fname fappend~ write_title 18 30 ; 3 1 ; '<b>GREEN SURFACE</b>' 
 fw=. ":<. glGrStimp NB. Convert to feet and inches
 fw=. fw,'&#39; ',": <. 0.5 + 12 * 1|glGrStimp
 fw=. fw,'&quot;'
@@ -998,8 +1017,17 @@ fname fappend~ write_input 24 30 ; 4 ; <(glGrContourVal i. glGrContour){glGrCont
 fname fappend~ 'R' write_cell 18 31 ; 3 ; 'Table Value'
 fw=. lookup_green_surface glGrStimp ; glGrContourVal i. glGrContour
 fname fappend~ write_calc 21 31 ; 3 4 ; fw
+fwtot=. fw
+NB. Unpleasant
+fname fappend~ write_row_head 18 32 ; 2.5 0.5 ; ' ' cut '<i>Unpleasant</i> <b>U</b>'
+fname fappend~ write_input 21 32 ; 3 4 ; 2$glGrSurfaceUnpleasant
+fwtot=. fwtot + 2$glGrSurfaceUnpleasant
+NB. Tiered
+fname fappend~ write_row_head 18 33 ; 2.5 0.5 ; ' ' cut '<i>Tiered</i> <b>T</b>'
+fname fappend~ write_input 21 33 ; 3 4 ; 2$glGrTiered
+fwtot=. fwtot + 2$glGrTiered
 fname fappend~ 'R' write_footer 18 35 ; 3 ; 'Gr Surface Rating'
-fname fappend~ 'C' write_footer 21 35 ;  3 4 ; fw
+fname fappend~ 'C' write_footer 21 35 ;  3 4 ; fwtot
 
 NB. -----------------------------
 NB. Altitude
@@ -1040,8 +1068,8 @@ fname fappend~ pdfBox 11 43; 17 1
 fname fappend~ pdfBox 8 1 ; 10 15 
 fname fappend~ pdfBox 8 16 ; 10 12 
 fname fappend~ pdfBox 8 28 ; 10 14 
-fname fappend~ pdfBox 18 1 ; 10 15 
-fname fappend~ pdfBox 18 16 ; 10 12
+fname fappend~ pdfBox 18 1 ; 10 17 NB. Water
+fname fappend~ pdfBox 18 18 ; 10 10 NB. Trees
 fname fappend~ pdfBox 18 30 ; 10 6
 
 NB. End of Page
@@ -1228,6 +1256,7 @@ utKeyRead glFilepath,'_plan'
 ww=. hole = glPlanHole
 ww=. ww *. 'C'=glPlanRecType
 ww=. ww *. x=glPlanCarryType
+ww=. ww *. glPlanCarryAffectsTee e. ' ',tee NB. New logic for when carry only impacts a single tee (' ' is all tees)
 
 if. (-. +. / ww) do. NB. No Carry
     res=. 0 * each yards

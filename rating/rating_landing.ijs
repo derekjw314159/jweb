@@ -170,24 +170,28 @@ stdout '</tbody></table>'
 NB. Table of values - Shot TO Landing Zone
 stdout LT1,'<h4>Shot TO Landing Zone</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>Landing Zone not Visible</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>LZ not Visible</th><th>LZ Tree Obstructed</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td><input type="checkbox" id="fwvisible" name="fwvisible" value="1" '
 stdout ((''$glPlanFWVisible)#'checked'),' tabindex="19">',LT4,'</td>'
+stdout LT4,'<td><input type="checkbox" id="treelzobstructed" name="treelzobstructed" value="1" '
+stdout ((''$glPlanTreeLZObstructed)#'checked'),' tabindex="20">',LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table>'
 
 NB. Table of values - Topography
 stdout LT1,'<h4>Topography and Shot FROM Landing Zone</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>Unpleasant Lie</th><th>Obstructed Shot</th><th>Targ not Visible</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>Unpleasant Lie</th><th>FW Obstructed Shot</th><th>Tree Obstructed Shot</th><th>Green Targ not Visible</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td><input type="checkbox" id="fwunpleasant" name="fwunpleasant" value="1" '
-stdout ((''$glPlanFWUnpleasant)#'checked'),' tabindex="20">',LT4,'</td>'
+stdout ((''$glPlanFWUnpleasant)#'checked'),' tabindex="21">',LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="fwobstructed" name="fwobstructed" value="1" '
-stdout ((''$glPlanFWObstructed)#'checked'),' tabindex="21">',LT4,'</td>'
+stdout ((''$glPlanFWObstructed)#'checked'),' tabindex="22">',LT4,'</td>'
+stdout LT4,'<td><input type="checkbox" id="treetargobstructed" name="treetargobstructed" value="1" '
+stdout ((''$glPlanTreeTargObstructed)#'checked'),' tabindex="23">',LT4,'</td>'
 stdout LT4,'<td>'
-djwSelect 'fwtargvisible' ; 22 ; glTargVisibleDesc ; glTargVisibleVal ; <''$glPlanFWTargVisible
+djwSelect 'fwtargvisible' ; 24 ; glTargVisibleDesc ; glTargVisibleVal ; <''$glPlanFWTargVisible
 stdout LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table>'
@@ -235,10 +239,12 @@ bunkline=: 0
 fwvisible=: 0
 fwunpleasant=: 0
 fwobstructed=: 0
+treetargobstructed=: 0
+treelzobstructed=: 0
 rrmounds=: 0
 waterline=: 0
 oobline=: 0
-xx=. djwCGIPost y ; ' ' cut 'alt fwwidth bunklz bunkline oobdist treedist latwaterdist doglegneg fwvisible fwunpleasant fwobstructed waterline rrmounds oobline'
+xx=. djwCGIPost y ; ' ' cut 'alt fwwidth bunklz bunkline oobdist treedist latwaterdist doglegneg fwvisible fwunpleasant fwobstructed treetargobstructed treelzobstructed waterline rrmounds oobline'
 glFilename=: dltb ;filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
@@ -293,6 +299,8 @@ glPlanFWTargVisible=: ,fwtargvisible
 glPlanTopogStance=: ,topogstance
 glPlanFWUnpleasant=: ,fwunpleasant
 glPlanFWObstructed=: ,fwobstructed
+glPlanTreeTargObstructed=: ,treetargobstructed
+glPlanTreeLZObstructed=: ,treelzobstructed
 glPlanRRMounds=: ,rrmounds
 
 NB. Write to files

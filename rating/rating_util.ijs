@@ -7,12 +7,12 @@ glMY=: 1.0936133
 NB. ==============================================
 NB. Global values and descriptions
 NB. ==============================================
-glTreeVal=: (<''),':' cut '+2 P3 Mod:+3 P3 Sig:+4 P3 Ext:+1 P4 MP(-1):.:+3 P4 Mod(-1):+4 P4 Mod:+5 P4 Sig(-1):+6 P4 Sig:+7 P4 Ext(-1):+8 P4 Ext' NB. Need two defaults
-glTreeDesc=: ':' cut '+1 Par3 Min Prob:+2 Par3 Mod Prob:+3 Par3 Sig Prob:+4 Par3 Ext Prob:+1 Min Prob(-1):+2 Min Prob:+3 Mod Prob (-1):+4 Mod Prob:+5 Sig Prob (-1):+6 Sig Prob:+7 Ext Prob (-1):+8 Ext Prob'
-glTreePar=: 3 3 3 3 4 4 4 4 4 4 4 4 
-glTreeNum=: 1 2 3 4 2 2 4 4 6 6 8 8 
-glTreeSev=: ' ' cut 'Min Mod Sig Ext Min Min Mod Mod Sig Sig Ext Ext'
-glTreeTweener=: 0 0 0 0 _1 0 _1 0 _1 0 _1 0
+glTreeVal=: (<''),':' cut '+2 P3 Mod:+3 P3 Sig:+4 P3 Ext:+1 P4 MP(-1):.:+3 P4 Mod(-1):+4 P4 Mod:+5 P4 Sig(-1):+6 P4 Sig:+7 P4 Ext(-1):+8 P4 Ext:0 P3:0 P4' NB. Need two defaults
+glTreeDesc=: ':' cut '+1 Par3 Min Prob:+2 Par3 Mod Prob:+3 Par3 Sig Prob:+4 Par3 Ext Prob:+1 Min Prob(-1):+2 Min Prob:+3 Mod Prob (-1):+4 Mod Prob:+5 Sig Prob (-1):+6 Sig Prob:+7 Ext Prob (-1):+8 Ext Prob:0 Par3:0 Trees'
+glTreePar=: 3 3 3 3 4 4 4 4 4 4 4 4 3 4
+glTreeNum=: 1 2 3 4 2 2 4 4 6 6 8 8 0 0
+glTreeSev=: ' ' cut 'Min Mod Sig Ext Min Min Mod Mod Sig Sig Ext Ext Zer Zer'
+glTreeTweener=: 0 0 0 0 _1 0 _1 0 _1 0 _1 0 0 0
 glRollLevelVal=: 1 0 2{ (<''),':' cut 'Down:Up'
 glRollLevelDesc=: ':' cut 'Downhill:Level:Uphill'
 glRollLevelNum=: ':' cut 'Down:Level:Up'
@@ -455,6 +455,7 @@ if. -.  (<ww,g) {glTeMeasured do. NB. Dead tee
 		glPlanLayupType=: (#key)$,' '
 		glPlanRecType=: (#key)$,'M'
 		glPlanCarryType=: (#key)$,' '
+		glPlanCarryAffectsTee=: (#key)$,' '
 		glPlanSqueezeType=: (#key)$,' '
 		glPlanSqueezeWidth=: (#key)$0
 		glPlanID=: newkey
@@ -516,6 +517,7 @@ label_shot.
 	    glPlanLayupType=: ,' '
 	    glPlanRecType=: ,'M'
 	    glPlanCarryType=: ,' '
+	    glPlanCarryAffectsTee=: ,' '
 	    glPlanSqueezeType=: ,' '
 	    glPlanID=: ,newkey
 	    utKeyPut glFilepath,'_plan'
@@ -560,6 +562,7 @@ label_shot.
 	glPlanRemGroundYards=: ,remgroundyards
 	glPlanRecType=: ,'P'
 	glPlanCarryType=: ,' '
+    glPlanCarryAffectsTee=: ,' '
 	glPlanSqueezeType=: ,' '
 	glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
 	glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
@@ -607,6 +610,7 @@ label_shot.
 	glPlanRollTwice=: ,<''
 	glPlanSqueezeWidth=: ,0
 	glPlanCarryType=: ,' '
+    glPlanCarryAffectsTee=: ,' '
 	glPlanSqueezeType=: ,' '
 	glPlanBunkCarry=: ,<''
 	NB. Don't reset the layup or roll stuff as it has just been entered
@@ -688,6 +692,8 @@ glPlanFWVisible=: 1 1 { glPlanFWVisible
 glPlanFWTargVisible=: 1 1 { glPlanFWTargVisible
 glPlanFWUnpleasant=: 1 1 { glPlanFWUnpleasant
 glPlanFWObstructed=: 1 1 { glPlanFWObstructed
+glPlanTreeTargObstructed=: 1 1 { glPlanTreeTargObstructed
+glPlanTreeLZObstructed=: 1 1 { glPlanTreeLZObstructed
 glPlanRRHeight=: 1 1 { glPlanRRHeight
 glPlanRRInconsistent=: 1 1 { glPlanRRInconsistent
 glPlanRRMounds=: 1 1 { glPlanRRMounds
@@ -776,17 +782,17 @@ for_h. holes do.
     ww=. ww *. glPlanRecType='C'
     ww=. I. ww
     if. 0=#ww do.
-	ind=. 0
+		ind=. 0
     else.
-	continue.
+		continue.
     end.
     keyy=. ,< (;'r<0>2.0' 8!:0 h),'-C',": ind
     (,<'_default') utKeyRead glFilepath,'_plan'
     glPlanID=: keyy
     glPlanHole=: h
     t_index=. _1 + #glTees
-    dist=. (<t_index,h){glTeesYards
-    glPlanTee=: ,t_index{glTees
+    dist=. (<t_index,h){glTeesYards NB. i.e. assume at shortest "Red" tee
+    glPlanTee=: 0{glTees NB. assume measured from longest "White" tee
     glPlanGender=: ,_1
     glPlanAbility=: ,_1
     glPlanShot=: ,_1
@@ -794,6 +800,7 @@ for_h. holes do.
     glPlanMeasDist=: ,dist
     glPlanRecType=: ,'C'
     glPlanCarryType=: ,'F'
+	glPlanCarryAffectsTee=: ,' '
     utKeyPut glFilepath,'_plan'
 end.
 )
@@ -816,6 +823,7 @@ glPlanCumGroundYards=: ,0
 glPlanLatLon=: , 0
 glPlanRemGroundYards=: ,0
 glPlanCarryType=: ,' '
+glPlanCarryAffectsTee=: ,' '
 glPlanSqueezeType=: ,' '
 glPlanSqueezeWidth=: ,0
 glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
@@ -843,6 +851,8 @@ glPlanRollExtreme=: ,(#glPlanID)$<''
 glPlanRollTwice=: ,(#glPlanID)$<''
 glPlanFWWidth=: ,(#glPlanID)$<0 
 glPlanFWObstructed=: ,(#glPlanID)$0
+glPlanTreeTargObstructed=: ,(#glPlanID)$0
+glPlanTreeLZObstructed=: ,(#glPlanID)$0
 glPlanTopogStance=: ,(#glPlanID)$<''
 glPlanFWVisible=: ,(#glPlanID)$<''
 glPlanFWTargVisible=: ,(#glPlanID)$<''
@@ -875,7 +885,8 @@ utKeyRead glFilepath,'_plan'
 NB. Clear tee altitudes
 utKeyRead glFilepath,'_tee'
 glTeAlt=: 0 * glTeAlt
-glTeTree=: (($glTeAlt), 2 2)$<'.' NB. Dot, not blank.  Doesn't work for Par 3's
+ww=.(3 4 5 i. glTePar){('' ; '.' ; '.')
+glTeTree=. (($ww),2)$,ww,"1 ww NB. Have to add extra dimension for the ability
 utKeyPut glFilepath,'_tee'
 NB. Clear green 
 utKeyRead glFilepath,'_green'
@@ -885,7 +896,7 @@ glGrWidth=: ($glGrWidth)$0
 glGrDiam=: ($glGrID)$0
 glGrCircleConcept=: ($glGrID)$0
 glGrVisibility=: ($glGrID)$<''
-glGrObstructed=: ($glGrID)$0
+glGrObstructed=: ($glGrID)$0 NB. Not used
 glGrTiered=: ($glGrID)$0
 glGrFirmness=: ($glGrID)$<''
 glGrWaterPercent=: ($glGrID)$<''
@@ -955,6 +966,21 @@ end.
 if. ( -. (<'glPlanCrowDist') e. dict ) do.
 	(,<'glPlanCrowDist') utKeyAddColumn y
 	glPlanCrowDist=: (#glPlanID)$0
+	utKeyPut y
+end.
+if. ( -. (<'glPlanCarryAffectsTee') e. dict ) do.
+	(,<'glPlanCarryAffectsTee') utKeyAddColumn y
+	glPlanCarryAffectsTee=: (#glPlanID)$' '
+	utKeyPut y
+end.
+if. ( -. (<'glPlanTreeTargObstructed') e. dict ) do.
+	(,<'glPlanTreeTargObstructed') utKeyAddColumn y
+	glPlanTreeTargObstructed=: (#glPlanID)$0
+	utKeyPut y
+end.
+if. ( -. (<'glPlanTreeLZObstructed') e. dict ) do.
+	(,<'glPlanTreeLZObstructed') utKeyAddColumn y
+	glPlanTreeLZObstructed=: (#glPlanID)$0
 	utKeyPut y
 end.
 )
