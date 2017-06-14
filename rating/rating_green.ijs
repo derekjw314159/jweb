@@ -106,9 +106,9 @@ stdout LT2,'<input type="hidden" name="keyplan" value="',(;keyy),'">'
 stdout LT2,'<input type="hidden" name="filename" value="',(;glFilename),'">'
 
 NB. Measurements
-stdout LT1,'<h4>Distances and Green Target</h4>'
+stdout LT1,'<h4>Distance, Green Target, Green Surface</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>From Tee</th><th>Green Front</th><th>Alt</th><th>Width</th><th>Length</th><th>Diam</th><th>Circle Concept</th><th>Tiered</th><th>Firmness</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>From Tee</th><th>Green Front</th><th>Alt</th><th>Width</th><th>Depth</th><th>Diam</th><th>Circle Concept</th><th>Tiered</th><th>Target Firmness</th><th>Stimp</th><th>All</th><th>Surface Contours</th><th>Surface Unpleas</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td>'
 djwSelect 'fromtee' ; 21 ; glTeesName ; (<"0 glTees) ; <<''$glGrTee
@@ -125,92 +125,96 @@ stdout ((''$glGrTiered)#'checked'),' tabindex="28">',LT4,'</td>'
 stdout LT4,'<td>'
 djwSelect 'firmness' ; 29 ; glGrFirmnessDesc ; glGrFirmnessVal ; <''$glGrFirmness
 stdout LT4,'</td>'
-stdout LT3,'</tr>'
-stdout '</tbody></table>'
-
-NB. Table of values - Common Values
-stdout LT1,'<h4>Common Measurements</h4>'
-stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>Surface contours</th><th>Dist Tree</th><th>Mounds</th><th>Bunk Frac</th><th>Bunk Dep</th><th>Dist OB</th><th>Dist Wat</th><th>Water Frac</th><th>Water SurrDist</th></tr>',LT2,'</thead>',LT2,'<tbody>'
-stdout LT3,'<tr>'
-stdout LT4,'<td>'
-djwSelect 'contour' ; 40 ; glGrContourDesc ; glGrContourVal ; <''$glGrContour
-stdout LT4,'</td>'
-stdout LT4,'<td><input value="',(":;glGrTreeDist),'" tabindex="40" ',(InputFieldnum 'treedist'; 3),'>',LT4,'</td>'
-stdout LT4,'<td><input type="checkbox" id="rrmounds" name="rrmounds" value="1" '
-stdout ((''$glGrRRMounds)#'checked'),' tabindex="43">',LT4,'</td>'
-stdout LT4,'<td>'
-djwSelect 'bunkfraction' ; 44 ; glBunkFractionDesc ; glBunkFractionVal ; <''$glGrBunkFraction
-stdout LT4,'</td>'
-stdout LT4,'<td>'
-djwSelect 'bunkdepth' ; 45 ; glBunkDepthDesc ; glBunkDepthVal ; <''$glGrBunkDepth
-stdout LT4,'</td>'
-stdout LT4,'<td><input value="',(":;glGrOOBDist),'" tabindex="46" ',(InputFieldnum 'oobdist'; 3),'>',LT4,'</td>'
-stdout LT4,'<td><input value="',(":;glGrWaterDist),'" tabindex="47" ',(InputFieldnum 'waterdist'; 3),'>',LT4,'</td>'
-stdout LT4,'<td>'
-djwSelect 'waterfraction' ; 48 ; glWaterFractionDesc ; glWaterFractionVal ; <''$glGrWaterFraction
-stdout LT4,'</td>'
-stdout LT4,'<td>'
-djwSelect 'watersurrdist' ; 49 ; glWaterSurrDistDesc ; glWaterSurrDistVal ; <''$glGrWaterSurrDist
-stdout LT4,'</td>'
-stdout LT3,'</tr>'
-stdout '</tbody></table>'
-
-NB. Table of values - Green Surface, R&R, Bunkers, OOB
-stdout LT1,'<h4>Green Surface, Recov and Rough, Bunkers, OOB/Extreme Rough, Water</h4>'
-stdout LT1,'<table>',LT2,'<thead>'
-stdout LT3,'<tr>'
-stdout LT4,'<th colspan="3">Green Surface</th><th colspan="3">Recoverability and Rough</th><th>Bunkers</th><th colspan="3">OOB/ER</th><th colspan="3">Water</th>'
-stdout LT3,'</tr>'
-stdout LT3,'<tr>'
-stdout LT4,'<th>Stimp</th><th>All</th><th>Unpleas</th><th>Rough Inconsistent</th><th>Rise and Drop</th><th>Unpleas</th><th>Extreme</th><th>Behind Green</th><th>Cart Path</th><th>%P</th><th>Behind Green</th><th>Cart Path</th><th>%P</th>'
-stdout LT3,'</tr>',LT2,'</thead>',LT2,'<tbody>'
-stdout LT3,'<tr>'
-stdout LT4,'<td><input value="',(":;glGrStimp),'" tabindex="60" ',(InputFieldnum 'stimp'; 3),'>',LT4,'</td>'
+stdout LT4,'<td><input value="',(":;glGrStimp),'" tabindex="30" ',(InputFieldnum 'stimp'; 3),'>',LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="all" name="all" value="1" '
-stdout ' tabindex="61">',LT4,'</td>'
-stdout LT4,'<td><input type="checkbox" id="surfaceunpleasant" name="surfaceunpleasant" value="1" '
-stdout ((''$glGrSurfaceUnpleasant)#'checked'),' tabindex="62">',LT4,'</td>'
+stdout ' tabindex="31">',LT4,'</td>'
 stdout LT4,'<td>'
-djwSelect 'rrinconsistent' ; 63 ; glRRInconsistentDesc ; glRRInconsistentVal ; <''$glGrRRInconsistent
+djwSelect 'contour' ; 32 ; glGrContourDesc ; glGrContourVal ; <''$glGrContour
 stdout LT4,'</td>'
+stdout LT4,'<td><input type="checkbox" id="surfaceunpleasant" name="surfaceunpleasant" value="1" '
+stdout ((''$glGrSurfaceUnpleasant)#'checked'),' tabindex="33">',LT4,'</td>'
+stdout LT3,'</tr>'
+stdout '</tbody></table>'
+
+NB. R&R, Bunkers
+stdout LT1,'<h4>Recoverability and Rough, Bunkers</h4>'
+stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
+stdout LT4,'<th>Rough Inconsistent</th><th>Rough Mounds</th><th>Rise & Drop</th><th>Rough Unpleas</th><th>Bunk Frac</th><th>Bunk Dep</th><th>Bunk Extreme</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT3,'<tr>'
 stdout LT4,'<td>'
-djwSelect 'rrrisedrop' ; 64 ; glRRRiseDropDesc ; glRRRiseDropVal ; <''$glGrRRRiseDrop
+djwSelect 'rrinconsistent' ; 34 ; glRRInconsistentDesc ; glRRInconsistentVal ; <''$glGrRRInconsistent
+stdout LT4,'</td>'
+stdout LT4,'<td><input type="checkbox" id="rrmounds" name="rrmounds" value="1" '
+stdout ((''$glGrRRMounds)#'checked'),' tabindex="35">',LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'rrrisedrop' ; 36 ; glRRRiseDropDesc ; glRRRiseDropVal ; <''$glGrRRRiseDrop
 stdout LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="rrunpleasant" name="rrunpleasant" value="1" '
-stdout ((''$glGrRRUnpleasant)#'checked'),' tabindex="65">',LT4,'</td>'
+stdout ((''$glGrRRUnpleasant)#'checked'),' tabindex="37">',LT4,'</td>'
 stdout LT4,'<td>'
-djwSelect 'bunkextreme' ; 66 ; glBunkExtremeDesc ; glBunkExtremeVal ; <''$glGrBunkExtreme
+djwSelect 'bunkfraction' ; 38 ; glBunkFractionDesc ; glBunkFractionVal ; <''$glGrBunkFraction
 stdout LT4,'</td>'
 stdout LT4,'<td>'
-djwSelect 'oobbehind' ; 67 ; glOOBBehindDesc ; glOOBBehindVal ; <''$glGrOOBBehind
+djwSelect 'bunkdepth' ; 39 ; glBunkDepthDesc ; glBunkDepthVal ; <''$glGrBunkDepth
 stdout LT4,'</td>'
 stdout LT4,'<td>'
-djwSelect 'oobcart' ; 68 ; glOOBCartDesc ; glOOBCartVal ; <''$glGrOOBCart
-stdout LT4,'</td>'
-stdout LT4,'<td>'
-djwSelect 'oobpercent' ; 69 ; glOOBPercentDesc ; glOOBPercentVal ; <''$glGrOOBPercent
-stdout LT4,'</td>'
-stdout LT4,'<td>'
-djwSelect 'waterbehind' ; 70 ; glWaterBehindDesc ; glWaterBehindVal ; <''$glGrWaterBehind
-stdout LT4,'</td>'
-stdout LT4,'<td>'
-djwSelect 'watercart' ; 71 ; glWaterCartDesc ; glWaterCartVal ; <''$glGrWaterCart
-stdout LT4,'</td>'
-stdout LT4,'<td>'
-djwSelect 'waterpercent' ; 72 ; glWaterPercentDesc ; glWaterPercentVal ; <''$glGrWaterPercent
+djwSelect 'bunkextreme' ; 40 ; glBunkExtremeDesc ; glBunkExtremeVal ; <''$glGrBunkExtreme
 stdout LT4,'</td>'
 stdout LT3,'</tr>'
-stdout '</tbody></table></div>'
+stdout '</tbody></table>'
 
+NB. Table of values - OB/ER, Water, Tree Dist
+stdout LT1,'<h4>OOB / ER, Water, Tree Dist</h4>'
+stdout LT1,'<table>',LT2,'<thead>'
+stdout LT3,'<tr>'
+stdout LT4,'<th>Dist OOB</th><th>OOB Behind</th><th>OOB Cart Path</th><th>OOB %P</th><th>Dist Water</th><th>Water Behind</th><th>Water Cart Path</th><th>Water %P</th><th>Water Frac</th><th>Water SurrDist</th>'
+stdout LT3,'</tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT3,'<tr>'
+stdout LT4,'<td><input value="',(":;glGrOOBDist),'" tabindex="41" ',(InputFieldnum 'oobdist'; 3),'>',LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'oobbehind' ; 42 ; glOOBBehindDesc ; glOOBBehindVal ; <''$glGrOOBBehind
+stdout LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'oobcart' ; 43 ; glOOBCartDesc ; glOOBCartVal ; <''$glGrOOBCart
+stdout LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'oobpercent' ; 44 ; glOOBPercentDesc ; glOOBPercentVal ; <''$glGrOOBPercent
+stdout LT4,'</td>'
+stdout LT4,'<td><input value="',(":;glGrWaterDist),'" tabindex="45" ',(InputFieldnum 'waterdist'; 3),'>',LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'waterbehind' ; 46 ; glWaterBehindDesc ; glWaterBehindVal ; <''$glGrWaterBehind
+stdout LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'watercart' ; 47 ; glWaterCartDesc ; glWaterCartVal ; <''$glGrWaterCart
+stdout LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'waterpercent' ; 48 ; glWaterPercentDesc ; glWaterPercentVal ; <''$glGrWaterPercent
+stdout LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'waterfraction' ; 49 ; glWaterFractionDesc ; glWaterFractionVal ; <''$glGrWaterFraction
+stdout LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'watersurrdist' ; 50 ; glWaterSurrDistDesc ; glWaterSurrDistVal ; <''$glGrWaterSurrDist
+stdout LT4,'</td>'
+stdout LT3,'</tr>'
+stdout '</tbody></table>'
+
+stdout LT1,'<table>',LT2,'<thead>'
+stdout LT3,'<tr>'
+stdout LT4,'<th>Tree Dist</th>'
+stdout LT3,'</tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT3,'<tr>'
+stdout LT4,'<td><input value="',(":;glGrTreeDist),'" tabindex="51" ',(InputFieldnum 'treedist'; 3),'>',LT4,'</td>'
+stdout LT3,'</tr>'
+stdout '</tbody></table></div>'
 
 NB. Submit buttons
 stdout LT1,'<div class="span-24 last">'
 stdout LT1,'Notes:',EM
-stdout LT4,'<input name="notes" value="',(;glGrNotes),'" tabindex="73" ',(InputField 100),'>',LT4,'</br>'
+stdout LT4,'<input name="notes" value="',(;glGrNotes),'" tabindex="52" ',(InputField 100),'>',LT4,'</br>'
 
-stdout LF,'<input type="submit" name="control_calc" value="Calc" tabindex="',(":100),'">'
-stdout LF,'     <input type="submit" name="control_done" value="Done" tabindex="',(,":101),'">'
+stdout LF,'<input type="submit" name="control_calc" value="Calc" tabindex="',(":53 ),'">'
+stdout LF,'     <input type="submit" name="control_done" value="Done" tabindex="',(,":54 ),'">'
 stdout LF,'</div>' NB. end submit
 stdout LF,'</div>' NB. end main container
 stdout '</body></html>'

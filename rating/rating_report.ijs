@@ -727,11 +727,12 @@ fname fappend~ write_input 21 2 ; sz ; (;waterdist)
 fname fappend~ 'R' write_cell 18 3 ; 3 ; '<i>Yds to Carry Safely</i>' 
 fname fappend~ write_input 21 3 ; sz ; (;carryyards)
 fname fappend~ 'R' write_cell 18 4 ; 3 ; 'Table Value'
-fwtot=. lookup_lateral_water gender ; hityards ; <waterdist
-fname fappend~ 'L' write_calc 21 4 ; sz ; <('bp' 8!:0 ;fwtot)
-fw=. lookup_carry_water gender ; <carryyards
-fname fappend~ 'R' write_calc 21 4 ; sz ; <('bp' 8!:0 ;fw)
-fwtot=. fwtot >. each fw
+watlat=. lookup_lateral_water gender ; hityards ; <waterdist
+fwtot=. watlat
+fname fappend~ 'L' write_calc 21 4 ; sz ; <('bp' 8!:0 ;watlat)
+watcarry=. lookup_carry_water gender ; <carryyards
+fname fappend~ 'R' write_calc 21 4 ; sz ; <('bp' 8!:0 ;watcarry)
+fwtot=. fwtot >. each watcarry
 for_i. i. 7 do. 
 	if. _1 ~: i{sz do. fname fappend~ pdfDiag ((21.33+i), 4) ; 0.33 1  end.
 end.
@@ -741,9 +742,9 @@ percent=. (' ' cut 'glPlanWaterPercent glGrWaterPercent') matrix_pull hole ; tee
 percent=. (<glWaterPercentVal) i. each percent
 fw=. (;percent) { glWaterPercentDesc
 fname fappend~ 'C' write_input 21 6 ; sz ; <fw 
-fw=. (percent) { each <1- glWaterPercentNum
-fw=. <. each (<0.5) + each fwtot * each fw
-fw=. fw - each fwtot
+fw=. (percent) { each <1- glWaterPercentNum NB. Fraction which remains
+fw=. <. each (<0.5) + each fwtot * each fw NB. Amount which remains (need to do this first for rounding)
+fw=. fw - each fwtot NB. Amount of reduction
 NB. fname fappend~ 'R' write_calc 21 6 ; sz ; <('bm<(>n<)>' 8!:0 ;fw)
 fwtot=. fwtot + each fw
 NB. Behind
@@ -754,8 +755,14 @@ fw=. behind { each <glWaterBehindNum,0
 fname fappend~ 'C' write_input 21 7 ; sz ; <'b' 8!:0 ;fw 
 fwtot=. fwtot + each fw
 NB. Two Ways
+NB. Only apply if both original values and the adjusted value is >=5
+fw=. (<5) <: each fwtot
+fw=. fw *. each (<5) <: each watlat
+fw=. fw *. each (<5) <: each watcarry
 fname fappend~ write_row_head 18 10 ; 2.5 0.5 ; '<i>Two Ways</i>' ; 'Y'
-
+fname fappend~ 'C' write_calc 21 10 ; sz ; (;fw)
+fwtot=. fwtot + each fw
+NB. Water Surround
 rr=. (glWaterFractionVal i. glGrWaterFraction)
 cc=. (glWaterSurrDistVal i. glGrWaterSurrDist)
 fname fappend~ 'C' write_input 18 11; 1.25 ;  <rr{glWaterFractionText
@@ -767,19 +774,24 @@ fname fappend~ write_calc 21 11; sz ; (;fw)
 fwtot=. fwtot +each fw
 fname fappend~ 'R' write_cell 18 12 ; 3 ; 'Total Shot Value'
 fname fappend~ write_calc 21 12 ; sz ; (;fwtot)
+NB. Calculate in play twice adjustment
+wattwice=. fwtot * each (<5) <: each fwtot NB. Add up values greater than or equal to 5
+wattwice=. wattwice *each (<2) <: each +/ each (<0) < each wattwice NB. Has to be at least two entries
+wattwice=. (; +/ each wattwice)
+wattwice=. (wattwice>0) + wattwice > 11
 fname fappend~ 'R' write_cell 18 13 ; 3 ; 'Highest Shot Value'
-fname fappend~ write_calc 21 13 ; 3 4 ; (;>. / each fwtot)
+fwtot=. ; >. / each fwtot NB. Max value
+fname fappend~ write_calc 21 13 ; 3 4 ; (fwtot)
 NB. In Play Twice
 fname fappend~ write_row_head 18 14 ; 2.5 0.5 ; '<i>In Play Twice</i>' ; '2'
-waterline=. 'glPlanWaterLine' matrix_pull hole ; tee ; gender
-fname fappend~ 'C' write_input 21 14 ; sz ; <<"0 (;waterline){' y'
+fname fappend~ 'C' write_calc 21 14 ; 3 4 ; (;wattwice)
+fwtot=. fwtot + wattwice
 NB. OOB anywhere
 fname fappend~ 'L' write_cell 18 15 ; 3 ; '<i>On Line of Play</i>' 
 waterline=. 'glPlanWaterLine' matrix_pull hole ; tee ; gender
 fname fappend~ 'C' write_input 21 15 ; sz ; <<"0 (;waterline){' y'
 NB. Overall rating
 fname fappend~ 'R' write_footer 18 16 ; 3 ; 'Water Rating'
-fwtot=. (;>./each fwtot) NB. max value
 fwtot=. fwtot + (0=fwtot) * +. / ; waterline 
 fname fappend~ 'C' write_footer 21 16 ;  3 4 ; fwtot
 
