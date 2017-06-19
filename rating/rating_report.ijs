@@ -423,13 +423,13 @@ for_ab. i. 2 do.
     fname fappend~ LF,('R' ; 1) write_cell (0 ,2+ab) ; 3 ; ('<i>',(>ab{' ' cut 'Scratch Bogey'),'</i>')
     ww2=. I. (ab=glPlanAbility) 
     ww2=. ('' (8!:0) ww2{glPlanHitYards),each <"0 ww2{glPlanLayupType
-    fname fappend~ ('C' ; 1) write_calc (3, 2+ab) ; (4{.((#ww2)$1.25), 4$_1.25) ; <ww2
+    fname fappend~ ('C' ; 1) write_input (3, 2+ab) ; (4{.((#ww2)$1.25), 4$_1.25) ; <ww2
 end.
 fname fappend~ ('R' ; 1) write_cell 0 4 ; 3 ; 'Transition Hole?'
 for_ab. i. 2 do.
     txt=. '<b>',(>ab{'/' cut 'Scratch: / Bogey: '),'</b>'
     txt=. txt, >(ab { transition) {' ' cut 'No Yes'
-    fname fappend~ write_calc ((3+ab*2.5) ,4) ; 2.5 ; txt 
+    fname fappend~ write_input ((3+ab*2.5) ,4) ; 2.5 ; txt 
 end.
 
 NB. ----------------
@@ -491,7 +491,11 @@ fname fappend~ 'R' write_cell 0 24 ; 3 ; 'Table Value'
 wid=. }: each 'glPlanFWWidth' matrix_pull hole ; tee ; gender
 select. z=. j. / > #each wid
     case. 0j0 do. sz=. _1 _1, _1 _1 _1
-    case. 0j1 do. sz=. _1 _1,  1 _1 _1
+    case. 0j1 do. 
+	NB. Bogey can't reach Par 3 is recorded under R&R
+	NB. Clear out the reading
+	sz=. _1 _1,  _1 _1 _1
+	wid=. (0$0) ; ,999
     case. 1j1 do. sz=.  1 _1,  1 _1 _1
     case. 1j2 do. sz=.  1 _1,  1  1 _1
     case. 2j2 do. sz=.  1  1 , 1  1 _1
@@ -836,6 +840,20 @@ fname fappend~ write_input 9.25 10 ; 1.25 ; <lay {':' cut 'Ft:5&#39;-10&#39;:&gt
 fname fappend~ write_cell 10.5 10 ; 0.5 ; <<'<b>R</b>'
 fname fappend~ write_calc 11 10 ; 3 4 ; 2$lay
 fwtot=. fwtot + lay
+NB. Unpleasant
+fname fappend~ write_row_head 8 11 ; 2.5 0.5; '<i>Unpleasant</i>'; '<b>U</b>'
+lay=. >+. / each (' ' cut 'glPlanRRUnpleasant glGrRRUnpleasant') matrix_pull hole ; tee ; gender 
+fname fappend~ 'C' write_input 11 11 ; 3 4 ; (;lay)
+fwtot=. fwtot + lay
+NB. Par 3 Bogey can't reach
+width=. }: each 'glPlanFWWidth' matrix_pull hole ; tee ; gender
+z=. j. / > #each width NB. later will check it is 0j1
+fname fappend~ write_row_head 8 13 ; 2.5 0.5; '<i>Bgy not reach P3</i>'; '<b>3</b>'
+width=.  _1 { ; {: each width
+fname fappend~ ('cell' ; 'input') write_row_head 11 13 ; 5 1 ; '<b>LZ cut to FW height</b>' ; (z=0j1) * width
+width=. (z=0j1) * (width < 20) { 1 2 NB. Zero if not par 3
+fname fappend~ write_calc 17 13 ; 1 ; width
+fwtot=. fwtot + 0,width
 NB. Surround
 lay=. >(>./ each watersurr)
 lay=. ( 2 3 i. lay){1 2 0
@@ -1095,7 +1113,8 @@ NB. End of Page
 fname fappend~ LF,'// -------- End of Page -------------'
 NB. fname fappend~ LF,'$pdf->SetXY(100,100);'
 NB. fname fappend~ LF,'$pdf->Write(10,''Return to plan'',''http://jw/rating/plannomap/',glFilename,'/',(":1+hole),''')'
-fname fappend~ LF,'$pdf->Output(''/var/www/tcpdf/rating/',shortname,'.pdf'', ''FI'');'
+NB. fname fappend~ LF,'$pdf->Output(''/var/www/tcpdf/rating/',shortname,'.pdf'', ''FI'');'
+fname fappend~ LF,'$pdf->Output(''',glDocument_Root,'/tcpdf/rating/',shortname,'.pdf'', ''FI'');'
 fname fappend~ LF,'?>'
 
 stdout '</head><body onLoad="redirect(''/tcpdf/rating/',shortname,'.php'')"'
@@ -1336,7 +1355,7 @@ NB. Usage
 NB.   lookup_green_target gender ; abilty ; yards ; width
 NB. Returns table value
 lookup_fairway_rating_old=: 3 :  0
-0 lookup_fairway_rating y
+0 lookup_fairway_rating_old y
 :
 'gender ab yards width'=. y
 if. gender=0 do. NB. Men
@@ -1369,14 +1388,17 @@ lookup_fairway_rating=: 3 :  0
 0 lookup_fairway_rating y
 :
 'gender ab yards width'=. y
+NB. Added extra row of zeros for complicated situation when 
+NB. Bogey cannot reach Par 3
+NB. When the distance will be passed as 999
 if. gender=0 do. NB. Men
     row=. 340 380 426 
-    col=. 50 39 29 25 24 23 19   
-    mat=. 4 8 $ 1 1 2 3 3 4 4 5, 1 2 3 3 4 4 5 6, 2 3 4 4 5 5 6 7, 2 3 4 5 6 6 7 8
+    col=. 299 50 39 29 25 24 23 19   
+    mat=. 4 9 $ 0 1 1 2 3 3 4 4 5, 0 1 2 3 3 4 4 5 6, 0 2 3 4 4 5 5 6 7, 0 2 3 4 5 6 6 7 8
 else.
     row=. 270 310 356 
-    col=. 45 34 29 25 24 23 19
-    mat=. 4 8 $ 1 1 2 3 3 4 4 5, 1 2 3 3 4 4 5 6, 2 3 4 4 5 5 6 7, 2 3 4 5 6 6 7 8
+    col=. 299 45 34 29 25 24 23 19
+    mat=. 4 9 $ 0 1 1 2 3 3 4 4 5, 0 1 2 3 3 4 4 5 6, 0 2 3 4 4 5 5 6 7, 0 2 3 4 5 6 6 7 8
 end.
 if. x do. NB. Print matrix
 	res=. <"0 mat

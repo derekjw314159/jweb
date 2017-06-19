@@ -332,12 +332,24 @@ exit ''
 )
 
 NB. =========================================================
+NB. rating_landingcopyshot_e
+NB. =========================================================
+NB. Copy data from nearest point based on same shot to different tee
+jweb_rating_landingcopyshot_e=: 3 : 0
+NB. Retrieve the details
+1 jweb_rating_landingcopy_e y
+)
+
+NB. =========================================================
 NB. rating_landingcopy_e
 NB. =========================================================
 NB. Copy data from nearest point
+NB. x is whether the copy is limited to the same shot for the same gender
+NB. typically to copy from white tee to yellow
 jweb_rating_landingcopy_e=: 3 : 0
+0 jweb_rating_landingcopy_e y
+:
 NB. Retrieve the details
-
 NB. y has two elements only
 
 'filename keyy'=. y
@@ -380,6 +392,12 @@ NB. Look for measurement point at the nearest distance
 hole=. ix{glPlanHole
 ww=. I. glPlanHole = hole
 ww=. ww -. ix NB. can't be self
+NB. Restrict to this shot and gender and ability if x=1
+if. x=1 do.
+    ww=. ( (ix{glPlanGender) = ww{glPlanGender) # ww
+    ww=. ( (ix{glPlanAbility) = ww{glPlanAbility) # ww
+    ww=. ( (ix{glPlanShot) = ww{glPlanShot) # ww
+end.
 ww=.  ( 0< ww { glPlanAlt + glPlanFWWidth + glPlanBunkLZ + glPlanBunkLine + glPlanOOBDist + glPlanTreeDist ) # ww
 
 if. 0<#ww do.
