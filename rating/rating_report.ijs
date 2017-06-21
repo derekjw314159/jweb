@@ -273,7 +273,7 @@ for_sz. size do.
     if. sz<0 do.
 	res=. res, write_lightgrey (offset+2{. sz_index{+/ \0,|size); |sz
     else.
-	res=.res, 'white' oN 'blue'
+	res=.res, 'black' oN 'grey'
 	sh=. ((sz_index){_1 + (+/) \ size >: 0 ){array
 	if. 1=L. sh do. sh=. >sh end.`
 	if. 2 ~: 3!:0 sh do. sh=. ;'p<+>' 8!:0 sh end.
@@ -396,6 +396,7 @@ targvisible=. 0, each }: each targvisible NB. Push to the shot after
 targvisible=. visible >. each targvisible
 rolllevel=. 'glPlanRollLevel' matrix_pull hole ; tee ; gender
 rollslope=. 'glPlanRollSlope' matrix_pull hole ; tee ; gender
+psych=. 0 2$0
 
 NB. Title row
 fname fappend~ LF,'// -------- Title Row -------------'
@@ -552,6 +553,7 @@ fwtot=. fwtot + lay
 NB. Fairway Overall rating
 fname fappend~ 'R' write_footer 0 33 ; 3 ; 'Fairway Rating'
 fname fappend~ 'C' write_footer 3 33 ;  2 3 ; fwtot
+psych=. psych, fwtot
 
 NB. ------------------------
 NB. Elevation
@@ -639,7 +641,9 @@ fname fappend~ 'C' write_calc  3 19 ; sz ; (;wid)
 fname fappend~ 'R' write_cell 0 20 ; 3 ; 'Highest Shot Value'
 fname fappend~ 'C' write_calc  3 20 ; 2 3 ; (0 >. ;>. / each wid) 
 fname fappend~ 'R' write_footer 0 21 ; 3 ; 'Topography'
-fname fappend~ 'C' write_footer 3 21 ;  2 3 ; (0 >. ;>. / each wid)
+wid=. 1 2$(0 >. ;>. / each wid)
+fname fappend~ 'C' write_footer 3 21 ;  2 3 ; wid
+psych=. psych, wid
 
 NB. ------------------------
 NB. Green Target
@@ -675,6 +679,7 @@ fname fappend~ write_input 3 40 ; 2.5 2.5 ; 2$fw
 greenval=. greenval + 2$fw
 fname fappend~ 'R' write_footer 0 41 ; 3 ; 'Green Target'
 fname fappend~ 'C' write_footer 3 41 ;  2.5 2.5 ; greenval
+psych=. psych, greenval
 
 NB. ------------------------
 NB. Type of Course
@@ -797,7 +802,8 @@ fname fappend~ 'C' write_input 21 15 ; sz ; <<"0 (;waterline){' y'
 NB. Overall rating
 fname fappend~ 'R' write_footer 18 16 ; 3 ; 'Water Rating'
 fwtot=. fwtot + (0=fwtot) * +. / ; waterline 
-fname fappend~ 'C' write_footer 21 16 ;  3 4 ; fwtot
+fname fappend~ 'C' write_footer 21 16 ;  3 4; fwtot
+psych=. psych, fwtot
 
 NB. ------------------------
 NB. Recoverability and Rough
@@ -863,6 +869,7 @@ fwtot=. fwtot + lay
 NB. Total
 fname fappend~ 'R' write_footer 8 15 ; 3 ; 'Recov & R Rating'
 fname fappend~ 'C' write_footer 11 15 ;  3 4 ; fwtot
+psych=. psych, fwtot
 
 NB. ----------------------------------------
 NB. Bunkers
@@ -931,6 +938,7 @@ fwtot=. 0 >. fwtot + fw NB. Can't be negative
 fwtot=. fwtot >. +./ ;lz,lop NB. Must be a minimum of one if it exists
 fname fappend~ 'R' write_footer 8 27 ; 3 ; <<'Bunker Rating'
 fname fappend~ 'C' write_footer 11 27 ;  3 4 ; fwtot
+psych=. psych, fwtot
 
 NB. ------------------------
 NB. OOB / Extreme Rough
@@ -996,6 +1004,7 @@ fname fappend~ 'R' write_footer 8 41  ; 3 ; 'OOB/ER Rating'
 fwtot=. (;>./each fwtot) NB. max value
 fwtot=. fwtot + (0=fwtot) * +. / ; oobline 
 fname fappend~ 'C' write_footer 11 41 ;  3 4 ; fwtot
+psych=. psych, fwtot
 
 NB. ------------------------
 NB. Trees
@@ -1032,14 +1041,18 @@ fname fappend~ 'R' write_cell 18 23 ; 3 ; 'Tweener Adj'
 fname fappend~ write_calc 21 23 ; 3 4 ; fw{glTreeTweener
 fname fappend~ 'R' write_cell 18 24 ; 3 ; '<b>Adjusted Val</b>'
 fname fappend~ write_calc 21 24 ; 3 4 ; fw{glTreeTweener+glTreeNum
+fwtot=. fw{glTreeTweener+glTreeNum
 NB. Tree obstructed
 fname fappend~ write_row_head 18 25 ; 2.5 0.5; '<i>Obstruct</i>'; '<b>O</b>'
 fname fappend~ write_input 21 25 ; sz ; (;treeobs)
+fwtot=. fwtot + > (>. /each treeobs)
 NB. Tree squeeze (not yet implemented)
 fname fappend~ write_row_head 18 26 ; 2.5 0.5; '<i>Squeeze</i>'; '<b>Q</b>'
 fname fappend~ write_input 21 26 ; sz ; 0 * ;treeobs
+NB. Tree Rating
 fname fappend~ 'R' write_footer 18 27 ; 3 ; 'Tree Rating'
-fname fappend~ 'C' write_footer 21 27 ;  3 4 ; (> (>. / each treeobs)) + fw{glTreeTweener+glTreeNum
+fname fappend~ 'C' write_footer 21 27 ;  3 4 ; fwtot
+psych=. psych, fwtot
  
 NB. ------------------------
 NB. Green Surface
@@ -1063,8 +1076,37 @@ NB. Tiered
 fname fappend~ write_row_head 18 33 ; 2.5 0.5 ; ' ' cut '<i>Tiered</i> <b>T</b>'
 fname fappend~ write_input 21 33 ; 3 4 ; 2$glGrTiered
 fwtot=. fwtot + 2$glGrTiered
-fname fappend~ 'R' write_footer 18 35 ; 3 ; 'Gr Surface Rating'
-fname fappend~ 'C' write_footer 21 35 ;  3 4 ; fwtot
+fname fappend~ 'R' write_footer 18 34 ; 3 ; 'Gr Surface Rating'
+fname fappend~ 'C' write_footer 21 34 ;  3 4 ; fwtot
+psych=. psych, fwtot
+
+NB. ------------------------
+NB. Psychological
+NB. ------------------------
+fname fappend~ LF,'// -------- Psychological -------------'
+fname fappend~ write_title 18 35 ; 3 1 ; '<b>PSYCHOLOGICAL</b>' 
+fname fappend~ 'C' write_cell 21 35 ; 3 4 ; <' ' cut '<b>Scratch</b> <b>Bogey</b>' 
+fname fappend~ write_row_head 18 36 ; 2.9 0.1 ;  ':' cut 'No. Obstacles &gt;=5: '
+fname fappend~ write_calc 21 36 ; 3 4 ; <+ / psych >: 5
+fname fappend~ write_row_head 18 37 ; 2.9 0.1 ;  ':' cut 'Sum of Obstacles: '
+fname fappend~ write_calc 21 37 ; 3 4 ; <+ / psych * psych >: 5
+fname fappend~ 'R' write_cell 18 38 ; 3 ; 'Table Value'
+wid=. lookup_psychological psych
+fname fappend~ 'C' write_calc  21 38 ; 3 4 ; (;wid) 
+NB. Extraordinary rating if any rated 10
+fname fappend~ write_row_head 18 39 ; 2.5 0.5 ; 'Extraordinary' ; '<b>X</b>'
+fw=. (2 <. +/psych >: 10){ 0 5 9
+fw= 0 >. wid - fw
+fname fappend~ write_calc 21 39 ; 3 4 ; fw
+fwtot=. wid + fw
+NB. Hole 1 and 18
+fname fappend~ 'R' write_cell 18 40 ; 3 ; 'Hole 1 or 18' 
+fw=. 2$ hole e. 0 17
+fname fappend~ write_calc 21 40 ; 3 4 ; fw
+fwtot=. fwtot + fw
+fname fappend~ 'R' write_footer 18 41 ; 3 ; 'Psychological'
+fname fappend~ 'C' write_footer 21 41 ;  3 4 ; fwtot
+
 
 NB. -----------------------------
 NB. Altitude
@@ -1107,7 +1149,8 @@ fname fappend~ pdfBox 8 16 ; 10 12
 fname fappend~ pdfBox 8 28 ; 10 14 
 fname fappend~ pdfBox 18 1 ; 10 17 NB. Water
 fname fappend~ pdfBox 18 18 ; 10 10 NB. Trees
-fname fappend~ pdfBox 18 30 ; 10 6
+fname fappend~ pdfBox 18 30 ; 10 5 NB. Green Surface
+fname fappend~ pdfBox 18 35 ; 10 7 NB. Psychological
 
 NB. End of Page
 fname fappend~ LF,'// -------- End of Page -------------'
@@ -1715,3 +1758,28 @@ for_ab. 0 1 do.
 	res=. res, ( <(+/ (''$stimp) >: row), contour){mat
 end.
 )
+
+NB. =========================================================
+NB. lookup_psychological
+NB. =========================================================
+NB. Usage
+NB.   lookup_psychological psych
+lookup_psychological=: 3 : 0
+'psych'=. y
+res=. 0$0
+count=. +/psych >: 5
+tot=. +/psych * psych >:5
+for_ab. 0 1 do.
+    select. ab{count
+	case. 0 ; 1 ; 2 do. res=. res, 0
+	case. 3 do. res=. res, (+/(ab{tot)>: 20 22 24 26 99 28 99 29 30){0 2 3 4 5 6 7 8 9 10
+	case. 4 do. res=. res, (+/(ab{tot)>: 20 22 25 28 31 34 99 37 38){0 2 3 4 5 6 7 8 9 10
+	case. 5 do. res=. res, (+/(ab{tot)>: 25 27 29 31 34 37 40 43 46){0 2 3 4 5 6 7 8 9 10
+	case. 6 do. res=. res, (+/(ab{tot)>: 99 30 32 34 37 40 43 46 49){0 2 3 4 5 6 7 8 9 10
+	case. 7 do. res=. res, (+/(ab{tot)>: 99 99 35 37 40 43 46 49 52){0 2 3 4 5 6 7 8 9 10
+	case. 8 do. res=. res, (+/(ab{tot)>: 99 99 40 42 44 46 49 52 55){0 2 3 4 5 6 7 8 9 10
+	case. 9 do. res=. res, (+/(ab{tot)>: 99 99 99 45 47 49 52 55 58){0 2 3 4 5 6 7 8 9 10
+    end.
+end.
+)
+

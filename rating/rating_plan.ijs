@@ -268,10 +268,10 @@ for_rr. i. #glPlanID do.
 				stdout '<td>'
 				holelength=. (<(glTees i. t),hole){glTeesYards
 				holelength=. <. 0.5+ holelength - (rr{glPlanMeasDist) 
-			    ww=. InterceptPath backpath ; backstart ; holelength
+				ww=. InterceptPath backpath ; backstart ; holelength
 				ww=. <. 0.5 + glMY * |-/LatLontoFullOS backstart, 0{ww
 				if. holelength ~: ww do.
-					ww=. ' [',(":ww),']'
+					ww=. ' <span style="color: gray">[',(":ww),']</span>'
 				else.
 					ww=. ''
 				end.
@@ -288,12 +288,13 @@ for_rr. i. #glPlanID do.
 				stdout '</td>'
 			end.
 		end.
-		stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr{glPlanShot),({.>(glTees i. rr{glPlanTee){glTeesName),'</td>'
+		stdout '<td>',((rr{glPlanGender){'MW'),({.>(glTees i. rr{glPlanTee){glTeesName),'-',((rr{glPlanAbility){'SB'),(": 1+rr{glPlanShot),,'</td>'
+NB.stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr{glPlanShot),({.>(glTees i. rr{glPlanTee){glTeesName),'</td>'
 		stdout '<td><a href="/jw/rating/layup/e/',(glFilename),'/'
 		stdout ;": 1+rr{glPlanHole
 		stdout (;rr{glPlanTee),'/'
 		stdout ((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),(": 1+rr{glPlanShot),'">'
-		stdout (": rr{glPlanHitYards),( rr{glPlanHitYards ~: glPlanCrowDist)#' [',(": rr{glPlanCrowDist),']'
+		stdout (": rr{glPlanHitYards),( rr{glPlanHitYards ~: glPlanCrowDist)#' <span style="color: gray">[',(": rr{glPlanCrowDist),']</span>'
 		stdout (rr{glPlanLayupType)
 		stdout (('L'=rr{glPlanLayupType)#(3{.": >rr{glPlanLayupCategory)),'</a></td><td>', (": <. 0.5 + rr{glPlanRemGroundYards),'</td>' 
 		if. 0<rr{glPlanRemGroundYards do.
