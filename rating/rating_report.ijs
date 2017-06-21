@@ -785,7 +785,7 @@ NB. Only apply if both original values and the adjusted value is >=5
 fw=. (<5) <: each fwtot
 fw=. fw *. each (<5) <: each watlat
 fw=. fw *. each (<5) <: each watcarry
-fname fappend~ write_row_head 18 11 ; 2.5 0.5 ; '<i>Two Ways</i>' ; 'Y'
+fname fappend~ write_row_head 18 11 ; 2.5 0.5 ; '<i>Two Ways</i>' ; '<b>Y</b>'
 fname fappend~ 'C' write_calc 21 11 ; sz ; <'b<>' 8!:0 ;fw
 fwtot=. fwtot + each fw
 NB. Water Surround
@@ -815,6 +815,7 @@ fwtot=. fwtot + wattwice
 NB. OOB anywhere
 fname fappend~ 'L' write_cell 18 16 ; 3 ; '<i>On Line of Play</i>' 
 waterline=. 'glPlanWaterLine' matrix_pull hole ; tee ; gender
+waterline=. ; +. / each waterline
 fname fappend~ 'C' write_input 21 16 ; sz ; <<"0 (;waterline){' y'
 NB. Overall rating
 fname fappend~ 'R' write_footer 18 17 ; 3 ; 'Water Rating'
@@ -1002,6 +1003,7 @@ fname fappend~ write_input 11 28 ; sz ; (;oobdist)
 NB. Behind only applies to lateral distance
 fname fappend~ write_row_head 8 29 ; 2.5 0.5 ; '<i>Behind</i>' ; ''
 fwtot=. lookup_oob gender ; hityards ; <oobdist
+ooblat=. fwtot
 behind=. (' ' cut 'glPlanLayupReason glGrOOBBehind') matrix_pull hole ; tee ; gender
 behind=. (<glOOBBehindVal) i. each behind
 behind=. behind { each <glOOBBehindNum,0
@@ -1014,6 +1016,7 @@ NB. Lookup values
 fname fappend~ 'R' write_cell 8 31 ; 3 ; 'Table Value'
 fname fappend~ 'L' write_calc 11 31 ; sz ; <('bp' 8!:0 ;fwtot)
 fw=. lookup_carry_oob gender ; <carryyards
+oobcarry=. fw
 fname fappend~ 'R' write_calc 11 31 ; sz ; <('bp' 8!:0 ;fw)
 fwtot=. fwtot >. each fw
 for_i. i. 7 do. 
@@ -1042,19 +1045,36 @@ NB. Squeeze
 fname fappend~ write_row_head 8 35 ; 2.0 1.0 ; '<i>Squeeze</i>' ; '<b>Q</b>'
 fw=. 0 * each hityards NB. Temporarily set to zero
 fname fappend~ 'C' write_input 11 35 ; sz ; ;fw 
+NB. Two Ways
+NB. Only apply if both original values and the adjusted value is >=5
+fw=. (<5) <: each fwtot
+fw=. fw *. each (<5) <: each ooblat
+fw=. fw *. each (<5) <: each oobcarry
+fname fappend~ write_row_head  8 36 ; 2.5 0.5 ; '<i>Two Ways</i>' ; '<b>Y</b>'
+fname fappend~ 'C' write_calc 11 36 ; sz ; <'b<>' 8!:0 ;fw
+fwtot=. fwtot + each fw
 NB. Total shot value
-fname fappend~ 'R' write_cell 8 38  ; 3 ; 'Total Shot Value'
-fname fappend~ write_calc 11 38 ; sz ; (;fwtot)
-fname fappend~ 'R' write_cell 8 39  ; 3 ; 'Highest Shot Value'
-fname fappend~ write_calc 11 39 ; 3 4 ; (;>. / each fwtot)
+fname fappend~ 'R' write_cell 8 37  ; 3 ; 'Total Shot Value'
+fname fappend~ write_calc 11 37 ; sz ; (;fwtot)
+fname fappend~ 'R' write_cell 8 38  ; 3 ; 'Highest Shot Value'
+fname fappend~ write_calc 11 38 ; 3 4 ; (;>. / each fwtot)
+NB. Calculate in play twice adjustment
+oobtwice=. fwtot * each (<5) <: each fwtot NB. Add up values greater than or equal to 5
+oobtwice=. oobtwice *each (<2) <: each +/ each (<0) < each oobtwice NB. Has to be at least two entries
+oobtwice=. (; +/ each oobtwice)
+oobtwice=. (oobtwice>0) + oobtwice > 11
+NB. In Play Twice
+fname fappend~ write_row_head 8 39 ; 2.5 0.5 ; '<i>In Play Twice</i>' ; '2'
+fname fappend~ 'C' write_calc 11 39 ; 3 4 ; (;oobtwice)
+fwtot=. (; >. / each fwtot) + oobtwice
 NB. OOB anywhere
 fname fappend~ 'L' write_cell 8 40 ; 3 ; '<i>On Line of Play</i>' 
 oobline=. 'glPlanOOBLine' matrix_pull hole ; tee ; gender
-fname fappend~ 'C' write_input 11 40 ; sz ; <<"0 (;oobline){' y'
+oobline=. ; +. / each oobline
+fname fappend~ 'C' write_input 11 40 ;  3 4 ; <<"0 (;oobline){' y'
 NB. Overall rating
 fname fappend~ 'R' write_footer 8 41  ; 3 ; 'OOB/ER Rating'
-fwtot=. (;>./each fwtot) NB. max value
-fwtot=. fwtot + (0=fwtot) * +. / ; oobline 
+fwtot=. fwtot >. oobline 
 fname fappend~ 'C' write_footer 11 41 ;  3 4 ; fwtot
 psych=. psych, fwtot
 
