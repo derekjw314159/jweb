@@ -238,10 +238,10 @@ for_sz. size do.
     if. sz<0 do.
 	res=. res, write_lightgrey (offset+2{. sz_index{+/ \0,|size); |sz
     else.
-	res=.res, 'blue' oN 'lightblue'
+	res=.res, 'blue' oN 'white'
 	sh=. ((sz_index){_1 + (+/) \ size >: 0 ){array
 	if. 1=L. sh do. sh=. >sh end.`
-	if. 2 ~: 3!:0 sh do. sh=. ;'p<+>' 8!:0 sh end.
+	if. 2 ~: 3!:0 sh do. sh=. ;'p<>' 8!:0 sh end.
 	res=. res,LF,'$pdf->', just pdfMulti (offset+2{. sz_index{+/ \0,|size); (sz,1) ; sh ; boxe
     end.
 end.
@@ -276,7 +276,7 @@ for_sz. size do.
 	res=.res, 'black' oN 'grey'
 	sh=. ((sz_index){_1 + (+/) \ size >: 0 ){array
 	if. 1=L. sh do. sh=. >sh end.`
-	if. 2 ~: 3!:0 sh do. sh=. ;'p<+>' 8!:0 sh end.
+	if. 2 ~: 3!:0 sh do. sh=. ;'p<>' 8!:0 sh end.
 	sh=. '<b>',sh,'</b>'
 	res=. res,LF,'$pdf->', just pdfMulti (offset+2{. sz_index{+/ \0,|size); (sz,1) ; sh ; boxe
     end.
@@ -489,7 +489,8 @@ fname fappend~ 'C' write_cell 3 22 ; 1 ; <ww
 NB. Fairway Width
 fname fappend~ 'R' write_cell 0 23 ; 3 ; '<i>Width (Yds) at LZ</i>'
 fname fappend~ 'R' write_cell 0 24 ; 3 ; 'Table Value'
-wid=. }: each 'glPlanFWWidth' matrix_pull hole ; tee ; gender
+fairwaywidth=.  'glPlanFWWidth' matrix_pull hole ; tee ; gender
+wid=. }: each fairwaywidth
 select. z=. j. / > #each wid
     case. 0j0 do. sz=. _1 _1, _1 _1 _1
     case. 0j1 do. 
@@ -565,7 +566,7 @@ sh=. glGrAlt - glTeAlt
 sh=. sh * 10<: |sh NB. Minimum 10ft
 sh=. (*sh) * 10 * <.0.5+ 0.1 * (| sh) NB. Round to nearest 10
 if. 3=gender{glTePar do. _40 >. sh <. 40 end.
-fname fappend~ 'R' write_input 6 11 ; 1 1 ; (0 >. sh),0 <. sh 
+fname fappend~ 'R' write_input 6 11 ; 1 1 ; <'b<>p<+>' 8!:0 (0 >. sh),0 <. sh 
 
 NB. ------------------------
 NB. Lay-Up
@@ -611,8 +612,8 @@ NB. Alt has to be multiples of 10ft, and rounding is incorrect for negatives
 alt=. (*alt) * 10 * <. 0.5 + 0.1*(|alt)
 NB. For Par 3s, 40 is the maximum
 if. (gender{glTePar) = 3 do. alt=. _40 >. alt <. 40 end.
-fname fappend~ (' ' cut 'cell calc') write_row_head 3 15 ; 1.2  0.8 ; 'App S:' ; 0{alt
-fname fappend~ (' ' cut 'cell calc') write_row_head 5 15 ; 2 1 ; 'App Elev B:' ; 1{alt
+fname fappend~ (' ' cut 'cell input') write_row_head 3 15 ; 1.2  0.8 ; 'App S:' ; ;'p<+>' 8!:0 (0{alt)
+fname fappend~ (' ' cut 'cell input') write_row_head 5 15 ; 2 1 ; 'App Elev B:' ; ;'p<+>' 8!:0 (1{alt)
 fname fappend~ 'R' write_cell 0 16 ; 3 ; '<i>(LZtoLZ or Appr)</i>'
 ww=. ' ' cut 'LZ1-2 Appr LZ1-2 LZ2-3 Appr'
 ww=. (<'<b>'), each ww, each <'</b>'
@@ -733,76 +734,92 @@ select. z=. j. / > #each waterdist
 end.
 fname fappend~ 'R' write_cell 18 2 ; 3 ; '<i>Centre LZ to Lateral</i>' 
 fname fappend~ write_input 21 2 ; sz ; (;waterdist)
-fname fappend~ 'R' write_cell 18 3 ; 3 ; '<i>Yds to Carry Safely</i>' 
-fname fappend~ write_input 21 3 ; sz ; (;carryyards)
-fname fappend~ 'R' write_cell 18 4 ; 3 ; 'Table Value'
+fname fappend~ 'R' write_cell 18 4 ; 3 ; '<i>Yds to Carry Safely</i>' 
+fname fappend~ write_input 21 4 ; sz ; (;carryyards)
+fname fappend~ 'R' write_cell 18 5 ; 3 ; 'Table Value'
 watlat=. lookup_lateral_water gender ; hityards ; <waterdist
-fwtot=. watlat
-fname fappend~ 'L' write_calc 21 4 ; sz ; <('bp' 8!:0 ;watlat)
+NB. Behind adjustment for lateral only
+fname fappend~ write_row_head 18 3 ; 2.5 0.5 ; '<i>Behind</i>' ; ''
+behind=. (' ' cut 'glPlanLayupReason glGrWaterBehind') matrix_pull hole ; tee ; gender
+behind=. (<glWaterBehindVal) i. each behind
+fw=. behind { each <glWaterBehindNum,0
+fname fappend~ 'C' write_input 21 3 ; sz ; <'b' 8!:0 ;fw 
+watlat=. 0 >. each watlat + each fw
+fname fappend~ 'L' write_calc 21 5 ; sz ; <('bp' 8!:0 ;watlat)
+NB. Water carry
 watcarry=. lookup_carry_water gender ; <carryyards
-fname fappend~ 'R' write_calc 21 4 ; sz ; <('bp' 8!:0 ;watcarry)
-fwtot=. fwtot >. each watcarry
+fname fappend~ 'R' write_calc 21 5 ; sz ; <('bp' 8!:0 ;watcarry)
+fwtot=. watlat >. each watcarry
 for_i. i. 7 do. 
-	if. _1 ~: i{sz do. fname fappend~ pdfDiag ((21.33+i), 4) ; 0.33 1  end.
+	if. _1 ~: i{sz do. fname fappend~ pdfDiag ((21.33+i), 5) ; 0.33 1  end.
 end.
+NB. Cart Path Tilt
+fname fappend~ write_row_head 18 6 ; 2.0 1.0 ; '<i>Cart Path</i>' ; '<b>+B</b>'
+fw=. 0 * each carryyards NB. Temporarily set to zero
+fname fappend~ 'C' write_input 21 6 ; sz ; ;fw 
+NB. Cart Path Prevent
+fname fappend~ write_row_head 18 7 ; 2.0 1.0 ; '<i>Prevent</i>' ; '<b>-B</b>'
+fw=. 0 * each carryyards NB. Temporarily set to zero
+fname fappend~ 'C' write_input 21 7 ; sz ; ;fw 
 NB. Percent reduction
-fname fappend~ write_row_head 18 6 ; 2.5 0.5 ; '<i>Percent</i>' ; '<b>P</b>'
+fname fappend~ write_row_head 18 8 ; 2.5 0.5 ; '<i>Percent</i>' ; '<b>P</b>'
 percent=. (' ' cut 'glPlanWaterPercent glGrWaterPercent') matrix_pull hole ; tee ; gender
 percent=. (<glWaterPercentVal) i. each percent
 fw=. (;percent) { glWaterPercentDesc
-fname fappend~ 'C' write_input 21 6 ; sz ; <fw 
+fname fappend~ 'C' write_input 21 8 ; sz ; <fw 
 fw=. (percent) { each <1- glWaterPercentNum NB. Fraction which remains
 fw=. <. each (<0.5) + each fwtot * each fw NB. Amount which remains (need to do this first for rounding)
 fw=. fw - each fwtot NB. Amount of reduction
 NB. fname fappend~ 'R' write_calc 21 6 ; sz ; <('bm<(>n<)>' 8!:0 ;fw)
 fwtot=. fwtot + each fw
-NB. Behind
-fname fappend~ write_row_head 18 7 ; 2.5 0.5 ; '<i>Behind</i>' ; ''
-behind=. (' ' cut 'glPlanLayupReason glGrWaterBehind') matrix_pull hole ; tee ; gender
-behind=. (<glWaterBehindVal) i. each behind
-fw=. behind { each <glWaterBehindNum,0
-fname fappend~ 'C' write_input 21 7 ; sz ; <'b' 8!:0 ;fw 
-fwtot=. fwtot + each fw
+NB. Jeopardy
+fname fappend~ write_row_head 18 9 ; 2.0 1.0 ; '<i>Jeopardy</i>' ; '<b>J</b>'
+fw=. 0 * each carryyards NB. Temporarily set to zero
+fname fappend~ 'C' write_input 21 9 ; sz ; ;fw 
+NB. Squeeze
+fname fappend~ write_row_head 18 10 ; 2.0 1.0 ; '<i>Squeeze</i>' ; '<b>Q</b>'
+fw=. 0 * each carryyards NB. Temporarily set to zero
+fname fappend~ 'C' write_input 21 10 ; sz ; ;fw 
 NB. Two Ways
 NB. Only apply if both original values and the adjusted value is >=5
 fw=. (<5) <: each fwtot
 fw=. fw *. each (<5) <: each watlat
 fw=. fw *. each (<5) <: each watcarry
-fname fappend~ write_row_head 18 10 ; 2.5 0.5 ; '<i>Two Ways</i>' ; 'Y'
-fname fappend~ 'C' write_calc 21 10 ; sz ; (;fw)
+fname fappend~ write_row_head 18 11 ; 2.5 0.5 ; '<i>Two Ways</i>' ; 'Y'
+fname fappend~ 'C' write_calc 21 11 ; sz ; <'b<>' 8!:0 ;fw
 fwtot=. fwtot + each fw
 NB. Water Surround
 rr=. (glWaterFractionVal i. glGrWaterFraction)
 cc=. (glWaterSurrDistVal i. glGrWaterSurrDist)
-fname fappend~ 'C' write_input 18 11; 1.25 ;  <rr{glWaterFractionText
-fname fappend~ 'C' write_input 19.25 11; 1.25 ;  <cc{glWaterSurrDistText
-fname fappend~ 'R' write_cell 20.5 11 ; 0.5 ; '<b>S</b>'
+fname fappend~ 'C' write_input 18 12; 1.25 ;  <rr{glWaterFractionText
+fname fappend~ 'C' write_input 19.25 12; 1.25 ;  <cc{glWaterSurrDistText
+fname fappend~ 'R' write_cell 20.5 12 ; 0.5 ; '<b>S</b>'
 fw=. lookup_water_surround (rr{glWaterFractionNum) ; (cc{glWaterSurrDistNum) ; greenval ; <hityards
 watersurr=. fw
-fname fappend~ write_calc 21 11; sz ; (;fw)
+fname fappend~ write_calc 21 12; sz ; <'b<>' 8!:0 (;fw)
 fwtot=. fwtot +each fw
-fname fappend~ 'R' write_cell 18 12 ; 3 ; 'Total Shot Value'
-fname fappend~ write_calc 21 12 ; sz ; (;fwtot)
+fname fappend~ 'R' write_cell 18 13 ; 3 ; 'Total Shot Value'
+fname fappend~ write_calc 21 13 ; sz ; <'b<>' 8!:0 (;fwtot)
 NB. Calculate in play twice adjustment
 wattwice=. fwtot * each (<5) <: each fwtot NB. Add up values greater than or equal to 5
 wattwice=. wattwice *each (<2) <: each +/ each (<0) < each wattwice NB. Has to be at least two entries
 wattwice=. (; +/ each wattwice)
 wattwice=. (wattwice>0) + wattwice > 11
-fname fappend~ 'R' write_cell 18 13 ; 3 ; 'Highest Shot Value'
+fname fappend~ 'R' write_cell 18 14 ; 3 ; 'Highest Shot Value'
 fwtot=. ; >. / each fwtot NB. Max value
-fname fappend~ write_calc 21 13 ; 3 4 ; (fwtot)
+fname fappend~ write_calc 21 14 ; 3 4 ; (fwtot)
 NB. In Play Twice
-fname fappend~ write_row_head 18 14 ; 2.5 0.5 ; '<i>In Play Twice</i>' ; '2'
-fname fappend~ 'C' write_calc 21 14 ; 3 4 ; (;wattwice)
+fname fappend~ write_row_head 18 15 ; 2.5 0.5 ; '<i>In Play Twice</i>' ; '2'
+fname fappend~ 'C' write_calc 21 15 ; 3 4 ; (;wattwice)
 fwtot=. fwtot + wattwice
 NB. OOB anywhere
-fname fappend~ 'L' write_cell 18 15 ; 3 ; '<i>On Line of Play</i>' 
+fname fappend~ 'L' write_cell 18 16 ; 3 ; '<i>On Line of Play</i>' 
 waterline=. 'glPlanWaterLine' matrix_pull hole ; tee ; gender
-fname fappend~ 'C' write_input 21 15 ; sz ; <<"0 (;waterline){' y'
+fname fappend~ 'C' write_input 21 16 ; sz ; <<"0 (;waterline){' y'
 NB. Overall rating
-fname fappend~ 'R' write_footer 18 16 ; 3 ; 'Water Rating'
+fname fappend~ 'R' write_footer 18 17 ; 3 ; 'Water Rating'
 fwtot=. fwtot + (0=fwtot) * +. / ; waterline 
-fname fappend~ 'C' write_footer 21 16 ;  3 4; fwtot
+fname fappend~ 'C' write_footer 21 17 ;  3 4; fwtot
 psych=. psych, fwtot
 
 NB. ------------------------
@@ -824,51 +841,62 @@ fname fappend~ write_row_head 8 4 ; 2.5 0.5; '<i>Lay-up</i>'; '<b>L</b>'
 lay=. - each 'L' =each 'glPlanLayupType' matrix_pull hole ; tee ; gender NB. -1 if Layup
 fname fappend~ 'C' write_input 11 4 ; sz ; (;lay)
 fwtot=. fwtot + > +/each lay
+NB. Inconsistent
+fname fappend~ write_row_head 8 5 ; 2.5 0.5 ; '<i>Inconsistent</i>' ; '<b>I</b>'
+fw=. 0 * each lay NB. Temporarily set to zero
+fname fappend~ 'C' write_input 11 5 ; sz ; ;fw 
 NB. Mounds
 fname fappend~ write_row_head 8 6 ; 2.5 0.5; '<i>Mounds</i>'; '<b>M</b>'
 lay=. ('glPlanRRMounds' ; 'glGrRRMounds') matrix_pull hole ; tee ; gender 
 fname fappend~ 'C' write_input 11 6 ; sz ; (;lay)
 fwtot=. fwtot + > +/each lay
 NB. Carry
-fname fappend~ ('cell' ; 'input') write_row_head 8 8 ; 0.55 0.7 ; '<i>Y</i>' ; ":0{>0{carryyards
-fname fappend~ ('cell' ; 'input') write_row_head 9.25 8 ; 0.5 0.75 ; '<i>H</i>'; (":glGrRRRoughLength),'&quot;' 
+fname fappend~ ('cell' ; 'input') write_row_head 8 7 ; 0.55 0.7 ; '<i>Y</i>' ; ":0{>0{carryyards
+fname fappend~ ('cell' ; 'input') write_row_head 9.25 7 ; 0.5 0.75 ; '<i>H</i>'; (":glGrRRRoughLength),'&quot;' 
 lay=. lookup_carry_rough gender ; carryyards ; glGrRRRoughLength
-fname fappend~ 'R' write_cell 10.5 8 ; 0.5 ; '<b>C</b>'
-fname fappend~ 'C' write_calc 11 8 ; sz ; (;lay)
-fwtot=. fwtot + > +/each lay
+fname fappend~ 'R' write_cell 10.5 7 ; 0.5 ; '<b>C</b>'
+fname fappend~ 'C' write_calc 11 7 ; (_1 _1 _1, 1 _1 _1 _1) ; <'b<>' 8!:0 {. ; 1{lay NB. Only pull out Bogey Value, and the first one
+fwtot=. fwtot + ; >. /each lay
 NB. Sub-Total
-fname fappend~ 'R' write_cell 8 9 ; 3 ; 'Sum of <b><u>all</u></b> Values'
-fname fappend~ write_calc 11 9 ; 3 4 ; fwtot
+fname fappend~ 'R' write_cell 8 8 ; 3 ; 'Sum of <b><u>all</u></b> Values'
+fname fappend~ write_calc 11 8 ; 3 4 ; fwtot
 NB. Rise & Drop
 lay=. ''$(glRRRiseDropVal i. glGrRRRiseDrop){glRRRiseDropNum
-fname fappend~ write_input 8 10 ; 1.25 ; <(*lay ){':' cut 'Frac:&gt;&frac12;'
-fname fappend~ write_input 9.25 10 ; 1.25 ; <lay {':' cut 'Ft:5&#39;-10&#39;:&gt;10&#39;'
-fname fappend~ write_cell 10.5 10 ; 0.5 ; <<'<b>R</b>'
-fname fappend~ write_calc 11 10 ; 3 4 ; 2$lay
+fname fappend~ write_input 8  9 ; 1.25 ; <(*lay ){':' cut 'Frac:&gt;&frac12;'
+fname fappend~ write_input 9.25  9 ; 1.25 ; <lay {':' cut 'Ft:5&#39;-10&#39;:&gt;10&#39;'
+fname fappend~ write_cell 10.5  9 ; 0.5 ; <<'<b>R</b>'
+fname fappend~ write_calc 11  9 ; 3 4 ; 2$lay
 fwtot=. fwtot + lay
 NB. Unpleasant
-fname fappend~ write_row_head 8 11 ; 2.5 0.5; '<i>Unpleasant</i>'; '<b>U</b>'
+fname fappend~ write_row_head 8 10 ; 2.5 0.5; '<i>Unpleasant</i>'; '<b>U</b>'
 lay=. >+. / each (' ' cut 'glPlanRRUnpleasant glGrRRUnpleasant') matrix_pull hole ; tee ; gender 
-fname fappend~ 'C' write_input 11 11 ; 3 4 ; (;lay)
+fname fappend~ 'C' write_input 11 10 ; 3 4 ; (;lay)
 fwtot=. fwtot + lay
+NB. Calculate in play twice adjustment
+twice=. 2$ glGrRRRoughLength > 4 NB. Has to be at least 4 inches long
+twice=. twice *. (>#each hityards) >: 2 NB. Has to apply at least twice
+twice=. twice *. (2 <: ; +/each 30 >: each }: each fairwaywidth ) NB. At least two points have to be within 30 yards (arbitrary)
+fname fappend~ write_row_head 8 11 ; 2.5 0.5; '<i>Twice</i>'; '<b>2</b>'
+fname fappend~ 'C' write_input 11 11 ; 3 4 ; twice
+fwtot=. fwtot + twice
 NB. Par 3 Bogey can't reach
 width=. }: each 'glPlanFWWidth' matrix_pull hole ; tee ; gender
 z=. j. / > #each width NB. later will check it is 0j1
-fname fappend~ write_row_head 8 13 ; 2.5 0.5; '<i>Bgy not reach P3</i>'; '<b>3</b>'
+fname fappend~ write_row_head 8 12 ; 2.5 0.5; '<i>Bgy not reach P3</i>'; '<b>3</b>'
 width=.  _1 { ; {: each width
-fname fappend~ ('cell' ; 'input') write_row_head 11 13 ; 5 1 ; '<b>LZ cut to FW height</b>' ; (z=0j1) * width
+fname fappend~ ('cell' ; 'input') write_row_head 11 12 ; 5 1 ; '<b>LZ cut to FW height</b>' ; (z=0j1) * width
 width=. (z=0j1) * (width < 20) { 1 2 NB. Zero if not par 3
-fname fappend~ write_calc 17 13 ; 1 ; width
+fname fappend~ write_input 17 12 ; 1 ; width
 fwtot=. fwtot + 0,width
 NB. Surround
 lay=. >(>./ each watersurr)
 lay=. ( 2 3 i. lay){1 2 0
-fname fappend~ write_row_head 8 14 ; 2.5 0.5 ; '<i>Surr&#39;d (Water)</i>' ; '<b>S</b>'
-fname fappend~ write_input 11 14 ; 3 4 ; lay
+fname fappend~ write_row_head 8 13 ; 2.5 0.5 ; '<i>Surr&#39;d (Water)</i>' ; '<b>S</b>'
+fname fappend~ write_input 11 13 ; 3 4 ; lay
 fwtot=. fwtot + lay
 NB. Total
-fname fappend~ 'R' write_footer 8 15 ; 3 ; 'Recov & R Rating'
-fname fappend~ 'C' write_footer 11 15 ;  3 4 ; fwtot
+fname fappend~ 'R' write_footer 8 14 ; 3 ; 'Recov & R Rating'
+fname fappend~ 'C' write_footer 11 14 ;  3 4 ; fwtot
 psych=. psych, fwtot
 
 NB. ----------------------------------------
@@ -876,68 +904,76 @@ NB. Bunkers
 NB. ----------------------------------------
 fname fappend~ LF,'// -------- Bunkers -------------'
 carryyards=. 'B' carry_yards hole; tee ; gender 
-fname fappend~ write_title 8 16 ; 3 1 ; '<b>BUNKERS</b>'
-fname fappend~ write_cell 11 16 ; 3 ; 'Green Protection:' 
-fname fappend~ write_input 14 16; 4 ; <(glBunkFractionVal i. glGrBunkFraction){glBunkFractionText
+fname fappend~ write_title 8 15 ; 3 1 ; '<b>BUNKERS</b>'
+fname fappend~ write_cell 8 16 ; 1.5 ; 'Gr Prot:' 
+fname fappend~ write_input 9.5 16 ;  1.5  ; <(glBunkFractionVal i. glGrBunkFraction){glBunkFractionText
 fname fappend~ LF,'$pdf->SetFillColor(255, 255, 255);'
-fname fappend~ LF,'$pdf->',pdfMulti 8 17; 3 1 ; '' ; 1 
 ww=. ' ' cut 'S1 S2 S3 B1 B2 B3 B4'
 for_i. ww do.
-    fname fappend~ LF,'$pdf->',pdfMulti ((11+i_index),17) ; 1 1 ; ('<span style="text-align: center">',( > i),'</span>') ; 1  
+    fname fappend~ LF,'$pdf->',pdfMulti ((11+i_index),15) ; 1 1 ; ('<span style="text-align: center"><b>',( > i),'</b></span>') ; 1  
 end. 
 NB. Table Value
-fname fappend~ 'R' write_cell 8 18 ; 3 ; <<'Table Value' 
 lay=. lookup_bunker_rating greenval ; (glBunkFractionVal i. glGrBunkFraction){glBunkFractionNum
-fname fappend~ write_calc  11 18 ; 3 4 ; lay
+fname fappend~ write_calc  11 16 ; 3 4 ; lay
 fwtot=. lay
+NB. Bunker squeeze (not yet implemented)
+fname fappend~ write_row_head 8 17 ; 2.5 0.5; '<i>Squeeze</i>'; '<b>Q</b>'
+fname fappend~ write_input 11 17 ; sz ; 0 * ;hityards
 NB. Carry
 bunkcarry=. ('glPlanBunkLZCarry') matrix_pull hole ; tee ; gender NB. Shot TO landing zone
 bunkcarry=. bunkcarry +.each }:each (<0),each ('glPlanBunkTargCarry') matrix_pull hole ; tee ; gender NB. OR shot FROM LZ, shifted
-fname fappend~ write_row_head 8 20 ; 2.5 0.5 ; '<i>Carry</i>' ; '<b>C</b>'
-fname fappend~ 'R' write_input 11 20 ; sz ; (;bunkcarry) 
-fname fappend~ 'L' write_input 11 20 ; sz ; (;carryyards)
+fname fappend~ write_row_head 8 18 ; 2.5 0.5 ; '<i>Carry</i>' ; '<b>C</b>'
+fname fappend~ 'R' write_input 11 18 ; sz ; (;bunkcarry) 
+fname fappend~ 'L' write_input 11 18 ; sz ; (;carryyards)
 for_i. i. 7 do. 
-	if. _1 ~: i{sz do. fname fappend~ pdfDiag ((11.33+i), 20) ; 0.33 1  end. NB. Diagonal line
+	if. _1 ~: i{sz do. fname fappend~ pdfDiag ((11.33+i), 18) ; 0.33 1  end. NB. Diagonal line
 end.
 fwtot=. fwtot + ; +/ each bunkcarry
+NB. Extreme (not yet implemented)
+fname fappend~ write_row_head 8 19 ; 2.5 0.5; '<i>Extreme</i>'; '<b>E</b>'
+fname fappend~ write_input 11 19 ; sz ; 0 * ;hityards
 NB. Sub-Total
-fname fappend~ 'R' write_cell 8 22 ; 3 ; <<'Sum of <b><u>all</u></b> Values'
-fname fappend~ write_calc  11 22 ; 3 4 ; fwtot
+fname fappend~ 'R' write_cell 8 20 ; 3 ; <<'Sum of <b><u>all</u></b> Values'
+fname fappend~ write_calc  11 20 ; 3 4 ; fwtot
 NB. Landing Zones
 lz=. }: each 'glPlanBunkLZ' matrix_pull hole ; tee ; gender
 lop=. }: each 'glPlanBunkLine' matrix_pull hole ; tee ; gender
-fname fappend~ write_cell 8 23 ; 0.5 ; <<'S'
-fname fappend~ 'C' write_input 8.3571 23 ; (2{.((#>0{lz)$0.3571),2$_0.3571) ; <<"0 (>0{lz){' y'
-fname fappend~ write_cell 9.0713 23 ; 0.5 ; <<'B'
-fname fappend~ 'C' write_input 9.4284 23 ; (3{.((#>0{lz)$0.3571),3$_0.3571) ; <<"0 (>1{lz){' y'
-fname fappend~ write_cell 8 24 ; 2 ; <<'Bog Ln/Play'
-fname fappend~ write_input 10 24 ; 0.5 ; (+. / >1{lop){'ny'
+fname fappend~ write_cell 8 21 ; 0.5 ; <<'S'
+fname fappend~ 'C' write_input 8.3571 21 ; (2{.((#>0{lz)$0.3571),2$_0.3571) ; <<"0 (>0{lz){' y'
+fname fappend~ write_cell 9.0713 21 ; 0.5 ; <<'B'
+fname fappend~ 'C' write_input 9.4284 21 ; (3{.((#>0{lz)$0.3571),3$_0.3571) ; <<"0 (>1{lz){' y'
+fname fappend~ write_cell 8 22 ; 2 ; <<'Bog Ln/Play'
+fname fappend~ write_input 10 22 ; 0.5 ; (+. / >1{lop){'ny'
 fname fappend~ 'black' oN 'white'
-fname fappend~ LF,'$pdf->',pdfMulti 10.5 23 ; 0.5 2 ; ('<b>N</b>') ; 1
+fname fappend~ LF,'$pdf->',pdfMulti 10.5 21 ; 0.5 2 ; ('<b>N</b>') ; 1
 NB. Calculate Negative adjustment
 fw=. ((+. / >0{lz) {_1 0 ), ((+. / (>1{lz),(>1{lop)){_1 0) 
 fw=. _1 >. fw - 0=># each lz NB. Par 3
 fw=. fw * 0 ~: fwtot NB. Don't apply -1 adjustment if no bunkers at all
-fname fappend~ 'blue' oN 'lightblue'
-fname fappend~ LF,'$pdf->',pdfMulti 11 23 ; 3 2 ;  ('<span style="text-align: center">',(;(8!:0) 0{fw),'</span>') ; 1
-fname fappend~ LF,'$pdf->',pdfMulti 14 23 ; 4 2 ;  ('<span style="text-align: center">',(;(8!:0) 1{fw),'</span>') ; 1
+fname fappend~ 'blue' oN 'white'
+fname fappend~ LF,'$pdf->',pdfMulti 11 21 ; 3 2 ;  ('<span style="text-align: center">',(;(8!:0) 0{fw),'</span>') ; 1
+fname fappend~ LF,'$pdf->',pdfMulti 14 21 ; 4 2 ;  ('<span style="text-align: center">',(;(8!:0) 1{fw),'</span>') ; 1
 fwtot=. fwtot + fw
 NB. Greenside depth
-fname fappend~ write_cell 8 25 ; 1.2 ; <<'Depth' 
-fname fappend~ write_input 9.2 25 ; 1.3; <(glBunkDepthVal i. glGrBunkDepth){glBunkDepthText
-fname fappend~ write_cell 10.5 25 ; 0.5 ; <<'<b>D</b>'
+fname fappend~ write_cell 8 23 ; 1.2 ; <<'Depth' 
+fname fappend~ write_input 9.2 23 ; 1.3; <(glBunkDepthVal i. glGrBunkDepth){glBunkDepthText
+fname fappend~ write_cell 10.5 23 ; 0.5 ; <<'<b>D</b>'
 fw=. lookup_bunker_depth gender ; ''$(glBunkDepthVal i. glGrBunkDepth){glBunkDepthNum 
-fname fappend~ write_calc  11 25 ; 3 4 ; 2$fw
+fname fappend~ write_calc  11 23 ; 3 4 ; 2$fw
 fwtot=. fwtot + fw
 NB. In play twice
-fname fappend~ write_row_head 8 26 ; 2.5 0.5 ; '<i>Twice</i>' ; '<b>2</b>'
-fw=. 1< >+/each lz
-fname fappend~ write_calc  11 26 ; 3 4 ; fw
+fname fappend~ write_row_head 8 24 ; 2.5 0.5 ; '<i>Twice</i>' ; '<b>2</b>'
+fw=. 1< ; +/each lz NB. Must be at least two fairway bunkers in LZ
+fname fappend~ write_calc  11 24 ; 3 4 ; fw
+fwtot=. fwtot + fw
+NB. Does bunker exist for Scratch
+fname fappend~ write_row_head 8 25 ; 2.9 0.1 ; '<i>Scratch LoP</i>' ; ''
+fw=. 1< ; +/each lz NB. Must be at least two fairway bunkers in LZ
+fname fappend~ write_calc  11 25 ; 3 _4 ;  (+. / ;(0{lz),0{lop) # 'y'
 NB. Total
-fwtot=. 0 >. fwtot + fw NB. Can't be negative
-fwtot=. fwtot >. +./ ;lz,lop NB. Must be a minimum of one if it exists
-fname fappend~ 'R' write_footer 8 27 ; 3 ; <<'Bunker Rating'
-fname fappend~ 'C' write_footer 11 27 ;  3 4 ; fwtot
+fwtot=. fwtot >. ; +./ each lz,each lop NB. Must be a minimum of one if it exists
+fname fappend~ 'R' write_footer 8 26 ; 3 ; <<'Bunker Rating'
+fname fappend~ 'C' write_footer 11 26 ;  3 4 ; fwtot
 psych=. psych, fwtot
 
 NB. ------------------------
@@ -946,10 +982,10 @@ NB. ------------------------
 fname fappend~ LF,'// -------- OOB / Extreme Rough -------------'
 carryyards=. 'R' carry_yards hole; tee ; gender 
 oobdist=. (' ' cut 'glPlanOOBDist glGrOOBDist') matrix_pull hole ; tee ; gender
-fname fappend~ write_title 8 28 ; 3 1 ; '<b>OUT of BOUNDS / ER</b>' 
+fname fappend~ write_title 8 27 ; 3 1 ; '<b>OUT of BOUNDS / ER</b>' 
 ww=. ' ' cut 'S1 S2 S3 B1 B2 B3 B4'
 ww=. (<'<b>'), each ww, each (<'</b>')
-fname fappend~ 'C' write_cell 11 28 ; (7$1) ; <ww
+fname fappend~ 'C' write_cell 11 27 ; (7$1) ; <ww
 select. z=. j. / > #each carryyards
     case. 0j0 do. sz=. _1 _1 _1, _1 _1 _1 _1
     case. 0j1 do. sz=. _1 _1 _1,  1 _1 _1 _1
@@ -960,12 +996,22 @@ select. z=. j. / > #each carryyards
     case. 3j3 do. sz=.  1  1  1,  1  1  1 _1
     case. 3j4 do. sz=.  1  1  1,  1  1  1  1
 end.
-fname fappend~ 'R' write_cell 8 29 ; 3 ; '<i>Centre LZ to OOB/ER</i>' 
-fname fappend~ write_input 11 29 ; sz ; (;oobdist)
+NB. Distance from landing zone
+fname fappend~ 'R' write_cell 8 28 ; 3 ; '<i>Centre LZ to OOB/ER</i>' 
+fname fappend~ write_input 11 28 ; sz ; (;oobdist)
+NB. Behind only applies to lateral distance
+fname fappend~ write_row_head 8 29 ; 2.5 0.5 ; '<i>Behind</i>' ; ''
+fwtot=. lookup_oob gender ; hityards ; <oobdist
+behind=. (' ' cut 'glPlanLayupReason glGrOOBBehind') matrix_pull hole ; tee ; gender
+behind=. (<glOOBBehindVal) i. each behind
+behind=. behind { each <glOOBBehindNum,0
+fname fappend~ 'C' write_input 11 29 ; sz ; <'b' 8!:0 ; behind
+fwtot=. 0 >. each fwtot + each behind NB. Must be at least zero
+NB. Distance to carry safely
 fname fappend~ 'R' write_cell 8 30 ; 3 ; '<i>Yds to Carry Safely</i>' 
 fname fappend~ write_input 11 30 ; sz ; (;carryyards)
+NB. Lookup values
 fname fappend~ 'R' write_cell 8 31 ; 3 ; 'Table Value'
-fwtot=. lookup_oob gender ; hityards ; <oobdist
 fname fappend~ 'L' write_calc 11 31 ; sz ; <('bp' 8!:0 ;fwtot)
 fw=. lookup_carry_oob gender ; <carryyards
 fname fappend~ 'R' write_calc 11 31 ; sz ; <('bp' 8!:0 ;fw)
@@ -973,6 +1019,10 @@ fwtot=. fwtot >. each fw
 for_i. i. 7 do. 
 	if. _1 ~: i{sz do. fname fappend~ pdfDiag ((11.33+i), 31) ; 0.33 1  end.
 end.
+NB. Cart Path Tilt
+fname fappend~ write_row_head 8 32 ; 2.0 1.0 ; '<i>Tilt / Prevent</i>' ; '<b>+/-B</b>'
+fw=. 0 * each hityards NB. Temporarily set to zero
+fname fappend~ 'C' write_input 11 32 ; sz ; ;fw 
 NB. Percent reduction
 fname fappend~ write_row_head 8 33 ; 2.5 0.5 ; '<i>Percent</i>' ; '<b>P</b>'
 oobpercent=.  (' ' cut 'glPlanOOBPercent glGrOOBPercent') matrix_pull hole ; tee ; gender
@@ -984,13 +1034,15 @@ fw=. <. each (<0.5) + each fwtot * each fw
 fw=. fw - each fwtot
 NB. fname fappend~ 'R' write_calc 11 33 ; sz ; <('bm<(>n<)>' 8!:0 ;fw)
 fwtot=. fwtot + each fw
-NB. Behind
-fname fappend~ write_row_head 8 34 ; 2.5 0.5 ; '<i>Behind</i>' ; ''
-behind=. (' ' cut 'glPlanLayupReason glGrOOBBehind') matrix_pull hole ; tee ; gender
-behind=. (<glOOBBehindVal) i. each behind
-fw=. behind { each <glOOBBehindNum,0
-fname fappend~ 'C' write_input 11 34 ; sz ; <'b' 8!:0 ;fw 
-fwtot=. fwtot + each fw
+NB. Jeopardy
+fname fappend~ write_row_head 8 34 ; 2.0 1.0 ; '<i>Jeopardy</i>' ; '<b>J</b>'
+fw=. 0 * each hityards NB. Temporarily set to zero
+fname fappend~ 'C' write_input 11 34 ; sz ; ;fw 
+NB. Squeeze
+fname fappend~ write_row_head 8 35 ; 2.0 1.0 ; '<i>Squeeze</i>' ; '<b>Q</b>'
+fw=. 0 * each hityards NB. Temporarily set to zero
+fname fappend~ 'C' write_input 11 35 ; sz ; ;fw 
+NB. Total shot value
 fname fappend~ 'R' write_cell 8 38  ; 3 ; 'Total Shot Value'
 fname fappend~ write_calc 11 38 ; sz ; (;fwtot)
 fname fappend~ 'R' write_cell 8 39  ; 3 ; 'Highest Shot Value'
@@ -1013,10 +1065,10 @@ fname fappend~ LF,'// -------- Trees -------------'
 treedist=. (' ' cut 'glPlanTreeDist glGrTreeDist') matrix_pull hole ; tee ; gender
 treeobs=. ('glPlanTreeLZObstructed') matrix_pull hole ; tee ; gender NB. Shot TO landing zone
 treeobs=. treeobs +.each }:each (<0),each ('glPlanTreeTargObstructed') matrix_pull hole ; tee ; gender NB. OR shot FROM LZ, shifted
-fname fappend~ write_title 18 18; 3 1 ; '<b>TREES</b>' 
+fname fappend~ write_title 18 19; 3 1 ; '<b>TREES</b>' 
 ww=. ' ' cut 'S1 S2 S3 B1 B2 B3 B4'
 ww=. (<'<b>'), each ww, each (<'</b>')
-fname fappend~ 'C' write_cell 21 18 ; (7$1) ; <ww
+fname fappend~ 'C' write_cell 21 19 ; (7$1) ; <ww
 select. z=. j. / > #each treedist
     case. 0j0 do. sz=. _1 _1 _1, _1 _1 _1 _1
     case. 0j1 do. sz=. _1 _1 _1,  1 _1 _1 _1
@@ -1027,31 +1079,31 @@ select. z=. j. / > #each treedist
     case. 3j3 do. sz=.  1  1  1,  1  1  1 _1
     case. 3j4 do. sz=.  1  1  1,  1  1  1  1
 end.
-fname fappend~ 'R' write_cell 18 19 ; 3 ; '<i>Centre LZ to Trees</i>' 
-fname fappend~ write_input 21 19 ; sz ; (;treedist)
-fname fappend~ write_cell 18 20 ; 3 ; <<'Severity:'
-fname fappend~ write_cell 21 20 ; _3 _4 ; 0$<''
-fname fappend~ write_cell 18 21 ; 3 ; <<'Min / Mod / Sig / Ext'
+fname fappend~ 'R' write_cell 18 20 ; 3 ; '<i>Centre LZ to Trees</i>' 
+fname fappend~ write_input 21 20 ; sz ; (;treedist)
+fname fappend~ write_cell 18 21 ; 3 ; <<'Severity:'
+fname fappend~ write_cell 21 21 ; _3 _4 ; 0$<''
+fname fappend~ write_cell 18 22 ; 3 ; <<'Min / Mod / Sig / Ext'
 fw=. (<0 ; gender ; 0 1) {glTeTree NB. Pick up the two elements
 fw=. glTreeVal i. fw
-fname fappend~ write_input 21 21 ; 3 4 ; <fw{glTreeSev
-fname fappend~ 'R' write_cell 18 22 ; 3 ; 'Table Value'
-fname fappend~ write_calc 21 22 ; 3 4 ; fw{glTreeNum
-fname fappend~ 'R' write_cell 18 23 ; 3 ; 'Tweener Adj'
-fname fappend~ write_calc 21 23 ; 3 4 ; fw{glTreeTweener
-fname fappend~ 'R' write_cell 18 24 ; 3 ; '<b>Adjusted Val</b>'
-fname fappend~ write_calc 21 24 ; 3 4 ; fw{glTreeTweener+glTreeNum
+fname fappend~ write_input 21 22 ; 3 4 ; <fw{glTreeSev
+fname fappend~ 'R' write_cell 18 23 ; 3 ; 'Table Value'
+fname fappend~ write_calc 21 23 ; 3 4 ; fw{glTreeNum
+fname fappend~ 'R' write_cell 18 24 ; 3 ; 'Tweener Adj'
+fname fappend~ write_calc 21 24 ; 3 4 ; fw{glTreeTweener
+fname fappend~ 'R' write_cell 18 25 ; 3 ; '<b>Adjusted Val</b>'
+fname fappend~ write_calc 21 25 ; 3 4 ; fw{glTreeTweener+glTreeNum
 fwtot=. fw{glTreeTweener+glTreeNum
 NB. Tree obstructed
-fname fappend~ write_row_head 18 25 ; 2.5 0.5; '<i>Obstruct</i>'; '<b>O</b>'
-fname fappend~ write_input 21 25 ; sz ; (;treeobs)
+fname fappend~ write_row_head 18 26 ; 2.5 0.5; '<i>Obstruct</i>'; '<b>O</b>'
+fname fappend~ write_input 21 26 ; sz ; (;treeobs)
 fwtot=. fwtot + > (>. /each treeobs)
 NB. Tree squeeze (not yet implemented)
-fname fappend~ write_row_head 18 26 ; 2.5 0.5; '<i>Squeeze</i>'; '<b>Q</b>'
-fname fappend~ write_input 21 26 ; sz ; 0 * ;treeobs
+fname fappend~ write_row_head 18 27 ; 2.5 0.5; '<i>Squeeze</i>'; '<b>Q</b>'
+fname fappend~ write_input 21 27 ; sz ; 0 * ;treeobs
 NB. Tree Rating
-fname fappend~ 'R' write_footer 18 27 ; 3 ; 'Tree Rating'
-fname fappend~ 'C' write_footer 21 27 ;  3 4 ; fwtot
+fname fappend~ 'R' write_footer 18 28 ; 3 ; 'Tree Rating'
+fname fappend~ 'C' write_footer 21 28 ;  3 4 ; fwtot
 psych=. psych, fwtot
  
 NB. ------------------------
@@ -1074,8 +1126,8 @@ fname fappend~ write_input 21 32 ; 3 4 ; 2$glGrSurfaceUnpleasant
 fwtot=. fwtot + 2$glGrSurfaceUnpleasant
 NB. Tiered
 fname fappend~ write_row_head 18 33 ; 2.5 0.5 ; ' ' cut '<i>Tiered</i> <b>T</b>'
-fname fappend~ write_input 21 33 ; 3 4 ; 2$glGrTiered
-fwtot=. fwtot + 2$glGrTiered
+fname fappend~ write_input 21 33 ; _3 4 ; glGrTiered NB. Bogey only
+fwtot=. fwtot + 0,glGrTiered NB. Bogey only
 fname fappend~ 'R' write_footer 18 34 ; 3 ; 'Gr Surface Rating'
 fname fappend~ 'C' write_footer 21 34 ;  3 4 ; fwtot
 psych=. psych, fwtot
@@ -1084,29 +1136,28 @@ NB. ------------------------
 NB. Psychological
 NB. ------------------------
 fname fappend~ LF,'// -------- Psychological -------------'
-fname fappend~ write_title 18 35 ; 3 1 ; '<b>PSYCHOLOGICAL</b>' 
-fname fappend~ 'C' write_cell 21 35 ; 3 4 ; <' ' cut '<b>Scratch</b> <b>Bogey</b>' 
-fname fappend~ write_row_head 18 36 ; 2.9 0.1 ;  ':' cut 'No. Obstacles &gt;=5: '
-fname fappend~ write_calc 21 36 ; 3 4 ; <+ / psych >: 5
-fname fappend~ write_row_head 18 37 ; 2.9 0.1 ;  ':' cut 'Sum of Obstacles: '
-fname fappend~ write_calc 21 37 ; 3 4 ; <+ / psych * psych >: 5
-fname fappend~ 'R' write_cell 18 38 ; 3 ; 'Table Value'
+fname fappend~ write_title 18 36 ; 3 1 ; '<b>PSYCHOLOGICAL</b>' 
+fname fappend~ 'C' write_cell 21 36 ; 3 4 ; <' ' cut '<b>Scratch</b> <b>Bogey</b>' 
+fname fappend~ write_row_head 18 37 ; 2.9 0.1 ;  ':' cut 'No. Obstacles &gt;=5: '
+fname fappend~ write_calc 21 37 ; 3 4 ; <+ / psych >: 5
+fname fappend~ write_row_head 18 38 ; 2.9 0.1 ;  ':' cut 'Sum of Obstacles: '
+fname fappend~ write_calc 21 38 ; 3 4 ; <+ / psych * psych >: 5
+fname fappend~ 'R' write_cell 18 39 ; 3 ; 'Table Value'
 wid=. lookup_psychological psych
-fname fappend~ 'C' write_calc  21 38 ; 3 4 ; (;wid) 
+fname fappend~ 'C' write_calc  21 39 ; 3 4 ; (;wid) 
 NB. Extraordinary rating if any rated 10
-fname fappend~ write_row_head 18 39 ; 2.5 0.5 ; 'Extraordinary' ; '<b>X</b>'
+fname fappend~ write_row_head 18 40 ; 2.5 0.5 ; 'Extraordinary' ; '<b>X</b>'
 fw=. (2 <. +/psych >: 10){ 0 5 9
 fw= 0 >. wid - fw
-fname fappend~ write_calc 21 39 ; 3 4 ; fw
+fname fappend~ write_calc 21 40 ; 3 4 ; <'b<>' 8!:0 fw
 fwtot=. wid + fw
 NB. Hole 1 and 18
-fname fappend~ 'R' write_cell 18 40 ; 3 ; 'Hole 1 or 18' 
-fw=. 2$ hole e. 0 17
-fname fappend~ write_calc 21 40 ; 3 4 ; fw
+fname fappend~ 'R' write_cell 18 41 ; 3 ; 'Hole 1 or 18' 
+fw=. 2$ 2 * hole e. 0 17 NB. Add two points
+fname fappend~ write_calc 21 41 ; 3 4 ; <'b<>' 8!:0 fw
 fwtot=. fwtot + fw
-fname fappend~ 'R' write_footer 18 41 ; 3 ; 'Psychological'
-fname fappend~ 'C' write_footer 21 41 ;  3 4 ; fwtot
-
+fname fappend~ 'R' write_footer 18 42 ; 3 ; 'Psychological'
+fname fappend~ 'C' write_footer 21 42 ;  3 4 ; fwtot
 
 NB. -----------------------------
 NB. Altitude
@@ -1144,13 +1195,13 @@ fname fappend~ pdfBox 0 35 ; 8 7
 fname fappend~ pdfBox 0 42 ; 18 1
 fname fappend~ pdfBox 0 43 ; 11 1
 fname fappend~ pdfBox 11 43; 17 1 
-fname fappend~ pdfBox 8 1 ; 10 15 
-fname fappend~ pdfBox 8 16 ; 10 12 
-fname fappend~ pdfBox 8 28 ; 10 14 
+fname fappend~ pdfBox 8 1 ; 10 14 NB. Recov and Rough
+fname fappend~ pdfBox 8 15 ; 10 12 NB. Bunker
+fname fappend~ pdfBox 8 27 ; 10 15 NB. OOB / ER
 fname fappend~ pdfBox 18 1 ; 10 17 NB. Water
-fname fappend~ pdfBox 18 18 ; 10 10 NB. Trees
+fname fappend~ pdfBox 18 19 ; 10 10 NB. Trees
 fname fappend~ pdfBox 18 30 ; 10 5 NB. Green Surface
-fname fappend~ pdfBox 18 35 ; 10 7 NB. Psychological
+fname fappend~ pdfBox 18 36 ; 10 7 NB. Psychological
 
 NB. End of Page
 fname fappend~ LF,'// -------- End of Page -------------'
