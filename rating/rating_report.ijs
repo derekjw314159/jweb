@@ -816,7 +816,7 @@ NB. OOB anywhere
 fname fappend~ 'L' write_cell 18 16 ; 3 ; '<i>On Line of Play</i>' 
 waterline=. 'glPlanWaterLine' matrix_pull hole ; tee ; gender
 waterline=. ; +. / each waterline
-fname fappend~ 'C' write_input 21 16 ; sz ; <<"0 (;waterline){' y'
+fname fappend~ 'C' write_input 21 16 ;  3 4  ; <<"0 (;waterline){' y'
 NB. Overall rating
 fname fappend~ 'R' write_footer 18 17 ; 3 ; 'Water Rating'
 fwtot=. fwtot + (0=fwtot) * +. / ; waterline 

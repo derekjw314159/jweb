@@ -198,7 +198,7 @@ for_t.  i. #glTees do.
 	stdout LF,'<tr><td><a href="/jw/rating/tee/e/',glFilename,'/',(1 1 0 0 1#5{.>EnKey hole ; '' ; (t{glTees) ; 0 ; 0 ; 0),'">',(>t{glTeesName),'</td>'
 	backpath=. PathTeeToGreen hole ; t{glTees
 	crow=. <. 0.5 + glMY * |-/LatLontoFullOS 0 _1{backpath NB. Crows flight distance
-	stdout '<td>',(": <. 0.5 + (<t,hole){glTeesYards),' [',(":crow),']</td>'
+	stdout '<td>',(": <. 0.5 + (<t,hole){glTeesYards),' <span style="color: gray;">[',(":crow),']</span></td>'
 	utKeyRead glFilepath,'_tee'
 	ww=. (glTeHole=hole) *. glTeTee=t{glTees
 	(ww # glTeID) utKeyRead glFilepath,'_tee'
