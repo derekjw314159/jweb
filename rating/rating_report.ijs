@@ -273,7 +273,7 @@ for_sz. size do.
     if. sz<0 do.
 	res=. res, write_lightgrey (offset+2{. sz_index{+/ \0,|size); |sz
     else.
-	res=.res, 'black' oN 'grey'
+	res=.res, 'black' oN 'lightblue'
 	sh=. ((sz_index){_1 + (+/) \ size >: 0 ){array
 	if. 1=L. sh do. sh=. >sh end.`
 	if. 2 ~: 3!:0 sh do. sh=. ;'p<>' 8!:0 sh end.
@@ -1846,10 +1846,10 @@ for_ab. 0 1 do.
 	case. 3 do. res=. res, (+/(ab{tot)>: 20 22 24 26 99 28 99 29 30){0 2 3 4 5 6 7 8 9 10
 	case. 4 do. res=. res, (+/(ab{tot)>: 20 22 25 28 31 34 99 37 38){0 2 3 4 5 6 7 8 9 10
 	case. 5 do. res=. res, (+/(ab{tot)>: 25 27 29 31 34 37 40 43 46){0 2 3 4 5 6 7 8 9 10
-	case. 6 do. res=. res, (+/(ab{tot)>: 99 30 32 34 37 40 43 46 49){0 2 3 4 5 6 7 8 9 10
-	case. 7 do. res=. res, (+/(ab{tot)>: 99 99 35 37 40 43 46 49 52){0 2 3 4 5 6 7 8 9 10
-	case. 8 do. res=. res, (+/(ab{tot)>: 99 99 40 42 44 46 49 52 55){0 2 3 4 5 6 7 8 9 10
-	case. 9 do. res=. res, (+/(ab{tot)>: 99 99 99 45 47 49 52 55 58){0 2 3 4 5 6 7 8 9 10
+	case. 6 do. res=. res, (+/(ab{tot)>: 30 30 32 34 37 40 43 46 49){0 2 3 4 5 6 7 8 9 10
+	case. 7 do. res=. res, (+/(ab{tot)>: 35 35 35 37 40 43 46 49 52){0 2 3 4 5 6 7 8 9 10
+	case. 8 do. res=. res, (+/(ab{tot)>: 40 40 40 42 44 46 49 52 55){0 2 3 4 5 6 7 8 9 10
+	case. 9 do. res=. res, (+/(ab{tot)>: 45 45 45 45 47 49 52 55 58){0 2 3 4 5 6 7 8 9 10
     end.
 end.
 )
