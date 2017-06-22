@@ -942,9 +942,10 @@ NB. Landing Zones
 lz=. }: each 'glPlanBunkLZ' matrix_pull hole ; tee ; gender
 lop=. }: each 'glPlanBunkLine' matrix_pull hole ; tee ; gender
 fname fappend~ write_cell 8 21 ; 0.5 ; <<'S'
+'1' + 0
 fname fappend~ 'C' write_input 8.3571 21 ; (2{.((#>0{lz)$0.3571),2$_0.3571) ; <<"0 (>0{lz){' y'
 fname fappend~ write_cell 9.0713 21 ; 0.5 ; <<'B'
-fname fappend~ 'C' write_input 9.4284 21 ; (3{.((#>0{lz)$0.3571),3$_0.3571) ; <<"0 (>1{lz){' y'
+fname fappend~ 'C' write_input 9.4284 21 ; (3{.((#>1{lz)$0.3571),3$_0.3571) ; <<"0 (>1{lz){' y'
 fname fappend~ write_cell 8 22 ; 2 ; <<'Bog Ln/Play'
 fname fappend~ write_input 10 22 ; 0.5 ; (+. / >1{lop){'ny'
 fname fappend~ 'black' oN 'white'
