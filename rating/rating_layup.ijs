@@ -313,7 +313,7 @@ if. 1 +. changed do.
 end.
 
 if. defaulthit = glPlanHitYards do.
-	deletelayup=. 1
+	NB. 	deletelayup=. 1 NB. Remove this logic if roll without transition
 end.
 
 stdout 'Content-type: text/html',LF,LF

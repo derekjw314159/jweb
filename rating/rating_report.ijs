@@ -565,7 +565,7 @@ fname fappend~ write_cell 3 11 ; 3 ; 'Tee to Gr (<b>gt 10ft</b>)'
 sh=. glGrAlt - glTeAlt
 sh=. sh * 10<: |sh NB. Minimum 10ft
 sh=. (*sh) * 10 * <.0.5+ 0.1 * (| sh) NB. Round to nearest 10
-if. 3=gender{glTePar do. _40 >. sh <. 40 end.
+if. 3=gender{glTePar do. sh=. _40 >. sh <. 40 end.
 fname fappend~ 'R' write_input 6 11 ; 1 1 ; <'b<>p<+>' 8!:0 (0 >. sh),0 <. sh 
 
 NB. ------------------------
@@ -611,7 +611,8 @@ NB. alt=. alt * 3<gender{glTePar
 NB. Alt has to be multiples of 10ft, and rounding is incorrect for negatives
 alt=. (*alt) * 10 * <. 0.5 + 0.1*(|alt)
 NB. For Par 3s, 40 is the maximum
-if. (gender{glTePar) = 3 do. alt=. _40 >. alt <. 40 end.
+NB. if. (gender{glTePar) = 3 do. alt=. _40 >. alt <. 40 end.
+alt=. _40 >. alt <. 40 
 fname fappend~ (' ' cut 'cell input') write_row_head 3 15 ; 1.2  0.8 ; 'App S:' ; ;'p<+>' 8!:0 (0{alt)
 fname fappend~ (' ' cut 'cell input') write_row_head 5 15 ; 2 1 ; 'App Elev B:' ; ;'p<+>' 8!:0 (1{alt)
 fname fappend~ 'R' write_cell 0 16 ; 3 ; '<i>(LZtoLZ or Appr)</i>'
@@ -678,6 +679,7 @@ fw=. (glGrFirmnessVal i. glGrFirmness){glGrFirmnessNum
 fname fappend~ write_row_head 0 40 ; 2.5 0.5 ; ' ' cut '<i>Firmness</i> <b>F</b>'
 fname fappend~ write_input 3 40 ; 2.5 2.5 ; 2$fw
 greenval=. greenval + 2$fw
+greenval=. 10 <. greenval NB. Can't be bigger than 10
 fname fappend~ 'R' write_footer 0 41 ; 3 ; 'Green Target'
 fname fappend~ 'C' write_footer 3 41 ;  2.5 2.5 ; greenval
 psych=. psych, greenval
@@ -1009,6 +1011,7 @@ behind=. (<glOOBBehindVal) i. each behind
 behind=. behind { each <glOOBBehindNum,0
 fname fappend~ 'C' write_input 11 29 ; sz ; <'b' 8!:0 ; behind
 fwtot=. 0 >. each fwtot + each behind NB. Must be at least zero
+tvexists=. ooblat >each 0
 NB. Distance to carry safely
 fname fappend~ 'R' write_cell 8 30 ; 3 ; '<i>Yds to Carry Safely</i>' 
 fname fappend~ write_input 11 30 ; sz ; (;carryyards)
@@ -1032,11 +1035,11 @@ oobpercent=.  (' ' cut 'glPlanOOBPercent glGrOOBPercent') matrix_pull hole ; tee
 oobpercent=. (<glOOBPercentVal) i. each oobpercent
 fw=. (;oobpercent) { glOOBPercentDesc
 fname fappend~ 'C' write_input 11 33 ; sz ; <fw 
-fw=. (oobpercent) { each <1- glOOBPercentNum
-fw=. <. each (<0.5) + each fwtot * each fw
-fw=. fw - each fwtot
+fw=. (oobpercent) { each < glOOBPercentNum
+fw=. <. each (<0.5) + each fwtot * each fw NB. Round the reduction, not the total remaining WRONG ANSWER IMHO!
 NB. fname fappend~ 'R' write_calc 11 33 ; sz ; <('bm<(>n<)>' 8!:0 ;fw)
-fwtot=. fwtot + each fw
+fwtot=. fwtot - each fw
+fwtot=. fwtot >. each tvexists NB. In case reductions have taken it to zero
 NB. Jeopardy
 fname fappend~ write_row_head 8 34 ; 2.0 1.0 ; '<i>Jeopardy</i>' ; '<b>J</b>'
 fw=. 0 * each hityards NB. Temporarily set to zero
@@ -1168,9 +1171,8 @@ fname fappend~ 'C' write_calc  21 39 ; 3 4 ; (;wid)
 NB. Extraordinary rating if any rated 10
 fname fappend~ write_row_head 18 40 ; 2.5 0.5 ; 'Extraordinary' ; '<b>X</b>'
 fw=. (2 <. +/psych >: 10){ 0 5 9
-fw= 0 >. wid - fw
 fname fappend~ write_calc 21 40 ; 3 4 ; <'b<>' 8!:0 fw
-fwtot=. wid + fw
+fwtot=. wid >. fw
 NB. Hole 1 and 18
 fname fappend~ 'R' write_cell 18 41 ; 3 ; 'Hole 1 or 18' 
 fw=. 2$ 2 * hole e. 0 17 NB. Add two points
@@ -1755,12 +1757,12 @@ res=. col{mat
 )
 
 NB. =================================================
-NB. lookup_oob
+NB. lookup_oobold
 NB. =================================================
 NB. Usage
-NB.   lookup_oob gender ; shot ; dist
+NB.   lookup_oobold gender ; shot ; dist
 NB. Returns table value
-lookup_oob=: 3 : 0
+lookup_oobold=: 3 : 0
 'gender shot dist'=. y
 if. gender=0 do.
 	mat=. 7 5 $ 0 1 1 1 2, 0 1 2 2 3, 0 1 2 3 4, 0 1 2 4 5, 0 1 2 4 6, 0 2 3 5 7, 0 2 4 6 8
@@ -1778,7 +1780,39 @@ for_ab. 0 1  do.
 	for_sh. >ab{shot do.
 		r=. +/ sh >: (ab{row) 
 		c=. (sh_index{>ab{dist) 
-		c=. +/ (c + 999*c=0) <: col NB. If zero make maximum distance
+		c=. +/ (c + _*c=0) <: col NB. If zero make maximum distance of infinity
+		rr=. rr, (<r, c){mat
+	end.
+	res=. res, <rr
+end.
+)
+
+NB. =================================================
+NB. lookup_oob
+NB. =================================================
+NB. Usage
+NB.   lookup_oob gender ; shot ; dist
+NB. Returns table value
+NB. Expanded for several tweener columns
+lookup_oob=: 3 : 0
+'gender shot dist'=. y
+if. gender=0 do.
+	mat=. 7 11 $ 0 1 1 1 1 1 1 1 1 2 2 , 0 1 1 2 2 2 2 2 2 3 3 , 0 1 1 2 2 2 3 3 3 4 4, 0 1 1 2 2 3 3 4 4 5 5, 0 1 1 2 2 3 3 4 5 5 6, 0 2 2 3 3 4 4 5 6 6 7, 0 2 3 3 4 5 5 6 7 7 8
+	row=. 90 130 160 190 210 231 ,: 50 80 110 140 160 181
+	col=. 50 40 39 38 30 29 28 20 19 18
+else.
+	mat=. 7 11 $ 0 1 1 1 1 1 1 1 1 2 2 , 0 1 1 2 2 2 2 2 2 3 3 , 0 1 1 2 2 2 3 3 3 4 4, 0 1 1 2 2 3 3 4 4 5 5, 0 1 1 2 2 3 3 4 5 5 6, 0 2 2 3 3 4 4 5 6 6 7, 0 2 3 3 4 5 5 6 7 7 8
+	row=. 70 100 125 150 175 191 ,: 40 70 85 100 115 131
+	col=. 50 40 39 38 30 29 28 20 19 18
+end.
+
+res=. 0$<''
+for_ab. 0 1  do.
+	rr=. 0$0
+	for_sh. >ab{shot do.
+		r=. +/ sh >: (ab{row) 
+		c=. (sh_index{>ab{dist) 
+		c=. +/ (c + _*c=0) <: col NB. If zero make maximum distance of infinity
 		rr=. rr, (<r, c){mat
 	end.
 	res=. res, <rr
