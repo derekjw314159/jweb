@@ -1356,10 +1356,14 @@ NB.   merge_pdfs
 NB.
 NB. Returns a LF delimited string of distances
 merge_pdfs=: 3 : 0
+if. y -: '' do.
+    y=. glTees
+end.
 res=. 'pdftk '
 utKeyRead glFilepath,'_tee'
 for_gender. 0 1 do.
 	for_t. i. # glTeID do.
+		if. (t{glTees) e. y do. continue. end. NB. Only the tees specified
 		if. 0=(<t,gender){glTeMeasured do. continue. end.
 		hole=. ''$t{glTeHole 
 		tee=. ''$t{glTeTee
