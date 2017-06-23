@@ -344,7 +344,9 @@ NB.stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr
 		    other=. other, (rr{glPlanBunkTargCarry)#' Targ:BunkCarry'
 		    other=. other, (0<#>rr{glPlanRollTwice)#' Ro2:',;>rr{glPlanRollTwice
 		    stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">E</a>'
-		    stdout LT4,'<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>' NB. At green
+		    stdout LT4,'<td></td><td></td><td></td>'
+		    stdout LT3,'<td style="border-right: 1px solid lightgray">',((rr{glPlanBunkLine){'-y'),'</td>' NB. Show bunker in LoP
+			stdout '<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>' NB. At green
 		    stdout LT4,'<td colspan="3">',(}.other),'</td>'
 		end.
 	    stdout LT3,'</tr>'

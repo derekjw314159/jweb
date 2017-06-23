@@ -938,19 +938,21 @@ fname fappend~ write_input 11 19 ; sz ; 0 * ;hityards
 NB. Sub-Total
 fname fappend~ 'R' write_cell 8 20 ; 3 ; <<'Sum of <b><u>all</u></b> Values'
 fname fappend~ write_calc  11 20 ; 3 4 ; fwtot
-NB. Landing Zones
+NB. Landing Zones, need all for LoP variable, including shot to green on Par 3
 lz=. }: each 'glPlanBunkLZ' matrix_pull hole ; tee ; gender
 lop=. }: each 'glPlanBunkLine' matrix_pull hole ; tee ; gender
+lzfull=. 'glPlanBunkLZ' matrix_pull hole ; tee ; gender
+lopfull=. 'glPlanBunkLine' matrix_pull hole ; tee ; gender
 fname fappend~ write_cell 8 21 ; 0.5 ; <<'S'
 fname fappend~ 'C' write_input 8.3571 21 ; (2{.((#>0{lz)$0.3571),2$_0.3571) ; <<"0 (>0{lz){' y'
 fname fappend~ write_cell 9.0713 21 ; 0.5 ; <<'B'
 fname fappend~ 'C' write_input 9.4284 21 ; (3{.((#>1{lz)$0.3571),3$_0.3571) ; <<"0 (>1{lz){' y'
 fname fappend~ write_cell 8 22 ; 2 ; <<'Bog Ln/Play'
-fname fappend~ write_input 10 22 ; 0.5 ; (+. / >1{lop){'ny'
+fname fappend~ write_input 10 22 ; 0.5 ; (+. / >1{lopfull){' y'
 fname fappend~ 'black' oN 'white'
 fname fappend~ LF,'$pdf->',pdfMulti 10.5 21 ; 0.5 2 ; ('<b>N</b>') ; 1
 NB. Calculate Negative adjustment
-fw=. ((+. / >0{lz) {_1 0 ), ((+. / (>1{lz),(>1{lop)){_1 0) 
+fw=. ((+. / >0{lz) {_1 0 ), ((+. / (>1{lz),(>1{lopfull)){_1 0) 
 fw=. _1 >. fw - 0=># each lz NB. Par 3
 fw=. fw * 0 ~: fwtot NB. Don't apply -1 adjustment if no bunkers at all
 fname fappend~ 'blue' oN 'white'
@@ -972,9 +974,9 @@ fwtot=. fwtot + fw
 NB. Does bunker exist for Scratch
 fname fappend~ write_row_head 8 25 ; 2.9 0.1 ; '<i>Scratch LoP</i>' ; ''
 fw=. 1< ; +/each lz NB. Must be at least two fairway bunkers in LZ
-fname fappend~ write_calc  11 25 ; 3 _4 ;  (+. / ;(0{lz),0{lop) # 'y'
+fname fappend~ write_calc  11 25 ; 3 _4 ;  (+. / ;(0{lz),0{lopfull) # 'y'
 NB. Total
-fwtot=. fwtot >. ; +./ each lz,each lop NB. Must be a minimum of one if it exists
+fwtot=. fwtot >. ; +./ each lz,each lopfull NB. Must be a minimum of one if it exists
 fname fappend~ 'R' write_footer 8 26 ; 3 ; <<'Bunker Rating'
 fname fappend~ 'C' write_footer 11 26 ;  3 4 ; fwtot
 psych=. psych, fwtot
@@ -1353,18 +1355,21 @@ NB. merge pdfs
 NB. ==============================================================
 NB. Usage:
 NB.   merge_pdfs
-NB.
+NB. y is string of tees ('' does all)
+NB. x is whether to restrict to just measured tees (e.g. all yellows)
 NB. Returns a LF delimited string of distances
 merge_pdfs=: 3 : 0
+1 merge_pdfs y
+:
 if. y -: '' do.
     y=. glTees
 end.
 res=. 'pdftk '
 utKeyRead glFilepath,'_tee'
-for_gender. 0 1 do.
+for_gender. ,0  do.
 	for_t. i. # glTeID do.
-		if. (t{glTees) e. y do. continue. end. NB. Only the tees specified
-		if. 0=(<t,gender){glTeMeasured do. continue. end.
+		if. -. (t{glTeTee) e. y do. continue. end. NB. Only the tees specified
+		if. x *. 0=(<t,gender){glTeMeasured do. continue. end.
 		hole=. ''$t{glTeHole 
 		tee=. ''$t{glTeTee
 		shortname=. glFilename,'_',(;'r<0>2.0' 8!:0 (1+hole)),(gender{'MW'),tee
