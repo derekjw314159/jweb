@@ -562,7 +562,7 @@ label_shot.
 	glPlanRemGroundYards=: ,remgroundyards
 	glPlanRecType=: ,'P'
 	glPlanCarryType=: ,' '
-    glPlanCarryAffectsTee=: ,' '
+	glPlanCarryAffectsTee=: ,' '
 	glPlanSqueezeType=: ,' '
 	glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
 	glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
@@ -612,7 +612,7 @@ label_shot.
 	glPlanRollTwice=: ,<''
 	glPlanSqueezeWidth=: ,0
 	glPlanCarryType=: ,' '
-    glPlanCarryAffectsTee=: ,' '
+	glPlanCarryAffectsTee=: ,' '
 	glPlanSqueezeType=: ,' '
 	glPlanBunkCarry=: ,<''
 	NB. Don't reset the layup or roll stuff as it has just been entered

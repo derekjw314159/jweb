@@ -567,7 +567,7 @@ stdout LF,'  margin-right: 5px;'
 stdout LF,'  margin-bottom: 5px;'
 stdout LF,'  }'
 stdout LF,'</style>'
-stdout LF,'<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>'
+stdout LF,'<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAenjNEmfxxMDt3XnAXyY6jXwVgYmC5wjc&v=3.exp"></script>'
 stdout LF,'<script>',LF,'var map;'
 NB. Work out map centre from tees and greens
 path=. glGPSName i. ('r<0>2.0' 8!:0 (1+hole)),each <'TW'
@@ -585,9 +585,9 @@ stdout LF,'   var circ={'
 stdout LF,'      path: google.maps.SymbolPath.CIRCLE,'
 stdout LF,'      fillColor: inner,'
 stdout LF,'      fillOpacity: 1,'
-stdout LF,'      scale: 3.5,'
+stdout LF,'      scale: 4.5,'
 stdout LF,'      strokeColor: outer,'
-stdout LF,'      strokeWeight: 3'
+stdout LF,'      strokeWeight: 2.5'
 stdout LF,'      };'
 stdout LF,'   return circ;'
 stdout LF,'}'
@@ -626,6 +626,31 @@ for_hh. hole do.
 		stdout LF,'   marker',(":hh),'T',(t{glTees),'.setMap(map);'
 	end. 
     end.
+
+    NB. Landing points
+    utKeyRead glFilepath,'_plan'
+    ww=. glPlanHole =hh
+    ww=. ww *. glPlanRecType = 'P'
+    ww=. ww *. glPlanRemGroundYards > 0
+    ww=. ww * 1=#hole NB. Do show for multiple holes
+    for_rr. I. ww do.
+		stdout LF,'   var marker',((>rr{glPlanID)-.'-'),'=new google.maps.Marker({'
+		path=. +. rr { glPlanLatLon
+		stdout LF,'      position: new google.maps.LatLng(',(>'' 8!:0  (0{path)),',',(>'' 8!:0 (1{path)),'),'
+		outer=. rr { (2 * glPlanGender) + glPlanAbility
+		outer=. >outer { ' ' cut 'black blue brown grey'
+		rgb=. (glTees i. rr { glPlanTee){glTeesRGB
+		rgb=. (0{"1 glRGB) i. rgb
+		rgb=. >(<rgb,1) { glRGB
+		rgb=. '#',rgb
+		NB.	stdout LF,'      icon: dyncircle( ''white'', ''white''),'
+		stdout LF,'      icon: dyncircle( ''',rgb,''', ''',outer,'''),'
+		stdout LF,'      title: ''',(>(rr{glPlanGender){' ' cut 'Men Wmn'),' ',(>(glTees i. rr{glPlanTee){glTeesName),' ',(>(rr{glPlanAbility){' ' cut 'Scr Bgy'),' shot ',(": 1+rr{glPlanShot),''''
+		stdout LF,'      });'
+		stdout LF,'   marker',((>rr{glPlanID)-.'-'),'.setMap(map);'
+    end.
+	
+
 
     NB. Green marker 
     stdout LF,'   var marker',(":hh),'GC=new google.maps.Marker({'

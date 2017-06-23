@@ -444,6 +444,9 @@ NB. Roll Slope
 fname fappend~ write_cell 0 6 ; 3 ; '<i>Slope in Tee Shot LZ</i>'
 lay=. (glRollLevelVal i. >0{ each rolllevel) { glRollLevelNum
 lay=. lay, each (<' '),each (glRollSlopeVal i. >0{ each rollslope) { glRollSlopeNum
+NB. Clear the display if it level, ie. rolllevel is null 
+lay=. ( 0 < ; # each > 0{each rolllevel) # each lay
+lay=. ( 1 >. > #each lay) {. each lay NB. Max of one blank
 fname fappend~ ('C'; 1) write_input 3 6 ; 2.5 ;  <lay
 NB. Roll lookup table
 fname fappend~ LF,('R' ; 1) write_cell 0 7 ; 3 ; '<i>Table Value</i>'  
