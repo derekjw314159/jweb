@@ -251,7 +251,7 @@ stdout ;": 0{glPlanHole
 stdout '">Add carry point</a>',EM
 stdout '<a href="/jw/rating/squeeze/a/',(glFilename),'/'
 stdout ;": 0{glPlanHole
-stdout '">Add squeeze/chute</a></td></tr>'
+stdout '">Add chute</a></td></tr>'
 
 for_rr. i. #glPlanID do.
 	if. 'P' = rr{glPlanRecType do.
