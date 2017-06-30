@@ -111,7 +111,7 @@ stdout LT2,'<input type="hidden" name="filename" value="',(;glFilename),'">'
 NB. Table of values - Common Values
 stdout LT1,'<h4>Common Measurements</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>Alt</th><th>FW Width</th><th>Bunk LZ</th><th>Bunk LoP</th><th>Dist OB</th><th>OOB %age</th><th>OOB LoP</th><th>Dist Tr</th><th>Dist Wat</th><th>Water %age</th><th>Wat LoP</th><th>Mounds</th><th>Dogleg Neg</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>Alt</th><th>FW Width</th><th>Bunk LZ</th><th>Bunk LoP</th><th>Bunk Extrm</th><th>Dist OB</th><th>OOB %age</th><th>OOB LoP</th><th>Dist Tr</th><th>Dist Wat</th><th>Water %age</th><th>Wat LoP</th><th>Mounds</th><th>Dogleg Neg</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td><input value="',(":;glPlanAlt),'" tabindex="1" ',(InputFieldnum 'alt'; 3),'>',LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanFWWidth),'" tabindex="2" ',(InputFieldnum 'fwwidth'; 3),'>',LT4,'</td>'
@@ -119,6 +119,9 @@ stdout LT4,'<td><input type="checkbox" id="bunklz" name="bunklz" value="1" '
 stdout ((''$glPlanBunkLZ)#'checked'),' tabindex="3">',LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="bunkline" name="bunkline" value="1" '
 stdout ((''$glPlanBunkLine)#'checked'),' tabindex="4">',LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'bunkextreme' ; 5 ; glBunkExtremeDesc ; glBunkExtremeVal ; <''$glPlanBunkExtreme
+stdout LT4,'</td>'
 stdout LT4,'<td><input value="',(":;glPlanOOBDist),'" tabindex="5" ',(InputFieldnum 'oobdist'; 3),'>',LT4,'</td>'
 stdout LT4,'<td>'
 djwSelect 'oobpercent' ; 6 ; glOOBPercentDesc ; glOOBPercentVal ; <''$glPlanOOBPercent
@@ -287,6 +290,7 @@ glPlanFWWidth=: ,fwwidth
 glPlanFWWidthAdj=: ,widthadj
 glPlanBunkLZ=: ,bunklz
 glPlanBunkLine=: ,bunkline
+glPlanBunkExtreme=: ,bunkextreme
 glPlanBunkLZCarry=: ,bunklzcarry
 glPlanBunkTargCarry=: ,bunktargcarry
 glPlanOOBDist=: ,oobdist

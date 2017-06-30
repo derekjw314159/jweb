@@ -43,6 +43,7 @@ glBunkDepthText=:':' cut '&lt;2&#39;:2&#39;-3&#39;:3&#39;-5&#39;:5&#39;-6&#39;:6
 glBunkDepthNum=: 0 2.5 4 5.5 7 9 11 13.5 16
 glBunkExtremeVal=: (<''),':' cut '+1:+2'
 glBunkExtremeDesc=: ':' cut 'Zero:+1:+2'
+glBunkExtremeNum=: 0 1 2
 glOOBCartVal=: (<''),':' cut '+1:-1'
 glOOBCartDesc=: ':' cut 'None:+1 Bounce away:-1 Bounce towards'
 glOOBPercentVal=: (<''),':' cut '25%:50%:75%:100%'
@@ -241,7 +242,8 @@ NB. the path
 NB. Changed 12/5/15 to make it easier
 NB. Now assumes it follows the route of the fairway
 NB. and returns the LatLon of the new position
-NB. and the crow's flight distance of the ball
+NB. and the fairway distance (not the crow's flight)
+NB. and the vector of the direction (in OSGB units)
 NB. ----------------------------------------------
 InterceptPath=: 3 : 0
 (' ' cut 'path start radius')=. y
@@ -253,12 +255,14 @@ path=. LatLontoFullOS path
 start=. LatLontoFullOS start
 path=.((| path - _1{path) < (|start - _1{path)) # path
 
-NB. If first point of path is further than radius, simple calc
+NB. If first point of path is further than radius, simple calc because point is on first leg
 if. radius < (|start - 0{path) do.
     prop=. radius % (|start -0{path)
     res=. start + prop * (0{path) - start
     res=. FullOStoLatLon res
     res=. res, <. 0.5 + radius * glMY
+    blarge=. (0{path) - start
+    res=. res, blarge % |blarge NB. One metre long
     return.
 end.
 
@@ -271,18 +275,21 @@ if. radius >: ({:length) do.
     res=. FullOStoLatLon _1{path
     NB. Truncate path to startpoint
     res=. res, <. 0.5 + glMY *  _1{length
+    blarge=. - / _1 _2{path
+    res=. res, blarge % |blarge NB. One metre long
     return.
 end.
 
 NB. Need to find out which chunk of the path is crossed by radius
 dist=.( length > radius) i. 1
-NB. Need to image a triangle with point <B> at the start
+NB. Need to imagine a triangle with point <B> at the start
 NB. length of b
 b=. radius - (dist-1){length
 blarge=. -/ (dist,dist-1) { path
-res=. ((dist-1){path) + (b % |blarge) * blarge
+res=. ((dist-1){path) + (b % |blarge) * blarge NB. Proportion along this length
 res=. FullOStoLatLon res
 res=. res, <. 0.5 + glMY * radius
+res=. res, blarge % |blarge NB. One metre long
 
 )
 
@@ -511,7 +518,7 @@ label_shot.
 	    newkey=. EnKey h ; glPlanMeasDist ; t ; g ;ab ; shot
 	    newkey=. <6 {. >newkey NB. Just need first six characters
 	    glPlanHitYards=: ,0
-		glPlanCrowDist=: ,0
+	    glPlanCrowDist=: ,0
 	    glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
 	    glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 	    glPlanLayupType=: ,' '
@@ -593,6 +600,7 @@ label_shot.
 	glPlanTopogStance=: ,<''
 	glPlanBunkLZ=: ,0
 	glPlanBunkLine=: ,0
+	glPlanBunkExtreme=: ,0
 	glPlanBunkLZCarry=: ,0
 	glPlanBunkTargCarry=: ,0
 	glPlanLatWaterDist=: ,0
@@ -608,6 +616,7 @@ label_shot.
 	glPlanRRMounds=: ,0
 	glPlanRRRiseDrop=: ,0
 	glPlanRRUnpleasant=: ,0
+	glPlanRRInconsistent=: ,0
 	glPlanRollExtreme=: ,<''
 	glPlanRollTwice=: ,<''
 	glPlanSqueezeWidth=: ,0
@@ -682,6 +691,7 @@ glPlanTreeDist=: 1 1 { glPlanTreeDist
 glPlanTreeRecov=: 1 1 { glPlanTreeRecov
 glPlanBunkLZ=: 1 1 { glPlanBunkLZ
 glPlanBunkLine=: 1 1 { glPlanBunkLine
+glPlanBunkExtreme=: 1 1 { glPlanBunkExtreme
 glPlanBunkLZCarry=: 1 1 { glPlanBunkLZCarry
 glPlanBunkTargCarry=: 1 1 { glPlanBunkTargCarry
 glPlanLatWaterDist=: 1 1{glPlanLatWaterDist
@@ -804,7 +814,7 @@ for_h. holes do.
     glPlanMeasDist=: ,dist
     glPlanRecType=: ,'C'
     glPlanCarryType=: ,'F'
-	glPlanCarryAffectsTee=: ,' '
+    glPlanCarryAffectsTee=: ,' '
     utKeyPut glFilepath,'_plan'
 end.
 )
@@ -842,6 +852,7 @@ glPlanTreeDist=: ,0
 glPlanAlt=: ,0
 glPlanBunkLZ=: ,0
 glPlanBunkLine=: ,0
+glPlanBunkExtreme=: ,<''
 glPlanBunkLZCarry=: ,0
 glPlanBunkTargCarry=: ,0
 glPlanLatWaterDist=: ,0
@@ -997,6 +1008,11 @@ end.
 if. ( -. (<'glPlanBunkTargCarry') e. dict ) do.
 	(,<'glPlanBunkTargCarry') utKeyAddColumn y
 	glPlanBunkTargCarry=: (#glPlanID)$0
+	utKeyPut y
+end.
+if. ( -. (<'glPlanBunkExtreme') e. dict ) do.
+	(,<'glPlanBunkExtreme') utKeyAddColumn y
+	glPlanBunkExtreme=: (#glPlanID)$<''
 	utKeyPut y
 end.
 )

@@ -743,6 +743,7 @@ fname fappend~ 'R' write_cell 18 4 ; 3 ; '<i>Yds to Carry Safely</i>'
 fname fappend~ write_input 21 4 ; sz ; (;carryyards)
 fname fappend~ 'R' write_cell 18 5 ; 3 ; 'Table Value'
 watlat=. lookup_lateral_water gender ; hityards ; <waterdist
+tvexists=. watlat >each 0
 NB. Behind adjustment for lateral only
 fname fappend~ write_row_head 18 3 ; 2.5 0.5 ; '<i>Behind</i>' ; ''
 behind=. (' ' cut 'glPlanLayupReason glGrWaterBehind') matrix_pull hole ; tee ; gender
@@ -758,11 +759,11 @@ fwtot=. watlat >. each watcarry
 for_i. i. 7 do. 
 	if. _1 ~: i{sz do. fname fappend~ pdfDiag ((21.33+i), 5) ; 0.33 1  end.
 end.
-NB. Cart Path Tilt
+NB. Cart Path Tilt (not yet implemented)
 fname fappend~ write_row_head 18 6 ; 2.0 1.0 ; '<i>Cart Path</i>' ; '<b>+B</b>'
 fw=. 0 * each carryyards NB. Temporarily set to zero
 fname fappend~ 'C' write_input 21 6 ; sz ; ;fw 
-NB. Cart Path Prevent
+NB. Cart Path Prevent (not yet implemented)
 fname fappend~ write_row_head 18 7 ; 2.0 1.0 ; '<i>Prevent</i>' ; '<b>-B</b>'
 fw=. 0 * each carryyards NB. Temporarily set to zero
 fname fappend~ 'C' write_input 21 7 ; sz ; ;fw 
@@ -772,16 +773,15 @@ percent=. (' ' cut 'glPlanWaterPercent glGrWaterPercent') matrix_pull hole ; tee
 percent=. (<glWaterPercentVal) i. each percent
 fw=. (;percent) { glWaterPercentDesc
 fname fappend~ 'C' write_input 21 8 ; sz ; <fw 
-fw=. (percent) { each <1- glWaterPercentNum NB. Fraction which remains
-fw=. <. each (<0.5) + each fwtot * each fw NB. Amount which remains (need to do this first for rounding)
-fw=. fw - each fwtot NB. Amount of reduction
-NB. fname fappend~ 'R' write_calc 21 6 ; sz ; <('bm<(>n<)>' 8!:0 ;fw)
-fwtot=. fwtot + each fw
-NB. Jeopardy
+fw=. (percent) { each <glWaterPercentNum NB. Round the reduction, not the remaining.  Wrong IMHO.
+fw=. <. each (<0.5) + each fwtot * each fw 
+fwtot=. fwtot - each fw
+fwtot=. fwtot >. each tvexists NB. In case reductions have taken it to zero
+NB. Jeopardy (not yet implemented)
 fname fappend~ write_row_head 18 9 ; 2.0 1.0 ; '<i>Jeopardy</i>' ; '<b>J</b>'
 fw=. 0 * each carryyards NB. Temporarily set to zero
 fname fappend~ 'C' write_input 21 9 ; sz ; ;fw 
-NB. Squeeze
+NB. Squeeze (not yet implemented)
 fname fappend~ write_row_head 18 10 ; 2.0 1.0 ; '<i>Squeeze</i>' ; '<b>Q</b>'
 fw=. 0 * each carryyards NB. Temporarily set to zero
 fname fappend~ 'C' write_input 21 10 ; sz ; ;fw 
@@ -824,7 +824,7 @@ waterline=. ; +. / each waterline
 fname fappend~ 'C' write_input 21 16 ;  3 4  ; <<"0 (;waterline){' y'
 NB. Overall rating
 fname fappend~ 'R' write_footer 18 17 ; 3 ; 'Water Rating'
-fwtot=. fwtot + (0=fwtot) * +. / ; waterline 
+fwtot=. fwtot + (0=fwtot) * +. / ; waterline NB. Minimum of 1 if water exists
 fname fappend~ 'C' write_footer 21 17 ;  3 4; fwtot
 psych=. psych, fwtot
 
@@ -929,15 +929,19 @@ NB. Carry
 bunkcarry=. ('glPlanBunkLZCarry') matrix_pull hole ; tee ; gender NB. Shot TO landing zone
 bunkcarry=. bunkcarry +.each }:each (<0),each ('glPlanBunkTargCarry') matrix_pull hole ; tee ; gender NB. OR shot FROM LZ, shifted
 fname fappend~ write_row_head 8 18 ; 2.5 0.5 ; '<i>Carry</i>' ; '<b>C</b>'
-fname fappend~ 'R' write_input 11 18 ; sz ; (;bunkcarry) 
 fname fappend~ 'L' write_input 11 18 ; sz ; (;carryyards)
+fname fappend~ 'R' write_input 11 18 ; sz ; (;bunkcarry) 
 for_i. i. 7 do. 
 	if. _1 ~: i{sz do. fname fappend~ pdfDiag ((11.33+i), 18) ; 0.33 1  end. NB. Diagonal line
 end.
 fwtot=. fwtot + ; +/ each bunkcarry
 NB. Extreme (not yet implemented)
 fname fappend~ write_row_head 8 19 ; 2.5 0.5; '<i>Extreme</i>'; '<b>E</b>'
-fname fappend~ write_input 11 19 ; sz ; 0 * ;hityards
+fw=. ('glPlanBunkExtreme' ; 'glGrBunkExtreme') matrix_pull hole ; tee ; gender
+fw=. ( <glBunkExtremeVal ) i. each fw
+fw=. fw { each <glBunkExtremeNum
+fname fappend~ write_input 11 19 ; sz ; (;fw)
+fwtot=. fwtot + ;+/each fw
 NB. Sub-Total
 fname fappend~ 'R' write_cell 8 20 ; 3 ; <<'Sum of <b><u>all</u></b> Values'
 fname fappend~ write_calc  11 20 ; 3 4 ; fwtot
@@ -1129,9 +1133,16 @@ fwtot=. fwtot + > (>. /each treeobs)
 NB. Tree squeeze (not yet implemented)
 fname fappend~ write_row_head 18 27 ; 2.5 0.5; '<i>Squeeze</i>'; '<b>Q</b>'
 fname fappend~ write_input 21 27 ; sz ; 0 * ;treeobs
+NB. Tree chute (not yet implemented)
+'sqdist sqwidth'=. chute_yards hole ; tee ; gender
+
+fname fappend~ ('cell' ; 'input') write_row_head 18 28 ; 0.55 0.7 ; '<i>W</i>' ; ":0{>0{sqwidth
+fname fappend~ ('cell' ; 'input') write_row_head 19.25 28 ; 0.5 0.75 ; '<i>D</i>'; ":0{>0{sqdist
+fname fappend~ 'R' write_cell 20.5 28 ; 0.5 ; '<b>Q</b>'
+fname fappend~ 'C' write_calc 21 28 ;  sz ;  0*;sqdist NB. Haven't impleented the lookup yet
 NB. Tree Rating
-fname fappend~ 'R' write_footer 18 28 ; 3 ; 'Tree Rating'
-fname fappend~ 'C' write_footer 21 28 ;  3 4 ; fwtot
+fname fappend~ 'R' write_footer 18 29 ; 3 ; 'Tree Rating'
+fname fappend~ 'C' write_footer 21 29 ;  3 4 ; fwtot
 psych=. psych, fwtot
  
 NB. ------------------------
@@ -1226,7 +1237,7 @@ fname fappend~ pdfBox 8 1 ; 10 14 NB. Recov and Rough
 fname fappend~ pdfBox 8 15 ; 10 12 NB. Bunker
 fname fappend~ pdfBox 8 27 ; 10 15 NB. OOB / ER
 fname fappend~ pdfBox 18 1 ; 10 17 NB. Water
-fname fappend~ pdfBox 18 19 ; 10 10 NB. Trees
+fname fappend~ pdfBox 18 19 ; 10 11 NB. Trees
 fname fappend~ pdfBox 18 30 ; 10 5 NB. Green Surface
 fname fappend~ pdfBox 18 36 ; 10 7 NB. Psychological
 
@@ -1403,10 +1414,10 @@ res=. res, ' cat output /home/user/Downloads/',glFilename,'_sheets.pdf'
 )
 
 NB. ====================================================================
-NB. Carry_Yards
+NB. carry_yards
 NB. ====================================================================
 NB. Usage:
-NB.     carrytype carry_yards hole ; tee ; gender 
+NB.     carry_yards carry_yards hole ; tee ; gender 
 NB. Returns:
 NB. Boxed array of two elements for scratch and bogey with carries for each hit
 carry_yards=: 4 : 0
@@ -1416,9 +1427,10 @@ tee=. ''$ tee
 gender=. ''$ gender
 
 yards=: 'glPlanHitYards' matrix_pull hole ; tee ; gender 
-NB. Need to read the hole file again
+NB. Need to read the whole file again
 oldid=. glPlanID
 utKeyRead glFilepath,'_plan'
+NB. Don't restrict for the tee - that is just the arbitrary measurement point - glRemGroundYards controls it
 ww=. hole = glPlanHole
 ww=. ww *. 'C'=glPlanRecType
 ww=. ww *. x=glPlanCarryType
@@ -1428,7 +1440,7 @@ if. (-. +. / ww) do. NB. No Carry
     res=. 0 * each yards
 else.
     ww=. I. ww
-    NB. Loop round the carries
+    NB. Loop round the carries and find the last one
     res=. 0 * each yards
     totalyards=. (<(glTees i. tee),hole){glTeesYards
     for_ww1. ww do.
@@ -1441,6 +1453,51 @@ else.
 end.
 oldid utKeyRead glFilepath,'_plan'
 res=. res
+)
+
+
+NB. ====================================================================
+NB. chute_yards
+NB. ====================================================================
+NB. Usage:
+NB.     carry_yards carry_yards hole ; tee ; gender 
+NB. Returns:
+NB. Boxed array of two elements for scratch and bogey with carries for each hit
+chute_yards=: 3 : 0
+'hole tee gender'=. y
+hole=. ''$ hole
+tee=. ''$ tee
+gender=. ''$ gender
+
+yards=: 'glPlanHitYards' matrix_pull hole ; tee ; gender 
+NB. Need to read the whole file again
+oldid=. glPlanID
+utKeyRead glFilepath,'_plan'
+NB. Don't restrict for the tee - that is just the arbitrary measurement point - glRemGroundYards controls it
+ww=. hole = glPlanHole
+ww=. ww *. 'Q'=glPlanRecType
+
+if. (-. +. / ww) do. NB. No Carry
+    res=. 0 * each yards
+    width=. res
+else.
+    ww=. I. ww
+    ww=. ww \: ww{glPlanRemGroundYards NB. Sort by distance from tee
+    NB. Loop round the carries and find the last one
+    res=. 0 * each yards
+    width=. res NB. Need two answers
+    totalyards=. (<(glTees i. tee),hole){glTeesYards
+    for_ww1. ww do.
+	carry=. totalyards - ww1{ glPlanRemGroundYards
+	carry=. carry - each 0, each }: each +/ \ each yards
+	carry=. 0 >. each carry
+	carry=. carry * each  yards >: each carry
+	res=. res >. each carry
+	width=. width >. each (ww1{glPlanSqueezeWidth) * each 0 < each carry 
+    end.
+end.
+oldid utKeyRead glFilepath,'_plan'
+res=. res ; <width
 )
 
 NB. =================================================

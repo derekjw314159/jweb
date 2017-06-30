@@ -157,6 +157,7 @@ if. fexist glFilepath,'.ijf' do.
 	xx=. utKeyRead glFilepath,'_plan'
 	xx=. utKeyRead glFilepath,'_tee'
 	xx=. utKeyRead glFilepath,'_green'
+	CheckPlanFile glFilepath,'_plan'  NB. Check for added variables
 	err=. ''
 else.
 	err=. 'No such course'
@@ -299,6 +300,7 @@ NB.stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr
 		stdout (('L'=rr{glPlanLayupType)#(3{.": >rr{glPlanLayupCategory)),'</a></td><td>', (": <. 0.5 + rr{glPlanRemGroundYards),'</td>' 
 		if. 0<rr{glPlanRemGroundYards do.
 		    other=. ''
+		    other=. other, (0<#>rr{glPlanBunkExtreme)#' BuEx:',>rr{glPlanBunkExtreme
 		    other=. other, (0 ~: rr{glPlanDoglegNeg)#' D/LNeg:',": |rr{glPlanDoglegNeg
 		    other=. other, (0<#>rr{glPlanRollExtreme)#' RoEx:',;>rr{glPlanRollExtreme
 		    other=. other, (0<#>rr{glPlanRollTwice)#' Ro2:',;>rr{glPlanRollTwice
@@ -336,6 +338,8 @@ NB.stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr
 		    
 		else. NB. Truncated row when at hole
 		    other=. ''
+		    other=. other, (0<#>rr{glPlanBunkExtreme)#' BuEx:',>rr{glPlanBunkExtreme
+		    other=. other, (0 ~: rr{glPlanDoglegNeg)#' D/LNeg:',": |rr{glPlanDoglegNeg
 		    other=. other, (rr{glPlanFWVisible)#' LZ:V'
 		    other=. other, (rr{glPlanFWObstructed)#' FW:O'
 		    other=. other, (rr{glPlanTreeTargObstructed)#' Targ:TreeObs'
@@ -376,10 +380,10 @@ NB.stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr
 		other=. other, (rr{glPlanFWVisible)#' LZ:V'
 		other=. other, (rr{glPlanFWUnpleasant)#' FW:U'
 		other=. other, (rr{glPlanFWObstructed)#' FW:O'
-	    other=. other, (rr{glPlanBunkLZCarry)#' LZ:BunkCarry'
-	    other=. other, (rr{glPlanBunkTargCarry)#' Targ:BunkCarry'
-	    other=. other, (rr{glPlanTreeTargObstructed)#' Targ:TreeObs'
-	    other=. other, (rr{glPlanTreeLZObstructed)#' LZ:TreeObs'
+		other=. other, (rr{glPlanBunkLZCarry)#' LZ:BunkCarry'
+		other=. other, (rr{glPlanBunkTargCarry)#' Targ:BunkCarry'
+		other=. other, (rr{glPlanTreeTargObstructed)#' Targ:TreeObs'
+		other=. other, (rr{glPlanTreeLZObstructed)#' LZ:TreeObs'
 		other=. other, (0<#>rr{glPlanFWTargVisible)#' Targ:',;>rr{glPlanFWTargVisible
 		other=. other, (rr{glPlanRRMounds)#' RR:M'
 		other=. other, (0<#>rr{glPlanWaterPercent)#' Wat%:',;>rr{glPlanWaterPercent
@@ -576,7 +580,7 @@ path=. (path < #glGPSName) # path NB. Remove not found
 path=. LatLontoFullOS path { glGPSLatLon
 path=. ( +/path ) % #path
 path=.;  +. FullOStoLatLon path
-ww=. 9!:11 (9) 
+ww=. 9!:11 (9)  NB. Print precision
 stdout LF,'var myCenter=new google.maps.LatLng(',(>'' 8!:0  (0{path)),',',(>'' 8!:0 (1{path)),');'
 NB. stdout LF,'var myCenter=new google.maps.LatLng(51.5,-0.57);'
 
@@ -650,19 +654,17 @@ for_hh. hole do.
 		stdout LF,'   marker',((>rr{glPlanID)-.'-'),'.setMap(map);'
     end.
 	
-
-
     NB. Green marker 
     stdout LF,'   var marker',(":hh),'GC=new google.maps.Marker({'
-    path=. glGPSName i. <(>'r<0>2.0' 8!:0 (1+hh)),'GC'
-    path=. +. path { glGPSLatLon
-    stdout LF,'      position: new google.maps.LatLng(',(>'' 8!:0  (0{path)),',',(>'' 8!:0 (1{path)),'),'
+    rr=. glGPSName i. <(>'r<0>2.0' 8!:0 (1+hh)),'GC'
+    rr=. +. rr { glGPSLatLon
+    stdout LF,'      position: new google.maps.LatLng(',(>'' 8!:0  (0{rr)),',',(>'' 8!:0 (1{rr)),'),'
     stdout LF,'      icon: "http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|FF99CC|8|_|',(":1+hh),'"'
     stdout LF,'      });'
     stdout LF,'   marker',(":hh),'GC.setMap(map);'
 
     NB. Flightpath
-    path=. PathTeeToGreen hh ; 'W'
+    path=. PathTeeToGreen hh ; 0{glTees
     stdout LF,'var flightPathCoord',(":hh),' = ['
     for_p. path do.
 	    pp=. +. p
@@ -680,6 +682,38 @@ for_hh. hole do.
     stdout LF,'       strokeWeight: 1,'
     stdout LF,'       });'
     stdout LF,'flightPath',(":hh),'.setMap(map);'
+
+    NB. Carry Point .. draw perpendicular line
+    ww=. glPlanHole = hh
+    ww=. ww *. glPlanRecType e. 'QC' NB. Carry or chute
+    ww=. ww *. glPlanRemGroundYards > 0
+    ww=. ww * 1=#hole NB. Do show for multiple holes
+    for_rr. I. ww do.
+	radius=. (<0,hh){glTeesYards
+	radius=. radius - rr{glPlanRemGroundYards
+	ww=. InterceptPath path ; (0{path) ; radius
+	latlon=. LatLontoFullOS 0{ww
+	width=. 0.5 * ('Q'=rr{glPlanRecType){ 40, rr{glPlanSqueezeWidth
+	latlon=. latlon + _1 1 * ( width % glMY) * 0j1 * 2{ww NB. Multiply by 0j1 rotates vector by 90 degrees.  25 yards either side
+	latlon=. FullOStoLatLon latlon
+	stdout LF,'var flightPathCoordCarry',(":rr_index),' = ['
+	pp=. +. 0{latlon
+	stdout LF,'   new google.maps.LatLng(', (>'' 8!:0  (0{pp)),', ',(>'' 8!:0 (1{pp)),'),'
+	pp=. +. 1{latlon
+	stdout LF,'   new google.maps.LatLng(', (>'' 8!:0  (0{pp)),', ',(>'' 8!:0 (1{pp)),'),'
+	stdout LF,'   ];'
+	stdout LF,'var flightPathCarry',(":rr_index),' = new google.maps.Polyline({'
+	stdout LF,'       path: flightPathCoordCarry',(":rr_index),','
+	stdout LF,'       geodesic: true,'
+	rgb=. 'FWBR' i. rr{glPlanCarryType
+	rgb=. >rgb { ' ' cut '#007F00 #3333FF gold white pink'
+	stdout LF,'       strokeColor: ''',(rgb),''',' NB. Colour based on carry
+	stdout LF,'       strokeOpacity: 1,'
+	weight=. ('Q'=rr{glPlanRecType) { 1.5 2.5
+	stdout LF,'       strokeWeight: ',(":weight),','
+	stdout LF,'       });'
+	stdout LF,'flightPathCarry',(":rr_index),'.setMap(map);'
+    end.
 end.
     stdout LF,'}'
 NB. End of hh loop
