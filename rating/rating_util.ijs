@@ -600,7 +600,7 @@ label_shot.
 	glPlanTopogStance=: ,<''
 	glPlanBunkLZ=: ,0
 	glPlanBunkLine=: ,0
-	glPlanBunkExtreme=: ,0
+	glPlanBunkExtreme=: ,<''
 	glPlanBunkLZCarry=: ,0
 	glPlanBunkTargCarry=: ,0
 	glPlanLatWaterDist=: ,0
