@@ -496,7 +496,7 @@ ww=. ; 'r<0>4.0' 8!:0 {.ww
 utKeyClear glFilepath,'_player'
 glPlID=: ,< ww
 glPlFirstName=: ,<'First Name'
-glPlLastName=: ,<' Last Name'
+glPlLastName=: ,<'Last Name'
 glPlClub=: ,a:
 glPlGross=: 1 18$_
 glPlPutt=: 1 3$0 0 50

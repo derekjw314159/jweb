@@ -79,8 +79,30 @@ if. fexist y,'.ijf' do.
 		glScrollParam=: 5 1 0.05 NB. Initial : ScrollPixels : ScrollTime
 		ww=.(<'glScrollParam') utFilePut y
 	end.
+	if. 0 ~: 4!:0 <'glPlHCPFull' do.
+		glHCPAllow=: 0.75
+		glHCPRound=: 1
+		glPlHCPFull=: <. 0.5 + glPlHCP % glHCPAllow
+		ww=.(' ' cut 'glHCPAllow glHCPRound') utFilePut y
+		(,<'glPlHCPFull') utKeyAddColumn y,'_player'
+		utKeyPut y,'_player'
+	end.
+	if. 1 ~: $$glPlHCP do. NB. Should be rank 1
+	    glPlHCPFull=: ;glPlHCPFull
+	    utKeyPut y,'_player'
+	end.
+	if. 1 ~: $$glPlHCP do. NB. Should be rank 1
+	    glPlHCP=: ;glPlHCP
+	    utKeyPut y,'_player'
+	end.
+
+	if. 0 ~: 4!:0 <'glMax' do.
+		glMax=: 7
+		ww=.(<'glMax') utFilePut y
+	end.
 	err=. ''
 else.
 	err=. 'No such course'
 end.
 NB. ================================================
+)
