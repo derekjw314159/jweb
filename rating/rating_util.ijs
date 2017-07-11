@@ -547,9 +547,12 @@ label_shot.
 	NB. of the green for a Par 3 or 20 for Par 4/5
 	trans_dist=. shot { 10 20 20 20 20 20 
 	rem=. remgroundyards - <. 0.5 + 1{ww
-	if. ( 0 < rem) *. (trans_dist >: rem) *. (glPlanLayupType=' ') do.
-		radius2=. radius2 + rem
-		ww=. InterceptPath path ; start ; radius2
+	NB. Logic is now changed to only add 'T' if within 20 yards
+	NB. i.e. don'e extend previous shot
+	NB. if. ( 0 < rem) *. (trans_dist >: rem) *. (glPlanLayupType=' ') do.
+	if. ( remgroundyards > 0) *. ( remgroundyards <: trans_dist ) *. (glPlanLayupType=' ') do.
+		NB. radius2=. radius2 + rem
+		NB. ww=. InterceptPath path ; start ; radius2
 		glPlanLayupType=: ,'T'
 	end.
 

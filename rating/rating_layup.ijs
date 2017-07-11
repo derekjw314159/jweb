@@ -81,8 +81,10 @@ defaulthit=. defaulthit <. remain
 transition=. 0
 trans_dist=. shot { 10 20 20 20 20 20 
 NB. Transitional distance check if within 10 yards of par 3 or 20 yards of par 4/5
-if. (defaulthit < remain) *. (defaulthit + trans_dist) >: remain do.
-	defaulthit=. remain
+NB. Logic changed to only count if within 20 yards, i.e. don't extend previous shot
+NB. if. (defaulthit < remain) *. (defaulthit + trans_dist) >: remain do.
+if. (defaulthit <:  trans_dist) do.
+	NB. defaulthit=. remain
 	transition=. 1
 end.
 

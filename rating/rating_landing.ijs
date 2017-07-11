@@ -110,6 +110,9 @@ stdout LT2,'<input type="hidden" name="filename" value="',(;glFilename),'">'
 
 NB. Table of values - Common Values
 stdout LT1,'<h4>Common Measurements</h4>'
+stdout LT1,'<table>',LT2,'<tbody>',LT3,'<tr>'
+stdout LT1,'<td>Quick entry</td>'
+stdout LT1,'<td><input value="" name="quickentry" tabindex="1" ',(InputField 55),'></td></tr></tbody></table>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
 stdout LT4,'<th>Alt</th><th>FW Width</th><th>Bunk LZ</th><th>Bunk LoP</th><th>Bunk Extrm</th><th>Dist OB</th><th>OOB %age</th><th>OOB LoP</th><th>Dist Tr</th><th>Dist Wat</th><th>Water %age</th><th>Wat LoP</th><th>Mounds</th><th>Dogleg Neg</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
@@ -263,24 +266,55 @@ ww=. keyplan utKeyRead glFilepath,'_plan'
 
 NB. Throw error page if updated
 if. (-. glSimulate)  do.
-if. (-. (;glPlanUpdateTime) -: (;prevtime)) do.
-	stdout 'Content-type: text/html',LF,LF,'<html>',LF
- 	stdout LF,'<head>'
- 	stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
- 	djwBlueprintCSS ''
- 	stdout LF,'</head><body>'
- 	stdout LF,'<div class="container">'
- 	stdout LF,TAB,'<div class="span-24">'
- 	stdout LF,TAB,TAB,'<h1>Error updating ',(,;glPlanID),'</h1>'
- 	stdout LF,'<div class="error">Synch error updating ',(;glPlanID)
- 	stdout LF,'</br></br>',(":getenv 'REMOTE_USER'),' started to update record previously saved by ',(;prevname),' at ',;prevtime
- 	stdout LF,'</br><br>It has since been updated by: ',(; glPlanUpdateName),' at ',(;glPlanUpdateTime)
- 	stdout LF,'</br><br><b>**Update has been CANCELLED**</b>'
- 	stdout  ,2$,: '</div>'
- 	stdout LF,'</br><a href="/jw/rating/plan/v/',glFilename,'/',(;":1+glPlanHole),'">Restart plan of hole: ',(;":1+glPlanHole),'</a>'
- 	stdout, '</div></body>'
- 	exit ''
+    if. (-. (;glPlanUpdateTime) -: (;prevtime)) do.
+	    stdout 'Content-type: text/html',LF,LF,'<html>',LF
+	    stdout LF,'<head>'
+	    stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
+	    djwBlueprintCSS ''
+	    stdout LF,'</head><body>'
+	    stdout LF,'<div class="container">'
+	    stdout LF,TAB,'<div class="span-24">'
+	    stdout LF,TAB,TAB,'<h1>Error updating ',(,;glPlanID),'</h1>'
+	    stdout LF,'<div class="error">Synch error updating ',(;glPlanID)
+	    stdout LF,'</br></br>',(":getenv 'REMOTE_USER'),' started to update record previously saved by ',(;prevname),' at ',;prevtime
+	    stdout LF,'</br><br>It has since been updated by: ',(; glPlanUpdateName),' at ',(;glPlanUpdateTime)
+	    stdout LF,'</br><br><b>**Update has been CANCELLED**</b>'
+	    stdout  ,2$,: '</div>'
+	    stdout LF,'</br><a href="/jw/rating/plan/v/',glFilename,'/',(;":1+glPlanHole),'">Restart plan of hole: ',(;":1+glPlanHole),'</a>'
+	    stdout, '</div></body>'
+	    exit ''
+    end.
 end.
+
+NB. Override values with anything in quick entry
+quick=.' ' cut tolower ;quickentry
+quick=. (0<;#each quick) # quick
+for_qq. quick do.
+    if. 0 do. '' 
+    elseif. 'a' -: 0{;qq do. alt=: ,0 ". 1}. ;qq 
+    elseif. 'fw' -: 2{.;qq do.
+	fw=. 0 ". 2}. ;qq
+	fw=. glFWWidthAdjNum i. fw
+	widthadj=. ,fw{(glFWWidthAdjVal , a:) 
+    elseif. 'mp' -: 2{.;qq do.
+	topogstance=: ,<''
+    elseif. 'ma' -: 2{.;qq do.
+	topogstance=: ,<'MA'
+    elseif. 'sa' -: 2{.;qq do.
+	topogstance=: ,<'SA'
+    elseif. 'ea' -: 2{.;qq do.
+	topogstance=: ,<'EA'
+    elseif. 'f' -: 0{;qq do. fwwidth=: ,0 ". 1}. ;qq 
+    elseif. 't' -: 0{;qq do. treedist=: ,0 ". 1}. ;qq 
+    elseif. 'o' -: 0{;qq do. oobdist=: ,0 ". 1}. ;qq 
+    elseif. 'w' -: 0{;qq do. latwaterdist=: ,0 ". 1}. ;qq 
+    elseif. 'blop0' -: 5{.;qq do. bunkline=: ,0
+    elseif. 'blop' -: 4{.;qq do. bunkline=: ,1
+    elseif. 'b0' -: 2 {.;qq do. bunklz=: ,0
+    elseif. 'b' -: 0 {;qq do. bunklz=: ,1
+    elseif. 'm0' -: 2{.;qq do. rrmounds=: ,0
+    elseif. 'm' -: 0{;qq do. rrmounds=: ,1
+    end.
 end.
 
 glPlanUpdateName=: ,<": getenv 'REMOTE_USER'
