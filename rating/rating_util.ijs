@@ -29,10 +29,10 @@ glRRRiseDropVal=: (<''),':' cut '>5'':>10'''
 glRRRiseDropDesc=: ':' cut 'None:+1 >5'':+2 >10'''
 glRRRiseDropNum=: 0 1 2
 glRRRiseDropText=: (<''),':' cut '5-10'':gt 10'''
-glTopogStanceVal=: (<''),':' cut 'MA:SA:EA'
-glTopogStanceDesc=: ':' cut 'Minor Problem:Moderately Awkward:Signif Awkward:Extremely Awkward'
-glTopogStanceText=: ':' cut 'MP:MA:SA:EA'
-glTopogStanceNum=: 1 2 3 4
+glTopogStanceVal=: (<''),':' cut 'MP-MA:MA:SA:EA'
+glTopogStanceDesc=: ':' cut 'Minor Problem:MP-MA:Moderately Awkward:Signif Awkward:Extremely Awkward'
+glTopogStanceText=: ':' cut 'MP:MP/A:MA:SA:EA'
+NB. glTopogStanceNum=: 1 2 3 4 5
 glBunkFractionVal=: (<''),':' cut '<1/4:<1/2:<3/4:>3/4'
 glBunkFractionDesc=: ':' cut 'Zero:0 - 1/4:1/4 - 1/2:1/2 - 3/4:Greater than 3/4'
 glBunkFractionNum=: 0 1 2 3 4
@@ -937,10 +937,10 @@ glGrRRRiseDrop=: ($glGrID)$<''
 glGrBunkFraction=: ($glGrID)$<''
 glGrBunkDepth=: ($glGrID)$<''
 glGrBunkExtreme=: ($glGrID)$<''
-glGrOOBBehind=: ($glGrID)$0
+glGrOOBBehind=: ($glGrID)$<''
 glGrOOBCart=: ($glGrID)$<''
 glGrOOBPercent=: ($glGrID)$<''
-glGrWaterBehind=: ($glGrID)$0
+glGrWaterBehind=: ($glGrID)$<''
 glGrWaterCart=: ($glGrID)$<''
 glGrWaterPercent=: ($glGrID)$<''
 glGrWaterFraction=: ($glGrID)$<''
@@ -1051,3 +1051,28 @@ if. ( -. (<'glGrNotes') e. dict ) do.
 	utKeyPut y
 end.
 )
+
+CheckXLFile=: 3 : 0
+NB. =========================================================
+NB. CheckXLFile
+NB. =========================================================
+NB. Create XL file if it does not already exit
+if. fexist y,'.ijf' do. return. end.
+keycreate y
+2!:0 'chmod 775 ',y,'.ijf'
+(,<' ' cut 'glXLID glXLHole glXLTee glXLGender glXLNum glXLSheet glXLRow glXLColumn glXLString glXLType glXLNull glXLNote') keywrite y ; ,<'_dictionary'
+glXLID=: ,<'_default'
+glXLHole=: ,_1
+glXLTee=: ,' '
+glXLGender=: ,0
+glXLNum=: ,0
+glXLSheet=: ,<''
+glXLRow=: ,0
+glXLColumn=: ,0
+glXLString=: ,<''
+glXLType=: ,' '
+glXLNull=: ,0
+glXLNote=: ,<''
+utKeyPut y
+)
+

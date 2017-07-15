@@ -323,6 +323,8 @@ if. fexist glFilepath,'.ijf' do.
 	utKeyRead glFilepath,'_plan'
 	utKeyRead glFilepath,'_tee'
 	utKeyRead glFilepath,'_green'
+	CheckXLFile glFilepath,'_xl'  NB. Check existence of XL file
+	utKeyRead glFilepath,'_xl'
 	err=. ''
 else.
 	err=. 'No such course : ',glFilename
@@ -337,6 +339,13 @@ NB. Error page - No such course
 if. 0<#err do.
     djwErrorPage err ; ('No such course name : ',glFilename) ; '/jw/rating/plan/v' ; 'Back to rating plan'
 end.
+
+NB. Clear down the XL entries for this page
+ww=. glXLHole = hole
+ww=. ww *. glXLTee = tee
+ww=. ww *. glXLGender = gender
+(ww # glXLID) utKeyDrop glFilepath,'_xl'
+glXLCount=: _1
 
 NB. file exists if we have got this far
 NB. Need to check this is a valid shot
@@ -407,8 +416,10 @@ meas=. gender{;glTeMeasured
 fname fappend~ LF,'$pdf->',pdfMulti 4.75 0 ; 2.25 1 ; ('<b>TEE</b>: ',(>(glTees i. tee){glTeesName)); 1
 fname fappend~ LF,'$pdf->',pdfMulti 7 0 ; 2.5 1 ; ('<b>GENDER</b>: ',>gender{'/' cut '/Men/Women'); 1
 fname fappend~ LF,'$pdf->',pdfMulti 9.5 0 ; 1.5 1 ; ('<b>HOLE</b>: ',":1+hole); 1
-fname fappend~ LF,'$pdf->',pdfMulti 11 0 ; 3 1 ; ('<b>LENGTH</b>: ',":(<t_index,hole){glTeesYards); 1
+fname fappend~ LF,'$pdf->',pdfMulti 11 0 ; 3 1 ; ('<b>LENGTH</b>: ',":(<t_index,hole){glTeesYards) ; 1
+write_xl hole ; tee ; gender ; (hole+1) ; 51 ; 6 ; 0 ; 'Hole length' ; (<t_index,hole){glTeesYards NB. Hole length
 fname fappend~ LF,'$pdf->',pdfMulti 14 0 ; 2 1 ; ('<b>PAR</b>: ',":gender{,glTePar); 1
+write_xl hole ; tee ; gender ; (hole+1) ; 51 ; 8 ; 0 ; 'Hole par' ; gender{,glTePar NB. Hole par
 fname fappend~ LF,'$pdf->',pdfMulti 16 0 ; 5 1 ; ('<b>DATE RATED</b>: ',glCourseDate) ; 1
 fname fappend~ LF,'$pdf->',pdfMulti 21 0 ; 7 1 ; ('<b>T/LEADER</b>: ',glCourseLead) ; 1
 
@@ -423,6 +434,8 @@ fname fappend~ 'C' write_cell 3 1 ; 1.25; <sh
 for_ab. i. 2 do.
     fname fappend~ LF,('R' ; 1) write_cell (0 ,2+ab) ; 3 ; ('<i>',(>ab{' ' cut 'Scratch Bogey'),'</i>')
     ww2=. I. (ab=glPlanAbility) 
+    write_xl hole ; tee ; gender ; (hole+1) ; (53+ab) ; 5 ; 0 ; 'Shot distance' ; ww2{glPlanHitYards NB. Distances
+    write_xl hole ; tee ; gender ; (hole+1) ; 55 ; (ab{6 8) ; 0 ; 'Transition' ; (+. / 'T'=ww2 {glPlanLayupType){'NY' NB. Transition y/n
     ww2=. ('' (8!:0) ww2{glPlanHitYards),each <"0 ww2{glPlanLayupType
     fname fappend~ ('C' ; 1) write_input (3, 2+ab) ; (4{.((#ww2)$1.25), 4$_1.25) ; <ww2
 end.
@@ -514,7 +527,7 @@ for_ab. 0 1 do.
     end.
     fwtot=. fwtot, <fw
 end.
-fname fappend~ 'C' write_input 3 23 ; sz ; (;wid) 
+fname fappend~ 'C' write_input 3 23 ; sz ; (;wid)  * 999> ;wid NB. Suppress 999
 fname fappend~ 'C' write_calc 3 24 ; sz ; (;fwtot) 
 NB. Fairway Layup
 fname fappend~ write_row_head 0 25 ; 2.5 0.5; '<i>Lay-up</i>'; '<b>L</b>'
@@ -1616,9 +1629,10 @@ NB. =================================================
 NB. Usage
 NB.   lookup_roll_topog_rating alt ; stance
 NB. Returns table value
+NB. Enhanced to add tweener value
 lookup_topog_rating=: 3 :  0
 'alt stance'=. y
-mat=. 5 5 $ 1 3 4 5, 0, 2 4 5 6, 1, 3 5 6 7, 2, 4 6 7 8, 3, 5 7 8 9, 4
+mat=. 5 2 $ 1 2 3 4 5, 0, 2 3 4 5 6, 1, 3 4 5 6 7, 2, 4 5 6 7 8, 3, 5 6 7 8 9, 4
 res=. 0$<''
 for_ab. i. 2 do.
 	rr=. 0$0
@@ -1956,4 +1970,62 @@ for_ab. 0 1 do.
     end.
 end.
 )
+
+write_xl=: 3 : 0
+NB. =========================================================
+NB. write_xl
+NB. =========================================================
+NB. Usage:
+NB.    write_xl hole ; tee ; gender ; sheet ; row ; column ; null ; note ; value
+
+'hole tee gender sheet row column null note value'=. y
+NB. Check if boxed or literal
+string=. 0
+select. 3!:0 value
+    case. 32 do.
+	value=. ,value NB. Already boxed, just ravel
+	string=. 1
+    case. 2 do.
+	value=. ,<value NB. If text/literal box and ravel
+	string=. 1
+end.
+value=. ,value NB. All other cases are numeric
+key=. EnKey hole ; '' ; tee ; gender ; 0 ; 0
+key=. (0 1 2 4 5 6){> key
+
+for_vv. value do.
+    glXLCount=: 1 + glXLCount
+    glXLID=: ,<key,'-', ;'r<0>3.0' 8!:0 glXLCount
+    glXLHole=: ,hole
+    glXLTee=: ,tee
+    glXLGender=: ,gender
+    if. 2 = 3!:0 sheet do.
+	glXLSheet=: ,<sheet
+    else. 
+	glXLSheet=: ,<'H',":sheet
+    end.
+    glXLRow=: ,row
+    NB. Column can be scalar or vector of columns
+    if. 1=#,column do.
+	glXLColumn=: ,column+vv_index
+    else.
+	glXLColumn=: ,vv_index{column
+    end.
+    glXLString=: , string
+    glXLNull=: , null
+    glXLNote=: ,<note
+    if. string do.
+	glXLString=: ,vv
+	glXLNum=: ,0
+	glXLType=: ,'S'
+    else.
+	glXLString=: ,<''
+	glXLNum=: ,vv
+	glXLType=: ,'N'
+    end.
+    utKeyPut glFilepath,'_xl'
+end.
+)
+
+
 

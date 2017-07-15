@@ -298,6 +298,8 @@ for_qq. quick do.
 	widthadj=. ,fw{(glFWWidthAdjVal , a:) 
     elseif. 'mp' -: 2{.;qq do.
 	topogstance=: ,<''
+    elseif. 'm+' -: 2{.;qq do.
+	topogstance=: ,<'MP-MA'
     elseif. 'ma' -: 2{.;qq do.
 	topogstance=: ,<'MA'
     elseif. 'sa' -: 2{.;qq do.

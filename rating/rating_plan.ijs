@@ -332,7 +332,7 @@ NB.stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr
 		    stdout LT3, '<td style="border-right: 1px solid lightgray">',((rr{glPlanWaterLine){'-y'),'</td>'
 		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanRollLevel),'</td>'
 		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (3{. ":  ,>rr{glPlanRollSlope),'</td>'
-		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanTopogStance),'</td>'
+		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (,>rr{glPlanTopogStance),'</td>'
 		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (6{. ":  ,>rr{glPlanFWWidthAdj),'</td>'
 		    stdout LT3,'<td colspan="3">',(}.other),'</td>'
 		    
@@ -401,7 +401,7 @@ NB.stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr
 	    stdout LT3, '<td style="border-right: 1px solid lightgray">',((rr{glPlanWaterLine){'-y'),'</td>'
 		stdout LT3, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanRollLevel),'</td>'
 		stdout LT3, '<td style="border-right: 1px solid lightgray">', (3{. ":  ,>rr{glPlanRollSlope),'</td>'
-		stdout LT3, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanTopogStance),'</td>'
+		stdout LT3, '<td style="border-right: 1px solid lightgray">', (,>rr{glPlanTopogStance),'</td>'
 		stdout LT3, '<td style="border-right: 1px solid lightgray">', (6{. ":  ,>rr{glPlanFWWidthAdj),'</td>'
 		stdout LT3,'<td colspan=3>',(}.other),'</td>'
 
