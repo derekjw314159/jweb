@@ -49,11 +49,11 @@ for_tee. tees do.
 	    NB. Write the umbrella macro
 	    stdout LF,'Sub Check_',(>(glTees i. tee){glTeesName),'_',(>gender{' ' cut 'Men Women'),'()<br>'
 	    for_hole. holes do.
-		stdout LT1,tab,'Call Check_',(;'r<0>2.0' 8!:0 hole+1),'_',(>(glTees i. tee){glTeesName),'_',(>gender{' ' cut 'Men Women'),'()<br>'
+			stdout LT1,tab,'Call Check_',(>(glTees i. tee){glTeesName),'_',(>gender{' ' cut 'Men Women'),'_',(;'r<0>2.0' 8!:0 hole+1),'()<br>'
 	    end.
 	    stdout LF,'End Sub<br>'
 	    for_hole. holes do.
-		stdout LF,'Sub Check_',(;'r<0>2.0' 8!:0 hole+1),'_',(>(glTees i. tee){glTeesName),'_',(>gender{' ' cut 'Men Women'),'()<br>'
+			stdout LF,'Sub Check_',(>(glTees i. tee){glTeesName),'_',(>gender{' ' cut 'Men Women'),'_',(;'r<0>2.0' 8!:0 hole+1),'()<br>'
 		ix=. I. ((hole = glXLHole) *. (tee = glXLTee) *. gender=glXLGender)
 		for_i. ix do.
 		    ww=. LT1,tab,'If 2 = CheckVal("',(>i{glXLSheet),'", '
