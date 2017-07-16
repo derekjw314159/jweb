@@ -309,6 +309,8 @@ NB. rating_report
 NB. =========================================================
 NB. View scores for participant
 jweb_rating_report=: 3 : 0
+0 jweb_rating_report y
+:
 'filename hole gender tee'=. y
 hole=. ''$ ".hole
 tee=. ''$ tee
@@ -325,15 +327,20 @@ if. fexist glFilepath,'.ijf' do.
 	utKeyRead glFilepath,'_green'
 	CheckXLFile glFilepath,'_xl'  NB. Check existence of XL file
 	utKeyRead glFilepath,'_xl'
+	CheckSSFile glFilepath,'_ss'
+	utKeyRead glFilepath,'_ss'
 	err=. ''
 else.
 	err=. 'No such course : ',glFilename
 end.
 
+
+if. x=0 do.
 stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 djwBlueprintCSS ''
+end. 
 
 NB. Error page - No such course
 if. 0<#err do.
@@ -346,6 +353,20 @@ ww=. ww *. glXLTee = tee
 ww=. ww *. glXLGender = gender
 (ww # glXLID) utKeyDrop glFilepath,'_xl'
 glXLCount=: _1
+
+NB. Pull / create SS record
+ww=. glSSHole = hole
+ww=. ww *. glSSTee=tee
+ww=. ww *. glSSGender=gender
+if. +. /ww do.
+    (ww#glSSID) utKeyRead glFilepath,'_ss'
+else.
+    key=. EnKey hole ; '' ; tee ; gender ; 0 ; 0
+    glSSID=: ,<(0 1 2 4 5 6){> key
+    glSSHole=: ,hole
+    glSSTee=: ,tee
+    glSSGender=: ,gender
+end.
 
 NB. file exists if we have got this far
 NB. Need to check this is a valid shot
@@ -408,6 +429,7 @@ rollslope=. 'glPlanRollSlope' matrix_pull hole ; tee ; gender
 psych=. 0 2$0
 
 NB. Title row
+glOldColor=: '' ; '' ; '' NB. Need to reset at the start
 fname fappend~ LF,'// -------- Title Row -------------'
 fname fappend~ 'black' oN 'white'
 fname fappend~ LF,'$pdf->',pdfMulti 0 0 ; 4.75 1 ; ('<b>CLUB</b>: ',glCourseName); 1
@@ -418,8 +440,12 @@ fname fappend~ LF,'$pdf->',pdfMulti 7 0 ; 2.5 1 ; ('<b>GENDER</b>: ',>gender{'/'
 fname fappend~ LF,'$pdf->',pdfMulti 9.5 0 ; 1.5 1 ; ('<b>HOLE</b>: ',":1+hole); 1
 fname fappend~ LF,'$pdf->',pdfMulti 11 0 ; 3 1 ; ('<b>LENGTH</b>: ',":(<t_index,hole){glTeesYards) ; 1
 write_xl hole ; tee ; gender ; (hole+1) ; 51 ; 6 ; 0 ; 'Hole length' ; (<t_index,hole){glTeesYards NB. Hole length
+glSSYards=: , (<t_index,hole){glTeesYards
 fname fappend~ LF,'$pdf->',pdfMulti 14 0 ; 2 1 ; ('<b>PAR</b>: ',":gender{,glTePar); 1
 write_xl hole ; tee ; gender ; (hole+1) ; 51 ; 8 ; 0 ; 'Hole par' ; gender{,glTePar NB. Hole par
+glSSPar=: ,gender{,glTePar
+glSSObsFactor=: (''$glSSPar>3){2 10$0.08 0 0.09 0.13 0.06 0.08 0.13 0.07 0.11 0.05, 0.1 0.11 0.09 0.14 0.07 0.1 0.14 0.09 0.11 0.05 NB. Scratch
+glSSObsFactor=: 1 10 2$, glSSObsFactor,. (''$glSSPar>3){2 10$0.08 0 0.07 0.13 0.10 0.07 0.11 0.11 0.09 0.04,0.12 0.09 0.06 0.15 0.10 0.09 0.14 0.14 0.08 0.03 NB. Bogey
 fname fappend~ LF,'$pdf->',pdfMulti 16 0 ; 5 1 ; ('<b>DATE RATED</b>: ',glCourseDate) ; 1
 fname fappend~ LF,'$pdf->',pdfMulti 21 0 ; 7 1 ; ('<b>T/LEADER</b>: ',glCourseLead) ; 1
 
@@ -492,6 +518,8 @@ fwtot=. fwtot + sh
 NB. Roll Overall rating
 fname fappend~ ('R'; 1 ) write_footer 0 10 ; 3  ; 'Roll Rating'
 fname fappend~ ('C'; 1 ) write_footer 3 10 ; 2.5 ; fwtot
+write_xl hole ; tee ; gender ; (hole+1) ; 61 ; 5 7 ; 0 ; 'Roll Rating' ; fwtot NB. Roll Rating
+glSSRoll=: 1 2$fwtot
 
 NB. ------------------------
 NB. Fairway
@@ -571,6 +599,7 @@ NB. Fairway Overall rating
 fname fappend~ 'R' write_footer 0 33 ; 3 ; 'Fairway Rating'
 fname fappend~ 'C' write_footer 3 33 ;  2 3 ; fwtot
 psych=. psych, fwtot
+write_xl hole ; tee ; gender ; (hole+1) ; 89 ; 5 7 ; 0 ; 'Fairway' ; fwtot  NB. Fairway
 
 NB. ------------------------
 NB. Elevation
@@ -583,6 +612,8 @@ sh=. sh * 10<: |sh NB. Minimum 10ft
 sh=. (*sh) * 10 * <.0.5+ 0.1 * (| sh) NB. Round to nearest 10
 if. 3=gender{glTePar do. sh=. _40 >. sh <. 40 end.
 fname fappend~ 'R' write_input 6 11 ; 1 1 ; <'b<>p<+>' 8!:0 (0 >. sh),0 <. sh 
+write_xl hole ; tee ; gender ; (hole+1) ; 68 ; 9 ; 0 ; 'Elevation Change' ; sh NB. Elevation Change
+glSSElevation=: ,sh
 
 NB. ------------------------
 NB. Lay-Up
@@ -598,6 +629,9 @@ NB. Look for negative dogleg
 sh=. sh - 50 <. >+/ each | each 'glPlanDoglegNeg' matrix_pull hole ; tee ; gender
 ww=. ('Sc: ';'Bo: ') , each 'bp<+>' 8!:0 sh
 fname fappend~ 'C' write_input 5 12 ; 1.5 ;  <(<"0 (0 ~: sh))#each ww
+write_xl hole ; tee ; gender ; (hole+1) ; 64 ; 9 ; 0 ; 'Layup Scratch' ; 0{sh NB. Layup scratch
+write_xl hole ; tee ; gender ; (hole+1) ; 66 ; 9 ; 0 ; 'Layup Bogey' ; 1{sh NB. Layup bogey
+glSSDogleg=: 1 2$sh
 NB. Layup Type
 sh=. 'glPlanLayupCategory' matrix_pull hole ; tee ; gender
 sh=. (<glLayupCategoryVal) i. each sh
@@ -662,6 +696,7 @@ fname fappend~ 'R' write_footer 0 21 ; 3 ; 'Topography'
 wid=. 1 2$(0 >. ;>. / each wid)
 fname fappend~ 'C' write_footer 3 21 ;  2 3 ; wid
 psych=. psych, wid
+write_xl hole ; tee ; gender ; (hole+1) ; 77 ; 5 7 ; 0 ; 'Topography' ; wid  NB. Topography
 
 NB. ------------------------
 NB. Green Target
@@ -699,6 +734,7 @@ greenval=. 10 <. greenval NB. Can't be bigger than 10
 fname fappend~ 'R' write_footer 0 41 ; 3 ; 'Green Target'
 fname fappend~ 'C' write_footer 3 41 ;  2.5 2.5 ; greenval
 psych=. psych, greenval
+write_xl hole ; tee ; gender ; (hole+1) ; 98 ; 5 7 ; 0 ; 'Green Target' ; greenval  NB. Topography
 
 NB. ------------------------
 NB. Type of Course
@@ -709,6 +745,8 @@ fname fappend~ write_input 3 42 ; 15 ; <<glCourseType
 fname fappend~ write_title 0 43 ; 3 1 ; '<b>EXPOSURE</b>' 
 fname fappend~ write_input 3 43 ; 8 ; glCourseExposure
 fname fappend~ write_cell 11 43 ; 17 ; <<'(Form <b>MUST</b> be used in conjuction with USGA Course Rating System Guide)'
+write_xl hole ; tee ; gender ; 'Information' ; 22 ; 5 ; 0 ; 'Exposure' ; glCourseExposure  NB. Wind Exposure
+glSSWind=: ,glCourseExposure
 
 NB. ------------------------
 NB. Check distances to front of green
@@ -840,6 +878,7 @@ fname fappend~ 'R' write_footer 18 17 ; 3 ; 'Water Rating'
 fwtot=. fwtot + (0=fwtot) * +. / ; waterline NB. Minimum of 1 if water exists
 fname fappend~ 'C' write_footer 21 17 ;  3 4; fwtot
 psych=. psych, fwtot
+write_xl hole ; tee ; gender ; (hole+1) ; 79 ; 30 36 ; 0 ; 'Water' ; fwtot  NB. Water
 
 NB. ------------------------
 NB. Recoverability and Rough
@@ -848,6 +887,10 @@ fname fappend~ LF,'// -------- Recoverability and Rough -------------'
 carryyards=. 'F' carry_yards hole; tee ; gender 
 fname fappend~ write_title 8 1 ; 3 1 ; '<b>RECOV & ROUGH</b>' 
 fname fappend~ ('cell' ; 'input') write_row_head 11 1 ; 5 2 ; '<i>Average Hole Rough Height:</i>' ; (":glGrRRRoughLength),'&quot;'
+NB. XL has a range
+ww=. (+/(''$glGrRRRoughLength) >: 1.5 2 3.001 ){':' cut '< 1.5:< 2.0:2.0 to 3.0:> 3.0 to 3.75'
+if. 0=0{;carryyards do. ww=.0 end. NB. Special case if no carry
+write_xl hole ; tee ; gender ; (hole+1) ; 58 ; 19 ; 0 ; 'Rough length' ; ww NB. Rough Length 
 fname fappend~ write_cell 8 2 ; 3 ; <<' '
 ww=. ' ' cut 'S1 S2 S3 B1 B2 B3 B4'
 ww=. (<'<b>'), each ww, each (<'</b>')
@@ -917,6 +960,7 @@ NB. Total
 fname fappend~ 'R' write_footer 8 14 ; 3 ; 'Recov & R Rating'
 fname fappend~ 'C' write_footer 11 14 ;  3 4 ; fwtot
 psych=. psych, fwtot
+write_xl hole ; tee ; gender ; (hole+1) ; 67 ; 13 19  ; 0 ; 'Recov & Rough' ; fwtot  NB. Recoverability and Rough
 
 NB. ----------------------------------------
 NB. Bunkers
@@ -1000,6 +1044,7 @@ fwtot=. fwtot >. ; +./ each lz,each lopfull NB. Must be a minimum of one if it e
 fname fappend~ 'R' write_footer 8 26 ; 3 ; <<'Bunker Rating'
 fname fappend~ 'C' write_footer 11 26 ;  3 4 ; fwtot
 psych=. psych, fwtot
+write_xl hole ; tee ; gender ; (hole+1) ; 81 ; 13 19  ; 0 ; 'Bunkers' ; fwtot  NB. Bunkers
 
 NB. ------------------------
 NB. OOB / Extreme Rough
@@ -1102,6 +1147,7 @@ fname fappend~ 'R' write_footer 8 41  ; 3 ; 'OOB/ER Rating'
 fwtot=. fwtot >. oobline 
 fname fappend~ 'C' write_footer 11 41 ;  3 4 ; fwtot
 psych=. psych, fwtot
+write_xl hole ; tee ; gender ; (hole+1) ; 106 ; 13 19  ; 0 ; 'OOB / ER' ; fwtot  NB. OOB / Extreme Rough
 
 NB. ------------------------
 NB. Trees
@@ -1157,6 +1203,7 @@ NB. Tree Rating
 fname fappend~ 'R' write_footer 18 29 ; 3 ; 'Tree Rating'
 fname fappend~ 'C' write_footer 21 29 ;  3 4 ; fwtot
 psych=. psych, fwtot
+write_xl hole ; tee ; gender ; (hole+1) ; 92 ; 30 36 ; 0 ; 'Trees' ; fwtot  NB. Trees
  
 NB. ------------------------
 NB. Green Surface
@@ -1183,6 +1230,7 @@ fwtot=. fwtot + 0,glGrTiered NB. Bogey only
 fname fappend~ 'R' write_footer 18 34 ; 3 ; 'Gr Surface Rating'
 fname fappend~ 'C' write_footer 21 34 ;  3 4 ; fwtot
 psych=. psych, fwtot
+write_xl hole ; tee ; gender ; (hole+1) ; 98 ; 30 36 ; 0 ; 'Green Surface' ; fwtot  NB. Green Surface
 
 NB. ------------------------
 NB. Psychological
@@ -1209,6 +1257,14 @@ fname fappend~ write_calc 21 41 ; 3 4 ; <'b<>' 8!:0 fw
 fwtot=. fwtot + fw
 fname fappend~ 'R' write_footer 18 42 ; 3 ; 'Psychological'
 fname fappend~ 'C' write_footer 21 42 ;  3 4 ; fwtot
+psych=. psych, fwtot
+write_xl hole ; tee ; gender ; (hole+1) ; 106 ; 30 36 ; 0 ; 'Psychological' ; fwtot  NB. Psychological
+
+NB. ------------------------------
+NB. Write out Standard Scratch
+NB. ------------------------------
+glSSObstacle=: 1 10 2$, 1 0 2 4 5 6 3 7 8 9 {psych
+utKeyPut glFilepath,'_ss'
 
 NB. -----------------------------
 NB. Altitude
@@ -1261,10 +1317,14 @@ NB. fname fappend~ LF,'$pdf->Write(10,''Return to plan'',''http://jw/rating/plan
 NB. fname fappend~ LF,'$pdf->Output(''/var/www/tcpdf/rating/',shortname,'.pdf'', ''FI'');'
 fname fappend~ LF,'$pdf->Output(''',glDocument_Root,'/tcpdf/rating/',shortname,'.pdf'', ''FI'');'
 fname fappend~ LF,'?>'
+if. x=0 do.
+    stdout '</head><body onLoad="redirect(''/tcpdf/rating/',shortname,'.php'')"'
+    stdout LF,'</body></html>'
+    exit ''
+end.
 
-stdout '</head><body onLoad="redirect(''/tcpdf/rating/',shortname,'.php'')"'
-stdout LF,'</body></html>'
-exit ''
+NB. Need to set the correct permissions on the file
+2!:0 'chmod 775 ',fname
 )
 
 NB. =========================================================
@@ -1399,6 +1459,11 @@ for_gender. ,0  do.
 		if. x *. 0=(<t,gender){glTeMeasured do. continue. end.
 		hole=. ''$t{glTeHole 
 		tee=. ''$t{glTeTee
+		NB. Regenerate only if a measured tee
+		if. (<t,gender){glTeMeasured do.
+		    1 jweb_rating_report glFilename ; (":hole)  ; (":gender); tee
+		    utKeyRead glFilepath,'_tee'
+		end.
 		shortname=. glFilename,'_',(;'r<0>2.0' 8!:0 (1+hole)),(gender{'MW'),tee
 		fname=. glDocument_Root,'/tcpdf/',glBasename,'/',shortname,'.pdf'
 		res=. res,' ',fname
@@ -1632,7 +1697,7 @@ NB. Returns table value
 NB. Enhanced to add tweener value
 lookup_topog_rating=: 3 :  0
 'alt stance'=. y
-mat=. 5 2 $ 1 2 3 4 5, 0, 2 3 4 5 6, 1, 3 4 5 6 7, 2, 4 5 6 7 8, 3, 5 6 7 8 9, 4
+mat=. 5 6 $ 1 2 3 4 5, 0, 2 3 4 5 6, 1, 3 4 5 6 7, 2, 4 5 6 7 8, 3, 5 6 7 8 9, 4
 res=. 0$<''
 for_ab. i. 2 do.
 	rr=. 0$0

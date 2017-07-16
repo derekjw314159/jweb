@@ -129,6 +129,7 @@ stdout LF,'        '
 for_h. i. 18 do.
 		stdout '    <a href="/jw/rating/plan',((-. showmap)#'nomap'),'/v/',glFilename,'/',(": 1+h),'">',(":1+h),'</a>'
 end.
+stdout LF,'<br><a href="/jw/rating/xl/',glFilename,'">XL Macro</a>'
 	
 stdout LF,'</div>' NB. container
 stdout '</body></html>'

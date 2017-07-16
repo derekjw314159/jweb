@@ -1076,3 +1076,26 @@ glXLNote=: ,<''
 utKeyPut y
 )
 
+CheckSSFile=: 3 : 0
+NB. =========================================================
+NB. CheckSSFile
+NB. =========================================================
+NB. Create SS file if it does not already exit
+if. fexist y,'.ijf' do. return. end.
+keycreate y
+2!:0 'chmod 775 ',y,'.ijf'
+(,<' ' cut 'glSSID glSSHole glSSTee glSSGender glSSYards glSSPar glSSRoll glSSElevation glSSDogleg glSSWind glSSObstacle glSSObsFactor') keywrite y ; ,<'_dictionary'
+glSSID=: ,<'_default'
+glSSHole=: ,_1
+glSSTee=: ,' '
+glSSGender=: ,_1
+glSSYards=: ,0
+glSSPar=: ,_1
+glSSRoll=: 1 2$0
+glSSElevation=: ,0
+glSSDogleg=: 1 2$0
+glSSWind=: ,0
+glSSObstacle=: 1 10 2$0
+glSSObsFactor=: 1 10 2$0
+)
+

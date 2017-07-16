@@ -63,7 +63,7 @@ for_tee. tees do.
 		    ww=. ww, (>(i{glXLNull){' ' cut 'False True'),', '
 		    ww=. ww, '"',(>i{glXLNote),'", '
 		    if. 'N' = i{glXLType do.
-			ww=. ww, (": i{glXLNum)
+			ww=. ww,('_' ; '-') stringreplace (": i{glXLNum)
 		    else.
 			ww=. ww, '"',(>i{glXLString),'"'
 		    end.
