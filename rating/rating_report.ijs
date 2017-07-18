@@ -439,6 +439,7 @@ fname fappend~ LF,'$pdf->',pdfMulti 4.75 0 ; 2.25 1 ; ('<b>TEE</b>: ',(>(glTees 
 fname fappend~ LF,'$pdf->',pdfMulti 7 0 ; 2.5 1 ; ('<b>GENDER</b>: ',>gender{'/' cut '/Men/Women'); 1
 fname fappend~ LF,'$pdf->',pdfMulti 9.5 0 ; 1.5 1 ; ('<b>HOLE</b>: ',":1+hole); 1
 fname fappend~ LF,'$pdf->',pdfMulti 11 0 ; 3 1 ; ('<b>LENGTH</b>: ',":(<t_index,hole){glTeesYards) ; 1
+1 write_xl hole ; tee ; gender ; 'Information' ; 25 ; (3+hole) ; 0 ; 'Shot distance input' ; (<t_index,hole){glTeesYards NB. Hole length
 write_xl hole ; tee ; gender ; (hole+1) ; 51 ; 6 ; 0 ; 'Hole length' ; (<t_index,hole){glTeesYards NB. Hole length
 glSSYards=: , (<t_index,hole){glTeesYards
 fname fappend~ LF,'$pdf->',pdfMulti 14 0 ; 2 1 ; ('<b>PAR</b>: ',":gender{,glTePar); 1
@@ -460,7 +461,15 @@ fname fappend~ 'C' write_cell 3 1 ; 1.25; <sh
 for_ab. i. 2 do.
     fname fappend~ LF,('R' ; 1) write_cell (0 ,2+ab) ; 3 ; ('<i>',(>ab{' ' cut 'Scratch Bogey'),'</i>')
     ww2=. I. (ab=glPlanAbility) 
+    NB. Differences from default hit
+    if. -. +. / (ww2{glPlanLayupType) e. 'LR' do.
+	ww=. <(#ww2)$<''
+    else.
+	ww=. ww2{glPlanHitYards
+    end.
+    2 write_xl hole ; tee ; gender ; (hole+1) ; (ab{7 9) ; 5 ; 0 ; 'Shot distance input' ; ww
     write_xl hole ; tee ; gender ; (hole+1) ; (53+ab) ; 5 ; 0 ; 'Shot distance' ; ww2{glPlanHitYards NB. Distances
+    2 write_xl hole ; tee ; gender ; (hole+1) ; 10 ; (ab{6 9) ; 0 ; 'Transition input' ; (+. / 'T'=ww2 {glPlanLayupType)#'Y' NB. Transition y/n
     write_xl hole ; tee ; gender ; (hole+1) ; 55 ; (ab{6 8) ; 0 ; 'Transition' ; (+. / 'T'=ww2 {glPlanLayupType){'NY' NB. Transition y/n
     ww2=. ('' (8!:0) ww2{glPlanHitYards),each <"0 ww2{glPlanLayupType
     fname fappend~ ('C' ; 1) write_input (3, 2+ab) ; (4{.((#ww2)$1.25), 4$_1.25) ; <ww2
@@ -1203,7 +1212,8 @@ NB. Tree Rating
 fname fappend~ 'R' write_footer 18 29 ; 3 ; 'Tree Rating'
 fname fappend~ 'C' write_footer 21 29 ;  3 4 ; fwtot
 psych=. psych, fwtot
-write_xl hole ; tee ; gender ; (hole+1) ; 92 ; 30 36 ; 0 ; 'Trees' ; fwtot  NB. Trees
+1 write_xl hole ; tee ; gender ; (hole+1) ; 33 ; 30 36 ; 0 ; 'Trees input'  ; fwtot  
+write_xl hole ; tee ; gender ; (hole+1) ; 92 ; 30 36 ; 0 ; 'Trees' ; fwtot
  
 NB. ------------------------
 NB. Green Surface
@@ -2042,7 +2052,9 @@ NB. write_xl
 NB. =========================================================
 NB. Usage:
 NB.    write_xl hole ; tee ; gender ; sheet ; row ; column ; null ; note ; value
-
+NB.    x is whether to overwrite
+0 write_xl y
+:
 'hole tee gender sheet row column null note value'=. y
 NB. Check if boxed or literal
 string=. 0
@@ -2064,6 +2076,7 @@ for_vv. value do.
     glXLHole=: ,hole
     glXLTee=: ,tee
     glXLGender=: ,gender
+    glXLOverwrite=: ,x
     if. 2 = 3!:0 sheet do.
 	glXLSheet=: ,<sheet
     else. 
@@ -2091,6 +2104,3 @@ for_vv. value do.
     utKeyPut glFilepath,'_xl'
 end.
 )
-
-
-

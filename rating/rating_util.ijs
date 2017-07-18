@@ -474,6 +474,7 @@ end.
 
 for_ab. abilities do.
     shot=. _1
+    previouslayup=. ,' '
     cumgroundyards=. 0 
     path=. LatLontoFullOS PathTeeToGreen h ; t
     remgroundyards=. <. 0.5 + glMY * +/ |(}.path) - }:path
@@ -538,9 +539,11 @@ label_shot.
     defaulthit=.  (<g,ab, 1<.shot){glPlayerDistances
     if. ( glPlanLayupType e. 'LR') do. NB. Found
 	    radius2=. ''$ glPlanHitYards
+	    previouslayup=. ((glPlanLayupType='L'){' L'),previouslayup NB. need to know if previous shot was layup for transition
     else.
 	    radius2=. ''$ defaulthit
 	    glPlanLayupType=: ,' '
+	    previouslayup=. ' ',previouslayup
     end.
     ww=. InterceptPath path ; start ; radius2
     NB. New logic for transition within 10 yards of 
@@ -550,7 +553,7 @@ label_shot.
 	NB. Logic is now changed to only add 'T' if within 20 yards
 	NB. i.e. don'e extend previous shot
 	NB. if. ( 0 < rem) *. (trans_dist >: rem) *. (glPlanLayupType=' ') do.
-	if. ( remgroundyards > 0) *. ( remgroundyards <: trans_dist ) *. (glPlanLayupType=' ') do.
+	if. ( remgroundyards > 0) *. ( remgroundyards <: trans_dist ) *. (glPlanLayupType=' ') *. ' '=1{previouslayup do. NB. second element of previous layup
 		NB. radius2=. radius2 + rem
 		NB. ww=. InterceptPath path ; start ; radius2
 		glPlanLayupType=: ,'T'
@@ -1057,23 +1060,32 @@ NB. =========================================================
 NB. CheckXLFile
 NB. =========================================================
 NB. Create XL file if it does not already exit
-if. fexist y,'.ijf' do. return. end.
-keycreate y
-2!:0 'chmod 775 ',y,'.ijf'
-(,<' ' cut 'glXLID glXLHole glXLTee glXLGender glXLNum glXLSheet glXLRow glXLColumn glXLString glXLType glXLNull glXLNote') keywrite y ; ,<'_dictionary'
-glXLID=: ,<'_default'
-glXLHole=: ,_1
-glXLTee=: ,' '
-glXLGender=: ,0
-glXLNum=: ,0
-glXLSheet=: ,<''
-glXLRow=: ,0
-glXLColumn=: ,0
-glXLString=: ,<''
-glXLType=: ,' '
-glXLNull=: ,0
-glXLNote=: ,<''
-utKeyPut y
+if. -. fexist y,'.ijf' do. 
+    keycreate y
+    2!:0 'chmod 775 ',y,'.ijf'
+    (,<' ' cut 'glXLID glXLHole glXLTee glXLGender glXLNum glXLSheet glXLRow glXLColumn glXLString glXLType glXLNull glXLNote') keywrite y ; ,<'_dictionary'
+    glXLID=: ,<'_default'
+    glXLHole=: ,_1
+    glXLTee=: ,' '
+    glXLGender=: ,0
+    glXLNum=: ,0
+    glXLSheet=: ,<''
+    glXLRow=: ,0
+    glXLColumn=: ,0
+    glXLString=: ,<''
+    glXLType=: ,' '
+    glXLNull=: ,0
+    glXLNote=: ,<''
+    utKeyPut y
+end.
+NB. Check for variables
+utKeyRead y
+dict=. >keyread y ; '_dictionary'
+if. ( -. (<'glXLOverwrite') e. dict ) do.
+	(,<'glXLOverwrite') utKeyAddColumn y
+	glXLOverwrite=: (#glXLID)$0
+	utKeyPut y
+end.
 )
 
 CheckSSFile=: 3 : 0
@@ -1081,21 +1093,23 @@ NB. =========================================================
 NB. CheckSSFile
 NB. =========================================================
 NB. Create SS file if it does not already exit
-if. fexist y,'.ijf' do. return. end.
-keycreate y
-2!:0 'chmod 775 ',y,'.ijf'
-(,<' ' cut 'glSSID glSSHole glSSTee glSSGender glSSYards glSSPar glSSRoll glSSElevation glSSDogleg glSSWind glSSObstacle glSSObsFactor') keywrite y ; ,<'_dictionary'
-glSSID=: ,<'_default'
-glSSHole=: ,_1
-glSSTee=: ,' '
-glSSGender=: ,_1
-glSSYards=: ,0
-glSSPar=: ,_1
-glSSRoll=: 1 2$0
-glSSElevation=: ,0
-glSSDogleg=: 1 2$0
-glSSWind=: ,0
-glSSObstacle=: 1 10 2$0
-glSSObsFactor=: 1 10 2$0
+if. -. fexist y,'.ijf' do. 
+    keycreate y
+    2!:0 'chmod 775 ',y,'.ijf'
+    (,<' ' cut 'glSSID glSSHole glSSTee glSSGender glSSYards glSSPar glSSRoll glSSElevation glSSDogleg glSSWind glSSObstacle glSSObsFactor') keywrite y ; ,<'_dictionary'
+    glSSID=: ,<'_default'
+    glSSHole=: ,_1
+    glSSTee=: ,' '
+    glSSGender=: ,_1
+    glSSYards=: ,0
+    glSSPar=: ,_1
+    glSSRoll=: 1 2$0
+    glSSElevation=: ,0
+    glSSDogleg=: 1 2$0
+    glSSWind=: ,0
+    glSSObstacle=: 1 10 2$0
+    glSSObsFactor=: 1 10 2$0
+end.
+
 )
 
