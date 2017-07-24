@@ -1325,7 +1325,7 @@ fname fappend~ LF,'// -------- End of Page -------------'
 NB. fname fappend~ LF,'$pdf->SetXY(100,100);'
 NB. fname fappend~ LF,'$pdf->Write(10,''Return to plan'',''http://jw/rating/plannomap/',glFilename,'/',(":1+hole),''')'
 NB. fname fappend~ LF,'$pdf->Output(''/var/www/tcpdf/rating/',shortname,'.pdf'', ''FI'');'
-fname fappend~ LF,'$pdf->Output(''',glDocument_Root,'/tcpdf/rating/',shortname,'.pdf'', ''FI'');'
+fname fappend~ LF,'$pdf->Output(''',glDocument_Root,'/tcpdf/rating/',shortname,'.pdf'', ''F',((-. x)#'I'),''');'
 fname fappend~ LF,'?>'
 if. x=0 do.
     stdout '</head><body onLoad="redirect(''/tcpdf/rating/',shortname,'.php'')"'
