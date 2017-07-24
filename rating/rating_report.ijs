@@ -1197,7 +1197,7 @@ fwtot=. fw{glTreeTweener+glTreeNum
 NB. Tree obstructed
 fname fappend~ write_row_head 18 26 ; 2.5 0.5; '<i>Obstruct</i>'; '<b>O</b>'
 fname fappend~ write_input 21 26 ; sz ; (;treeobs)
-fwtot=. fwtot + > (>. /each treeobs)
+NB. fwtot=. fwtot + > (>. /each treeobs) NB. Removed this adjustment
 NB. Tree squeeze (not yet implemented)
 fname fappend~ write_row_head 18 27 ; 2.5 0.5; '<i>Squeeze</i>'; '<b>Q</b>'
 fname fappend~ write_input 21 27 ; sz ; 0 * ;treeobs
