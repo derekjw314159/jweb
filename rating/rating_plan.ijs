@@ -315,6 +315,9 @@ NB.stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr
 		    other=. other, (0<#>rr{glPlanFWTargVisible)#' Targ:',;>rr{glPlanFWTargVisible
 		    other=. other, (rr{glPlanRRMounds)#' RR:M'
 		    other=. other, (0<#>rr{glPlanWaterPercent)#' Wat%:',;>rr{glPlanWaterPercent
+		    other=. other, (0<#>rr{glPlanBunkSqueeze)#' BuSq:',;>rr{glPlanBunkSqueeze
+		    other=. other, (0<#>rr{glPlanTransitionOverride)#' Tran O/R:',;>rr{glPlanTransitionOverride
+		    other=. other, (0<#>rr{glPlanTransitionAdj)#' Tran Adj:',;>rr{glPlanTransitionAdj
 		    NB. Edit / Copy links
 		    stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">E</a>'
 		    stdout LT4,' <a href="/jw/rating/landingcopy/e/',(glFilename),'/',(;rr{glPlanID),'">C</a>'
@@ -348,6 +351,8 @@ NB.stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr
 		    other=. other, (rr{glPlanBunkLZCarry)#' LZ:BunkCarry'
 		    other=. other, (rr{glPlanBunkTargCarry)#' Targ:BunkCarry'
 		    other=. other, (0<#>rr{glPlanRollTwice)#' Ro2:',;>rr{glPlanRollTwice
+		    other=. other, (0<#>rr{glPlanTransitionOverride)#' Tran O/R:',;>rr{glPlanTransitionOverride
+		    other=. other, (0<#>rr{glPlanTransitionAdj)#' Tran Adj:',;>rr{glPlanTransitionAdj
 		    stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">E</a>'
 		    stdout LT4,'<td></td><td></td><td></td>'
 		    stdout LT3,'<td style="border-right: 1px solid lightgray">',((rr{glPlanBunkLine){'-y'),'</td>' NB. Show bunker in LoP
@@ -388,6 +393,9 @@ NB.stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr
 		other=. other, (0<#>rr{glPlanFWTargVisible)#' Targ:',;>rr{glPlanFWTargVisible
 		other=. other, (rr{glPlanRRMounds)#' RR:M'
 		other=. other, (0<#>rr{glPlanWaterPercent)#' Wat%:',;>rr{glPlanWaterPercent
+		other=. other, (0<#>rr{glPlanBunkSqueeze)#' BuSq:',;>rr{glPlanBunkSqueeze
+		other=. other, (0<#>rr{glPlanTransitionOverride)#' Tran O/R:',;>rr{glPlanTransitionOverride
+		other=. other, (0<#>rr{glPlanTransitionAdj)#' Tran Adj:',;>rr{glPlanTransitionAdj
 		stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">E</a> <a href="/jw/rating/landing/d/',glFilename,'/',(;rr{glPlanID),'">D</a>'
 		stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanAlt),'</td>'
 		stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanFWWidth),'</td>'

@@ -150,7 +150,7 @@ stdout '</tbody></table>'
 NB. Table of values - Roll
 stdout LT1,'<h4>Roll</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>Level</th><th>Slope</th><th>Stance or Lie</th><th>FW +/-W</th><th>Extreme</th><th>Twice</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>Level</th><th>Slope</th><th>Stance or Lie</th><th>FW +/-W</th><th>Extreme</th><th>Twice</th><th>Trans O/ride</th><th>Trans Adj</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td>'
 djwSelect 'rolllevel' ; 13 ; glRollLevelDesc ; glRollLevelVal ; <''$glPlanRollLevel
@@ -170,20 +170,29 @@ stdout LT4,'</td>'
 stdout LT4,'<td>'
 djwSelect 'rolltwice' ; 18 ; glRollTwiceDesc ; glRollTwiceVal ; <''$glPlanRollTwice
 stdout LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'transitionoverride' ; 19 ; glTransitionOverrideDesc ; glTransitionOverrideVal ; <''$glPlanTransitionOverride
+stdout LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'transitionadj' ; 20 ; glTransitionAdjDesc ; glTransitionAdjVal ; <''$glPlanTransitionAdj
+stdout LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table>'
 
 NB. Table of values - Shot TO Landing Zone
 stdout LT1,'<h4>Shot TO Landing Zone</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>LZ not Visible</th><th>LZ Tree Obstructed</th><th>LZ Bunk Carry</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>LZ not Visible</th><th>LZ Tree Obstructed</th><th>LZ Bunk Carry</th><th>Bunk Squeeze</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td><input type="checkbox" id="fwvisible" name="fwvisible" value="1" '
-stdout ((''$glPlanFWVisible)#'checked'),' tabindex="19">',LT4,'</td>'
+stdout ((''$glPlanFWVisible)#'checked'),' tabindex="20">',LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="treelzobstructed" name="treelzobstructed" value="1" '
 stdout ((''$glPlanTreeLZObstructed)#'checked'),' tabindex="20">',LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="bunklzcarry" name="bunklzcarry" value="1" '
-stdout ((''$glPlanBunkLZCarry)#'checked'),' tabindex="20">',LT4,'</td>'
+stdout ((''$glPlanBunkLZCarry)#'checked'),' tabindex="21">',LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'bunksqueeze' ; 22 ; glBunkSqueezeDesc ; glBunkSqueezeVal ; <''$glPlanBunkSqueeze
+stdout LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table>'
 
@@ -193,16 +202,16 @@ stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
 stdout LT4,'<th>Unpleasant Lie</th><th>FW Obstructed Shot</th><th>Tree Obstructed Shot</th><th>Green Targ not Visible</th><th>Targ Bunk Carry</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td><input type="checkbox" id="fwunpleasant" name="fwunpleasant" value="1" '
-stdout ((''$glPlanFWUnpleasant)#'checked'),' tabindex="21">',LT4,'</td>'
+stdout ((''$glPlanFWUnpleasant)#'checked'),' tabindex="23">',LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="fwobstructed" name="fwobstructed" value="1" '
-stdout ((''$glPlanFWObstructed)#'checked'),' tabindex="22">',LT4,'</td>'
+stdout ((''$glPlanFWObstructed)#'checked'),' tabindex="24">',LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="treetargobstructed" name="treetargobstructed" value="1" '
-stdout ((''$glPlanTreeTargObstructed)#'checked'),' tabindex="23">',LT4,'</td>'
+stdout ((''$glPlanTreeTargObstructed)#'checked'),' tabindex="25">',LT4,'</td>'
 stdout LT4,'<td>'
-djwSelect 'fwtargvisible' ; 24 ; glTargVisibleDesc ; glTargVisibleVal ; <''$glPlanFWTargVisible
+djwSelect 'fwtargvisible' ; 26 ; glTargVisibleDesc ; glTargVisibleVal ; <''$glPlanFWTargVisible
 stdout LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" id="bunktargcarry" name="bunktargcarry" value="1" '
-stdout ((''$glPlanBunkTargCarry)#'checked'),' tabindex="24">',LT4,'</td>'
+stdout ((''$glPlanBunkTargCarry)#'checked'),' tabindex="27">',LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table>'
 
@@ -329,6 +338,9 @@ glPlanBunkLine=: ,bunkline
 glPlanBunkExtreme=: ,bunkextreme
 glPlanBunkLZCarry=: ,bunklzcarry
 glPlanBunkTargCarry=: ,bunktargcarry
+glPlanBunkSqueeze=: ,bunksqueeze
+glPlanTransitionOverride=: ,transitionoverride
+glPlanTransitionAdj=: ,transitionadj
 glPlanOOBDist=: ,oobdist
 glPlanOOBPercent=: ,oobpercent
 glPlanOOBLine=: ,oobline
@@ -350,6 +362,14 @@ glPlanFWObstructed=: ,fwobstructed
 glPlanTreeTargObstructed=: ,treetargobstructed
 glPlanTreeLZObstructed=: ,treelzobstructed
 glPlanRRMounds=: ,rrmounds
+
+NB. Transition logic
+if. glPlanLayupType e. 'T ' do.
+    transition=. glPlanLayupType='T'
+    transition=. transition + (glTransitionOverrideVal i. glPlanTransitionOverride) { glTransitionOverrideNum
+    transition=. 0 >. 1 <. transition
+    glPlanLayupType=: ,transition { ' T'
+end.
 
 NB. Write to files
 keyplan utKeyPut glFilepath,'_plan'

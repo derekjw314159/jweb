@@ -308,6 +308,13 @@ end.
 
 NB. Write to two files
 if. 1 +. changed do.
+	NB. Transition logic
+	if. glPlanLayupType e. 'T ' do.
+	    transition=. glPlanLayupType='T'
+	    transition=. transition + (glTransitionOverrideVal i. glPlanTransitionOverride) { glTransitionOverrideNum
+	    transition=. 0 >. 1 <. transition
+	    glPlanLayupType=: ,transition { ' T'
+	end.
 	(,<keyplan) utKeyPut glFilepath,'_plan'
 	NB. Calculate Everything
 	BuildPlan glPlanHole ; glPlanTee ; glPlanGender ; glPlanAbility

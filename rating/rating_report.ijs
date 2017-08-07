@@ -711,16 +711,32 @@ NB. ------------------------
 NB. Green Target
 NB. ------------------------
 fname fappend~ LF,'// -------- Green Target -------------'
-fname fappend~ write_title 0 35 ; 3 1 ; '<b>GREEN TARGET</b>' 
-fname fappend~ (' ' cut 'cell input') write_row_head 3 35 ; 0.80 0.45 ; 'Circ:' ; <glGrCircleConcept{'ny'
-fname fappend~ (' ' cut 'cell input') write_row_head 4.25 35 ; 0.60 0.65 ; 'W:' ; glGrWidth
-fname fappend~ (' ' cut 'cell input') write_row_head 5.50 35 ; 0.60 0.65 ; 'L:' ; glGrLength
-fname fappend~ (' ' cut 'cell input') write_row_head 6.75 35 ; 0.60 0.65 ; 'Di:' ; glGrDiam
+fname fappend~ write_title 0 34 ; 3 1 ; '<b>GREEN TARGET</b>' 
+fname fappend~ (' ' cut 'cell input') write_row_head 3 34 ; 0.80 0.45 ; 'Circ:' ; <glGrCircleConcept{'ny'
+fname fappend~ (' ' cut 'cell input') write_row_head 4.25 34 ; 0.60 0.65 ; 'W:' ; glGrWidth
+fname fappend~ (' ' cut 'cell input') write_row_head 5.50 34 ; 0.60 0.65 ; 'L:' ; glGrLength
+fname fappend~ (' ' cut 'cell input') write_row_head 6.75 34 ; 0.60 0.65 ; 'Di:' ; glGrDiam
+write_xl hole ; tee ; gender ; (hole+1) ; 90 ; 6 8 10 ; 0 ; 'Green dimensions' ; glGrWidth, glGrLength, glGrDiam 
+write_xl hole ; tee ; gender ; (hole+1) ; 91 ; 7 ; 0 ; 'Green circle' ; glGrCircleConcept{'NY'
+2 write_xl hole ; tee ; gender ; 'Greens Data' ; 7 ; (4+2*hole) ; 0 ; 'Green width' ; glGrWidth
+2 write_xl hole ; tee ; gender ; 'Greens Data' ; 8 ; (4+2*hole) ; 0 ; 'Green depth' ; glGrLength
+2 write_xl hole ; tee ; gender ; 'Greens Data' ; 9 ; (4+2*hole) ; 0 ; 'Green diameter if circle' ; glGrCircleConcept { '' ; ":glGrDiam
 greenval=. >_1 { each hityards
 greenval=. lookup_green_target gender ; greenval ; (''$glGrDiam) ; transition
-fname fappend~ 'R' write_cell 0 36 ; 3 ; <<'Table Value'
-fname fappend~ write_calc 3 36 ; 2.5 2.5 ; greenval
+fname fappend~ 'R' write_cell 0 35 ; 3 ; <<'Table Value'
+fname fappend~ write_calc 3 35 ; 2.5 2.5 ; greenval
 fwtot=. greenval
+NB. Transition adjustment
+adj=. 'glPlanTransitionAdj' matrix_pull hole ; tee ; gender NB. Tranistion adjustment
+adj=. (<glTransitionAdjVal) i. each adj
+adj=. adj { each <glTransitionAdjNum
+adj=. > +/ each adj
+fname fappend~ write_row_head 0 36 ; 2.5 0.5 ; ' ' cut '<i>Adjust</i> <b></b>'
+fname fappend~ write_input 3 36 ; 2.5 2.5 ; adj
+greenval=. greenval + adj
+write_xl hole ; tee ; gender ; (hole+1) ; 93 ; 5 7 ; 0 ; 'Transition adjustment' ; adj
+2 write_xl hole ; tee ; gender ; (hole+1) ; 37 ; 5 7 ; 0 ; 'Transition adjustment' ; adj
+NB. Visibility
 fname fappend~ write_row_head 0 37 ; 2.5 0.5 ; ' ' cut '<i>Visibility</i> <b>V</b>'
 fname fappend~ write_input 3 37 ; 2.5 2.5 ; > _1 { each targvisible
 greenval=. greenval + > _1 { each targvisible
@@ -988,9 +1004,24 @@ NB. Table Value
 lay=. lookup_bunker_rating greenval ; (glBunkFractionVal i. glGrBunkFraction){glBunkFractionNum
 fname fappend~ write_calc  11 16 ; 3 4 ; lay
 fwtot=. lay
-NB. Bunker squeeze (not yet implemented)
+NB. Bunker squeeze
 fname fappend~ write_row_head 8 17 ; 2.5 0.5; '<i>Squeeze</i>'; '<b>Q</b>'
-fname fappend~ write_input 11 17 ; sz ; 0 * ;hityards
+sq=. 'glPlanBunkSqueeze' matrix_pull hole ; tee ; gender
+sq=. ((<glBunkSqueezeVal) i. each sq) { each <glBunkSqueezeNum
+fname fappend~ write_input 11 17 ; sz ; (;sq)
+fwtot=. fwtot + ; +/each sq
+select. z=. j. / > #each }: each sq NB. Drop last items
+    case. 0j0 do. ssz=. 0 0 , 0 0 0
+    case. 0j1 do. ssz=. 0 0 , 1 0 0
+    case. 1j1 do. ssz=. 1 0 , 1 0 0
+    case. 1j2 do. ssz=. 1 0 , 1 1 0 
+    case. 2j2 do. ssz=. 1 1 , 1 1 0
+    case. 2j3 do. ssz=. 1 1 , 1 1 1
+end.
+write_xl hole ; tee ; gender ; (hole+1) ; 72 ; 13 15 19 21 23  ; 0 ; 'Bunker squeeze' ; ssz #inv ;}: each sq NB. Drop last item
+sq=.;  }: each sq
+msk=. sq > 0
+2 write_xl hole ; tee ; gender ; (hole+1) ; 17 ; 13 15 19 21 23  ; 0 ; 'Bunker squeeze' ; <ssz #inv msk #inv <"0 msk # sq
 NB. Carry
 bunkcarry=. ('glPlanBunkLZCarry') matrix_pull hole ; tee ; gender NB. Shot TO landing zone
 bunkcarry=. bunkcarry +.each }:each (<0),each ('glPlanBunkTargCarry') matrix_pull hole ; tee ; gender NB. OR shot FROM LZ, shifted
@@ -1308,7 +1339,7 @@ fname fappend~ pdfBox 0 11 ; 8 1
 fname fappend~ pdfBox 0 12 ; 8 3
 fname fappend~ pdfBox 0 15 ; 8 7  
 fname fappend~ pdfBox 0 22 ; 8 12 
-fname fappend~ pdfBox 0 35 ; 8 7  
+fname fappend~ pdfBox 0 34 ; 8 8 NB. Green Target 
 fname fappend~ pdfBox 0 42 ; 18 1
 fname fappend~ pdfBox 0 43 ; 11 1
 fname fappend~ pdfBox 11 43; 17 1 
@@ -1845,10 +1876,6 @@ for_ab. 0 1  do.
 end.
 )
 
-
-
-
-
 NB. =================================================
 NB. lookup_carry_rough
 NB. =================================================
@@ -2057,14 +2084,11 @@ NB.    x is whether to overwrite
 :
 'hole tee gender sheet row column null note value'=. y
 NB. Check if boxed or literal
-string=. 0
 select. 3!:0 value
     case. 32 do.
 	value=. ,value NB. Already boxed, just ravel
-	string=. 1
     case. 2 do.
 	value=. ,<value NB. If text/literal box and ravel
-	string=. 1
 end.
 value=. ,value NB. All other cases are numeric
 key=. EnKey hole ; '' ; tee ; gender ; 0 ; 0
@@ -2089,18 +2113,29 @@ for_vv. value do.
     else.
 	glXLColumn=: ,vv_index{column
     end.
-    glXLString=: , string
+    NB. Each element can be different string/value
+    select. 3!:0 vv
+	case. 32 do. NB. boxed
+	    if. 2=3!:0 >vv do. NB. literal
+		glXLString=: ,vv
+		glXLNum=: ,0
+		glXLType=: ,'S'
+	    elseif. 0=#>vv do.
+		glXLString=: ,<''
+		glXLNum=: ,0
+		glXLType=: ,'S'
+	    elseif. 1 do.
+		glXLString=: ,<''
+		glXLNum=: ,>vv
+		glXLType=: ,'N'
+	    end.
+	case. do. NB. Numbers
+	    glXLString=: ,<''
+	    glXLNum=: ,vv
+	    glXLType=: ,'N'
+    end.
     glXLNull=: , null
     glXLNote=: ,<note
-    if. string do.
-	glXLString=: ,vv
-	glXLNum=: ,0
-	glXLType=: ,'S'
-    else.
-	glXLString=: ,<''
-	glXLNum=: ,vv
-	glXLType=: ,'N'
-    end.
     utKeyPut glFilepath,'_xl'
 end.
 )

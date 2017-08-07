@@ -44,6 +44,9 @@ glBunkDepthNum=: 0 2.5 4 5.5 7 9 11 13.5 16
 glBunkExtremeVal=: (<''),':' cut '+1:+2'
 glBunkExtremeDesc=: ':' cut 'Zero:+1:+2'
 glBunkExtremeNum=: 0 1 2
+glBunkSqueezeVal=: (<''),':' cut '+1:+2'
+glBunkSqueezeDesc=: ':' cut 'None:+1 30y wide:+2 20y wide'
+glBunkSqueezeNum=: 0 1 2
 glOOBCartVal=: (<''),':' cut '+1:-1'
 glOOBCartDesc=: ':' cut 'None:+1 Bounce away:-1 Bounce towards'
 glOOBPercentVal=: (<''),':' cut '25%:50%:75%:100%'
@@ -52,6 +55,12 @@ glOOBPercentNum=: 0 0.25 0.5 0.75 1
 glOOBBehindVal=: (<''),':' cut '-1:-2'
 glOOBBehindDesc=: ':' cut '-:-1 Behind:-2 Behind'
 glOOBBehindNum=: 0 _1 _2
+glTransitionAdjVal=: (<''),':' cut '+1:-1'
+glTransitionAdjDesc=: ':' cut 'None:+1 GC front of TZ:-1 GC back of TZ'
+glTransitionAdjNum=: 0 1 _1
+glTransitionOverrideVal=: (<''),':' cut 'Y:N'
+glTransitionOverrideDesc=: ':' cut 'None:Yes:No'
+glTransitionOverrideNum=: 0 1 _1
 glRRInconsistentVal=: (<''),':' cut '+1:-1'
 glRRInconsistentDesc=: ':' cut 'None:+1 Harder:-1 Easier'
 glWaterFractionVal=: (<''),':' cut '1/4-<1/2:>1/2'
@@ -449,25 +458,25 @@ if. -.  (<ww,g) {glTeMeasured do. NB. Dead tee
     ww=. ww *. glPlanTee = t
     ww=. I. ww *. glPlanGender = g
     if. 0<#ww do.
-		NB. Write out measurement points with existing values
-		key=. ww{glPlanID
-		key utKeyRead glFilepath,'_plan'
-		newkey=. 'r<0>2.0' 8!:0 glPlanHole
-		newkey=. newkey ,each <'-'
-		newkey=. newkey ,each 'r<0>3.0' 8!:0 glPlanRemGroundYards
-		glPlanHitYards=: (#key) $0
-		glPlanCrowDist=: (#key) $0
-		glPlanUpdateName=: (#key)$<": getenv 'REMOTE_USER'
-		glPlanUpdateTime=: (#key)$< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
-		glPlanLayupType=: (#key)$,' '
-		glPlanRecType=: (#key)$,'M'
-		glPlanCarryType=: (#key)$,' '
-		glPlanCarryAffectsTee=: (#key)$,' '
-		glPlanSqueezeType=: (#key)$,' '
-		glPlanSqueezeWidth=: (#key)$0
-		glPlanID=: newkey
-		utKeyPut glFilepath,'_plan'
-		key utKeyDrop glFilepath,'_plan' 
+	    NB. Write out measurement points with existing values
+	    key=. ww{glPlanID
+	    key utKeyRead glFilepath,'_plan'
+	    newkey=. 'r<0>2.0' 8!:0 glPlanHole
+	    newkey=. newkey ,each <'-'
+	    newkey=. newkey ,each 'r<0>3.0' 8!:0 glPlanRemGroundYards
+	    glPlanHitYards=: (#key) $0
+	    glPlanCrowDist=: (#key) $0
+	    glPlanUpdateName=: (#key)$<": getenv 'REMOTE_USER'
+	    glPlanUpdateTime=: (#key)$< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
+	    glPlanLayupType=: (#key)$,' '
+	    glPlanRecType=: (#key)$,'M'
+	    glPlanCarryType=: (#key)$,' '
+	    glPlanCarryAffectsTee=: (#key)$,' '
+	    glPlanSqueezeType=: (#key)$,' '
+	    glPlanSqueezeWidth=: (#key)$0
+	    glPlanID=: newkey
+	    utKeyPut glFilepath,'_plan'
+	    key utKeyDrop glFilepath,'_plan' 
     end.
     continue. NB. Loop to next gender
 end.
@@ -609,6 +618,9 @@ label_shot.
 	glPlanBunkExtreme=: ,<''
 	glPlanBunkLZCarry=: ,0
 	glPlanBunkTargCarry=: ,0
+	glPlanBunkSqueeze=: ,<''
+	glPlanTransitionAdj=: ,<''
+	glPlanTransitionOverride=: ,<''
 	glPlanLatWaterDist=: ,0
 	glPlanWaterLine=: ,0
 	if. (glPlanLayupType='L') *. (glPlanLayupCategory ~: <'choice') do.
@@ -700,6 +712,9 @@ glPlanBunkLine=: 1 1 { glPlanBunkLine
 glPlanBunkExtreme=: 1 1 { glPlanBunkExtreme
 glPlanBunkLZCarry=: 1 1 { glPlanBunkLZCarry
 glPlanBunkTargCarry=: 1 1 { glPlanBunkTargCarry
+glPlanBunkSqueeze=: 1 1 { glPlanBunkSqueeze
+glPlanTransitionAdj=: 1 1 { glPlanTransitionAdj
+glPlanTransitionOverride=: 1 1 { glPlanTransitionOverride
 glPlanLatWaterDist=: 1 1{glPlanLatWaterDist
 glPlanWaterPercent=: 1 1{glPlanWaterPercent
 glPlanWaterLine=: 1 1 { glPlanWaterLine
@@ -861,6 +876,9 @@ glPlanBunkLine=: ,0
 glPlanBunkExtreme=: ,<''
 glPlanBunkLZCarry=: ,0
 glPlanBunkTargCarry=: ,0
+glPlanBunkSqueeze=: ,<''
+glPlanTransitionAdj=: ,<''
+glPlanTransitionOverride=: ,<''
 glPlanLatWaterDist=: ,0
 glPlanWaterPercent=: ,<''
 glPlanWaterLine=: ,0
@@ -1019,6 +1037,21 @@ end.
 if. ( -. (<'glPlanBunkExtreme') e. dict ) do.
 	(,<'glPlanBunkExtreme') utKeyAddColumn y
 	glPlanBunkExtreme=: (#glPlanID)$<''
+	utKeyPut y
+end.
+if. ( -. (<'glPlanBunkSqueeze') e. dict ) do.
+	(,<'glPlanBunkSqueeze') utKeyAddColumn y
+	glPlanBunkSqueeze=: (#glPlanID)$<''
+	utKeyPut y
+end.
+if. ( -. (<'glPlanTransitionAdj') e. dict ) do.
+	(,<'glPlanTransitionAdj') utKeyAddColumn y
+	glPlanTransitionAdj=: (#glPlanID)$<''
+	utKeyPut y
+end.
+if. ( -. (<'glPlanTransitionOverride') e. dict ) do.
+	(,<'glPlanTransitionOverride') utKeyAddColumn y
+	glPlanTransitionOverride=: (#glPlanID)$<''
 	utKeyPut y
 end.
 )
