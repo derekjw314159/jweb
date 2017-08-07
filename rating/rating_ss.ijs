@@ -55,7 +55,7 @@ stdout LF,'<div class="container">'
 
 NB. Error page - No such course
 if. 0<#err do.
-    djwErrorPage err ; ('No such course name : ',glFilename) ; '/jw/rating/plan/v' ; 'Back to rating plan'
+    djwErrorPage err ; ('No such course name : ',glFilename) ; ('/jw/rating/plan/v/',glFilename) ; 'Back to rating plan'
 end.
 
 stdout LF,'<h2>SS Reckoner : ', glCourseName,' : ',(;(glTees i. tee){glTeesName),' : ',(>gender{' ' cut 'Men Women'),'</h2>'
@@ -71,7 +71,8 @@ ww=. ww /: ww{glSSHole
 NB. Error page - No such course
 ww=.  (-. (i.18) e. glSSHole ) # 1+i. 18
 if. 0<#ww do.
-    djwErrorPage err ; ('Missing analysis for holes : ',glFilename,' Holes : ', ":ww) ; '/jw/rating/plan/v' ; 'Back to rating plan'
+    djwErrorPage err ; ('Missing analysis for holes : ',glFilename,' Holes : ', ":ww) ; ('/jw/rating/plan/v/',glFilename) ; 'Back to rating plan'
+	exit 2
 end.
 
 NB. Values
