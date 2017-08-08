@@ -539,13 +539,14 @@ ww=. ' ' cut 'S1 S2 B1 B2 B3'
 ww=. (<'<b>'), each ww
 ww=. ww, each <'</b>'
 fname fappend~ 'C' write_cell 3 22 ; 1 ; <ww
-NB. Fairway Width
+NB. Fairway Width and Lookup table
 fname fappend~ 'R' write_cell 0 23 ; 3 ; '<i>Width (Yds) at LZ</i>'
 fname fappend~ 'R' write_cell 0 24 ; 3 ; 'Table Value'
 fairwaywidth=.  'glPlanFWWidth' matrix_pull hole ; tee ; gender
 wid=. }: each fairwaywidth
 select. z=. j. / > #each wid
-    case. 0j0 do. sz=. _1 _1, _1 _1 _1
+    case. 0j0 do.
+	sz=. _1 _1, _1 _1 _1
     case. 0j1 do. 
 	NB. Bogey can't reach Par 3 is recorded under R&R
 	NB. Clear out the reading
@@ -566,6 +567,9 @@ for_ab. 0 1 do.
 end.
 fname fappend~ 'C' write_input 3 23 ; sz ; (;wid)  * 999> ;wid NB. Suppress 999
 fname fappend~ 'C' write_calc 3 24 ; sz ; (;fwtot) 
+msk=. _1 1 i. sz
+write_xl hole ; tee ; gender ; (hole+1) ; 79 ; 5 6 7 8 9 ; 0 ; 'Fairway width' ; <msk #inv <"0  ;wid
+2 write_xl hole ; tee ; gender ; (hole+1) ; 26 ; 5 6 7 8 9 ; 0 ; 'Fairway width' ; <msk #inv <"0  ;wid
 NB. Fairway Layup
 fname fappend~ write_row_head 0 25 ; 2.5 0.5; '<i>Lay-up</i>'; '<b>L</b>'
 lay=. - each 'L' =each }: each 'glPlanLayupType' matrix_pull hole ; tee ; gender NB. -1 if Layup
@@ -622,6 +626,7 @@ sh=. (*sh) * 10 * <.0.5+ 0.1 * (| sh) NB. Round to nearest 10
 if. 3=gender{glTePar do. sh=. _40 >. sh <. 40 end.
 fname fappend~ 'R' write_input 6 11 ; 1 1 ; <'b<>p<+>' 8!:0 (0 >. sh),0 <. sh 
 write_xl hole ; tee ; gender ; (hole+1) ; 68 ; 9 ; 0 ; 'Elevation Change' ; sh NB. Elevation Change
+2 write_xl hole ; tee ; gender ; (hole+1) ; 21 ; 9 ; 0 ; 'Elevation Change' ; <(0 ~: sh) { '' ; sh NB. Elevation Change
 glSSElevation=: ,sh
 
 NB. ------------------------
@@ -674,6 +679,8 @@ NB. if. (gender{glTePar) = 3 do. alt=. _40 >. alt <. 40 end.
 alt=. _40 >. alt <. 40 
 fname fappend~ (' ' cut 'cell input') write_row_head 3 15 ; 1.2  0.8 ; 'App S:' ; ;'p<+>' 8!:0 (0{alt)
 fname fappend~ (' ' cut 'cell input') write_row_head 5 15 ; 2 1 ; 'App Elev B:' ; ;'p<+>' 8!:0 (1{alt)
+write_xl hole ; tee ; gender ; (hole+1) ; 73 ; 6 9 ; 0 ; 'Approach elevation' ; alt
+2 write_xl hole ; tee ; gender ; (hole+1) ; 24 ; 6 9 ; 0 ; 'Approach elevation' ;  <((0 ~: alt)* 1+ i.$alt){ '' ; <"0 alt
 fname fappend~ 'R' write_cell 0 16 ; 3 ; '<i>(LZtoLZ or Appr)</i>'
 ww=. ' ' cut 'LZ1-2 Appr LZ1-2 LZ2-3 Appr'
 ww=. (<'<b>'), each ww, each <'</b>'
@@ -940,7 +947,9 @@ fwtot=. fwtot + > +/each lay
 NB. Carry
 fname fappend~ ('cell' ; 'input') write_row_head 8 7 ; 0.55 0.7 ; '<i>Y</i>' ; ":0{>0{carryyards
 fname fappend~ ('cell' ; 'input') write_row_head 9.25 7 ; 0.5 0.75 ; '<i>H</i>'; (":glGrRRRoughLength),'&quot;' 
-lay=. lookup_carry_rough gender ; carryyards ; glGrRRRoughLength
+write_xl hole ; tee ; gender ; (hole+1) ; 57 ; 19 ; 0 ; 'Fairway carry yards' ; 0{;carryyards
+2 write_xl hole ; tee ; gender ; (hole+1) ; 8 ; 19 ; 0 ; 'Fairway carry yards' ; (0 ~: 0{;carryyards){'' ; 0{;carryyards
+iay=. lookup_carry_rough gender ; carryyards ; glGrRRRoughLength
 fname fappend~ 'R' write_cell 10.5 7 ; 0.5 ; '<b>C</b>'
 fname fappend~ 'C' write_calc 11 7 ; (_1 _1 _1, 1 _1 _1 _1) ; <'b<>' 8!:0 {. ; 1{lay NB. Only pull out Bogey Value, and the first one
 fwtot=. fwtot + ; >. /each lay
@@ -1484,34 +1493,49 @@ NB. ==============================================================
 NB. Usage:
 NB.   merge_pdfs
 NB. y is string of tees ('' does all)
-NB. x is whether to restrict to just measured tees (e.g. all yellows)
+NB. x is whether to restrict to just measured tees (e.g. x=1 will do all yellows, x=0 will just do those flagged)
 NB. Returns a LF delimited string of distances
 merge_pdfs=: 3 : 0
-1 merge_pdfs y
+0 merge_pdfs y
 :
 if. y -: '' do.
     y=. glTees
 end.
 res=. 'pdftk '
+res1=. ''
 utKeyRead glFilepath,'_tee'
+
+NB. Sort by gender, tee
+ww=: /: glTeHole
+ww=: ww /: ww{glTeTee
+
 for_gender. ,0  do.
-	for_t. i. # glTeID do.
+	for_t.  ww do.
 		if. -. (t{glTeTee) e. y do. continue. end. NB. Only the tees specified
-		if. x *. 0=(<t,gender){glTeMeasured do. continue. end.
+		if. (x=0) *. 0=(<t,gender){glTeMeasured do. continue. end.
 		hole=. ''$t{glTeHole 
 		tee=. ''$t{glTeTee
-		NB. Regenerate only if a measured tee
-		if. (<t,gender){glTeMeasured do.
-		    1 jweb_rating_report glFilename ; (":hole)  ; (":gender); tee
-		    utKeyRead glFilepath,'_tee'
-		end.
 		shortname=. glFilename,'_',(;'r<0>2.0' 8!:0 (1+hole)),(gender{'MW'),tee
 		fname=. glDocument_Root,'/tcpdf/',glBasename,'/',shortname,'.pdf'
+		NB. Regenerate only if a measured tee
+		if. (<t,gender){glTeMeasured do.
+		    NB. Generate the PHP file 
+		    stdout LF,'Generating: ',(_4}.fname),'.php'
+		    1 jweb_rating_report glFilename ; (":hole)  ; (":gender); tee
+		    stdout LF,'Running to create: ',fname
+		    res1=. res1,LF,'echo "Running to create: ',fname,'"'
+		    res1=. res1,LF,'/usr/bin/php ',(_4}.fname),'.php'
+		    utKeyRead glFilepath,'_tee' NB. Need to reload
+		end.
+		stdout LF,'Append: ', fname
 		res=. res,' ',fname
 	end.
 end.
 res=. res, ' cat output ',glDocument_Root,'/tcpdf/',glBasename,'/',glFilename,'_all.pdf'
-2!:0 res
+res1=. res1,LF,'echo "Catenating files"'
+res1=. res1,LF,res
+
+(}.res1) fwrite glDocument_Root,'/tcpdf/',glBasename,'/',glFilename,'_all.sh'
 )
 
 NB. ==============================================================
