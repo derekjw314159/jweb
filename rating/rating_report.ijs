@@ -826,7 +826,7 @@ msk=. _1 1 i. sz
 write_xl hole ; tee ; gender ; (hole+1) ; 53 ; 30 32 34 36 38 40 42 ; 0 ; 'Water distance' ; <msk #inv <"0  ;waterdist
 msk=. (<_1 )+each #each waterdist NB. remove last one
 msk=. ; (3;4) {. each msk $ each <1
-2 write_xl hole ; tee ; gender ; (hole+1) ; 6 ; 30 32 34 36 38 40 42 ; 0 ; 'Water distance' ; <msk #inv <"0  ;}: each oobdist NB. Drop last one
+2 write_xl hole ; tee ; gender ; (hole+1) ; 6 ; 30 32 34 36 38 40 42 ; 0 ; 'Water distance' ; <msk #inv <"0  ;}: each waterdist NB. Drop last one
 fname fappend~ 'R' write_cell 18 4 ; 3 ; '<i>Yds to Carry Safely</i>' 
 fname fappend~ write_input 21 4 ; sz ; (;carryyards)
 msk=. _1 1 i. sz
