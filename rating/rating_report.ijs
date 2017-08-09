@@ -822,8 +822,18 @@ select. z=. j. / > #each waterdist
 end.
 fname fappend~ 'R' write_cell 18 2 ; 3 ; '<i>Centre LZ to Lateral</i>' 
 fname fappend~ write_input 21 2 ; sz ; (;waterdist)
+msk=. _1 1 i. sz
+write_xl hole ; tee ; gender ; (hole+1) ; 53 ; 30 32 34 36 38 40 42 ; 0 ; 'Water distance' ; <msk #inv <"0  ;waterdist
+msk=. (<_1 )+each #each waterdist NB. remove last one
+msk=. ; (3;4) {. each msk $ each <1
+2 write_xl hole ; tee ; gender ; (hole+1) ; 6 ; 30 32 34 36 38 40 42 ; 0 ; 'Water distance' ; <msk #inv <"0  ;}: each oobdist NB. Drop last one
 fname fappend~ 'R' write_cell 18 4 ; 3 ; '<i>Yds to Carry Safely</i>' 
 fname fappend~ write_input 21 4 ; sz ; (;carryyards)
+msk=. _1 1 i. sz
+write_xl hole ; tee ; gender ; (hole+1) ; 59 ; 30 32 34 36 38 40 42 ; 0 ; 'Water carry' ; <msk #inv <"0  (;carryyards)
+msk=. (<_1 )+each #each carryyards NB. remove last one
+msk=. ; (3;4) {. each msk $ each <1
+2 write_xl hole ; tee ; gender ; (hole+1) ; 9 ; 30 32 34 36 38 40 42 ; 0 ; 'Water carry' ; <msk #inv <"0  (;}: each carryyards) NB. Drop last one
 fname fappend~ 'R' write_cell 18 5 ; 3 ; 'Table Value'
 watlat=. lookup_lateral_water gender ; hityards ; <waterdist
 tvexists=. watlat >each 0
@@ -949,7 +959,7 @@ fname fappend~ ('cell' ; 'input') write_row_head 8 7 ; 0.55 0.7 ; '<i>Y</i>' ; "
 fname fappend~ ('cell' ; 'input') write_row_head 9.25 7 ; 0.5 0.75 ; '<i>H</i>'; (":glGrRRRoughLength),'&quot;' 
 write_xl hole ; tee ; gender ; (hole+1) ; 57 ; 19 ; 0 ; 'Fairway carry yards' ; 0{;carryyards
 2 write_xl hole ; tee ; gender ; (hole+1) ; 8 ; 19 ; 0 ; 'Fairway carry yards' ; (0 ~: 0{;carryyards){'' ; 0{;carryyards
-iay=. lookup_carry_rough gender ; carryyards ; glGrRRRoughLength
+lay=. lookup_carry_rough gender ; carryyards ; glGrRRRoughLength
 fname fappend~ 'R' write_cell 10.5 7 ; 0.5 ; '<b>C</b>'
 fname fappend~ 'C' write_calc 11 7 ; (_1 _1 _1, 1 _1 _1 _1) ; <'b<>' 8!:0 {. ; 1{lay NB. Only pull out Bogey Value, and the first one
 fwtot=. fwtot + ; >. /each lay
@@ -1118,6 +1128,11 @@ end.
 NB. Distance from landing zone
 fname fappend~ 'R' write_cell 8 28 ; 3 ; '<i>Centre LZ to OOB/ER</i>' 
 fname fappend~ write_input 11 28 ; sz ; (;oobdist)
+msk=. _1 1 i. sz
+write_xl hole ; tee ; gender ; (hole+1) ; 82 ; 13 15 17 19 21 23 25 ; 0 ; 'OOB distance' ; <msk #inv <"0  ;oobdist
+msk=. (<_1 )+each #each oobdist NB. remove last one
+msk=. ; (3;4) {. each msk $ each <1
+2 write_xl hole ; tee ; gender ; (hole+1) ; 28 ; 13 15 17 19 21 23 25 ; 0 ; 'OOB distance' ; <msk #inv <"0  ;}: each oobdist NB. Drop last one
 NB. Behind only applies to lateral distance
 fname fappend~ write_row_head 8 29 ; 2.5 0.5 ; '<i>Behind</i>' ; ''
 fwtot=. lookup_oob gender ; hityards ; <oobdist
@@ -1496,7 +1511,7 @@ NB. y is string of tees ('' does all)
 NB. x is whether to restrict to just measured tees (e.g. x=1 will do all yellows, x=0 will just do those flagged)
 NB. Returns a LF delimited string of distances
 merge_pdfs=: 3 : 0
-0 merge_pdfs y
+(,<'') merge_pdfs y
 :
 if. y -: '' do.
     y=. glTees
@@ -1512,13 +1527,13 @@ ww=: ww /: ww{glTeTee
 for_gender. ,0  do.
 	for_t.  ww do.
 		if. -. (t{glTeTee) e. y do. continue. end. NB. Only the tees specified
-		if. (x=0) *. 0=(<t,gender){glTeMeasured do. continue. end.
+		if. (-. (<'all')e.x) *. 0=(<t,gender){glTeMeasured do. continue. end.
 		hole=. ''$t{glTeHole 
 		tee=. ''$t{glTeTee
 		shortname=. glFilename,'_',(;'r<0>2.0' 8!:0 (1+hole)),(gender{'MW'),tee
 		fname=. glDocument_Root,'/tcpdf/',glBasename,'/',shortname,'.pdf'
 		NB. Regenerate only if a measured tee
-		if. (<t,gender){glTeMeasured do.
+		if. ((<'regen')e. x) *. (<t,gender){glTeMeasured do.
 		    NB. Generate the PHP file 
 		    stdout LF,'Generating: ',(_4}.fname),'.php'
 		    1 jweb_rating_report glFilename ; (":hole)  ; (":gender); tee
