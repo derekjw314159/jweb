@@ -723,7 +723,7 @@ fname fappend~ (' ' cut 'cell input') write_row_head 3 34 ; 0.80 0.45 ; 'Circ:' 
 fname fappend~ (' ' cut 'cell input') write_row_head 4.25 34 ; 0.60 0.65 ; 'W:' ; glGrWidth
 fname fappend~ (' ' cut 'cell input') write_row_head 5.50 34 ; 0.60 0.65 ; 'L:' ; glGrLength
 fname fappend~ (' ' cut 'cell input') write_row_head 6.75 34 ; 0.60 0.65 ; 'Di:' ; glGrDiam
-write_xl hole ; tee ; gender ; (hole+1) ; 90 ; 6 8 10 ; 0 ; 'Green dimensions' ; glGrWidth, glGrLength, glGrDiam 
+write_xl hole ; tee ; gender ; (hole+1) ; 90 ; 6 8 9 ; 0 ; 'Green dimensions' ; glGrWidth, glGrLength, glGrDiam 
 write_xl hole ; tee ; gender ; (hole+1) ; 91 ; 7 ; 0 ; 'Green circle' ; glGrCircleConcept{'NY'
 2 write_xl hole ; tee ; gender ; 'Greens Data' ; 7 ; (4+2*hole) ; 0 ; 'Green width' ; glGrWidth
 2 write_xl hole ; tee ; gender ; 'Greens Data' ; 8 ; (4+2*hole) ; 0 ; 'Green depth' ; glGrLength
@@ -823,14 +823,14 @@ end.
 fname fappend~ 'R' write_cell 18 2 ; 3 ; '<i>Centre LZ to Lateral</i>' 
 fname fappend~ write_input 21 2 ; sz ; (;waterdist)
 msk=. _1 1 i. sz
-write_xl hole ; tee ; gender ; (hole+1) ; 53 ; 30 32 34 36 38 40 42 ; 0 ; 'Water distance' ; <msk #inv <"0  ;waterdist
+NB. write_xl hole ; tee ; gender ; (hole+1) ; 53 ; 30 32 34 36 38 40 42 ; 0 ; 'Water distance' ; <msk #inv <"0  ;waterdist
 msk=. (<_1 )+each #each waterdist NB. remove last one
 msk=. ; (3;4) {. each msk $ each <1
 2 write_xl hole ; tee ; gender ; (hole+1) ; 6 ; 30 32 34 36 38 40 42 ; 0 ; 'Water distance' ; <msk #inv <"0  ;}: each waterdist NB. Drop last one
 fname fappend~ 'R' write_cell 18 4 ; 3 ; '<i>Yds to Carry Safely</i>' 
 fname fappend~ write_input 21 4 ; sz ; (;carryyards)
 msk=. _1 1 i. sz
-write_xl hole ; tee ; gender ; (hole+1) ; 59 ; 30 32 34 36 38 40 42 ; 0 ; 'Water carry' ; <msk #inv <"0  (;carryyards)
+NB. write_xl hole ; tee ; gender ; (hole+1) ; 59 ; 30 32 34 36 38 40 42 ; 0 ; 'Water carry' ; <msk #inv <"0  (;carryyards)
 msk=. (<_1 )+each #each carryyards NB. remove last one
 msk=. ; (3;4) {. each msk $ each <1
 2 write_xl hole ; tee ; gender ; (hole+1) ; 9 ; 30 32 34 36 38 40 42 ; 0 ; 'Water carry' ; <msk #inv <"0  (;}: each carryyards) NB. Drop last one
@@ -1129,7 +1129,7 @@ NB. Distance from landing zone
 fname fappend~ 'R' write_cell 8 28 ; 3 ; '<i>Centre LZ to OOB/ER</i>' 
 fname fappend~ write_input 11 28 ; sz ; (;oobdist)
 msk=. _1 1 i. sz
-write_xl hole ; tee ; gender ; (hole+1) ; 82 ; 13 15 17 19 21 23 25 ; 0 ; 'OOB distance' ; <msk #inv <"0  ;oobdist
+write_xl hole ; tee ; gender ; (hole+1) ; 85 ; 13 15 17 19 21 23 25 ; 0 ; 'OOB distance' ; <msk #inv <"0  ;oobdist
 msk=. (<_1 )+each #each oobdist NB. remove last one
 msk=. ; (3;4) {. each msk $ each <1
 2 write_xl hole ; tee ; gender ; (hole+1) ; 28 ; 13 15 17 19 21 23 25 ; 0 ; 'OOB distance' ; <msk #inv <"0  ;}: each oobdist NB. Drop last one
