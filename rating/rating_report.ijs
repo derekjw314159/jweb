@@ -4,6 +4,17 @@ NB.
 glPDFoffset=: 8 4
 glPDFmult=: (276 % 28), (190 % 46)
 
+boxnonzero=: 3 : 0
+NB. =========================================================
+NB. boxnonzero
+NB. ---------------------------------------------------------
+NB. Usage
+NB.   boxnonzero y
+NB. Returns boxed items, with zeros set to boxed null
+NB. =========================================================
+res=. (( y~: 0 ) * ($y)$1+i. */$y){ '' ; <"0 ,y
+)
+
 NB. =========================================================
 NB. pdfMulti
 NB. =========================================================
@@ -463,12 +474,12 @@ for_ab. i. 2 do.
     ww2=. I. (ab=glPlanAbility) 
     NB. Differences from default hit
     if. -. +. / (ww2{glPlanLayupType) e. 'LR' do.
-	ww=. <(#ww2)$<''
+	ww=. (#ww2)$<''
     else.
-	ww=. ww2{glPlanHitYards
+	ww=. boxnonzero ww2{glPlanHitYards
     end.
-    2 write_xl hole ; tee ; gender ; (hole+1) ; (ab{7 9) ; 5 ; 0 ; 'Shot distance input' ; ww
-    write_xl hole ; tee ; gender ; (hole+1) ; (53+ab) ; 5 ; 0 ; 'Shot distance' ; ww2{glPlanHitYards NB. Distances
+    2 write_xl hole ; tee ; gender ; (hole+1) ; (ab{7 9) ; 5 ; 0 ; 'Shot distance input' ; <(ab{3 4){.ww
+    write_xl hole ; tee ; gender ; (hole+1) ; (53+ab) ; 5 ; 0 ; 'Shot distance' ; (ab{3 4){.ww2{glPlanHitYards 
     2 write_xl hole ; tee ; gender ; (hole+1) ; 10 ; (ab{6 9) ; 0 ; 'Transition input' ; (+. / 'T'=ww2 {glPlanLayupType)#'Y' NB. Transition y/n
     write_xl hole ; tee ; gender ; (hole+1) ; 55 ; (ab{6 8) ; 0 ; 'Transition' ; (+. / 'T'=ww2 {glPlanLayupType){'NY' NB. Transition y/n
     ww2=. ('' (8!:0) ww2{glPlanHitYards),each <"0 ww2{glPlanLayupType
@@ -823,17 +834,15 @@ end.
 fname fappend~ 'R' write_cell 18 2 ; 3 ; '<i>Centre LZ to Lateral</i>' 
 fname fappend~ write_input 21 2 ; sz ; (;waterdist)
 msk=. _1 1 i. sz
-NB. write_xl hole ; tee ; gender ; (hole+1) ; 53 ; 30 32 34 36 38 40 42 ; 0 ; 'Water distance' ; <msk #inv <"0  ;waterdist
+write_xl hole ; tee ; gender ; (hole+1) ; 53 ; 30 32 34 36 38 40 42 ; 0 ; 'Water distance' ; <msk #inv boxnonzero  ;waterdist
 msk=. (<_1 )+each #each waterdist NB. remove last one
 msk=. ; (3;4) {. each msk $ each <1
-2 write_xl hole ; tee ; gender ; (hole+1) ; 6 ; 30 32 34 36 38 40 42 ; 0 ; 'Water distance' ; <msk #inv <"0  ;}: each waterdist NB. Drop last one
+2 write_xl hole ; tee ; gender ; (hole+1) ; 6 ; 30 32 34 36 38 40 42 ; 0 ; 'Water distance input' ; <msk #inv boxnonzero ;}: each waterdist NB. Drop last one
 fname fappend~ 'R' write_cell 18 4 ; 3 ; '<i>Yds to Carry Safely</i>' 
 fname fappend~ write_input 21 4 ; sz ; (;carryyards)
 msk=. _1 1 i. sz
-NB. write_xl hole ; tee ; gender ; (hole+1) ; 59 ; 30 32 34 36 38 40 42 ; 0 ; 'Water carry' ; <msk #inv <"0  (;carryyards)
-msk=. (<_1 )+each #each carryyards NB. remove last one
-msk=. ; (3;4) {. each msk $ each <1
-2 write_xl hole ; tee ; gender ; (hole+1) ; 9 ; 30 32 34 36 38 40 42 ; 0 ; 'Water carry' ; <msk #inv <"0  (;}: each carryyards) NB. Drop last one
+write_xl hole ; tee ; gender ; (hole+1) ; 59 ; 30 32 34 36 38 40 42 ; 0 ; 'Water carry' ; <msk #inv boxnonzero  (;carryyards)
+2 write_xl hole ; tee ; gender ; (hole+1) ; 9 ; 30 32 34 36 38 40 42 ; 0 ; 'Water carry input' ; <msk #inv boxnonzero  (;carryyards) NB. Don't drop last one on carry
 fname fappend~ 'R' write_cell 18 5 ; 3 ; 'Table Value'
 watlat=. lookup_lateral_water gender ; hityards ; <waterdist
 tvexists=. watlat >each 0
@@ -1051,6 +1060,12 @@ for_i. i. 7 do.
 	if. _1 ~: i{sz do. fname fappend~ pdfDiag ((11.33+i), 18) ; 0.33 1  end. NB. Diagonal line
 end.
 fwtot=. fwtot + ; +/ each bunkcarry
+msk=. (<_1 )+each #each bunkcarry NB. remove last one
+msk=. ; (2;4) {. each msk $ each <1
+write_xl hole ; tee ; gender ; (hole+1) ; 73 ; 13 15 19 21 23 25 ; 0 ; 'Bunker carry' ; msk #inv ;}: each bunkcarry NB. Drop the last one
+2 write_xl hole ; tee ; gender ; (hole+1) ; 18 ; 13 15 19 21 23 25 ; 0 ; 'Bunker carry input' ; <msk #inv boxnonzero  ;}: each bunkcarry NB. Drop last one
+write_xl hole ; tee ; gender ; (hole+1) ; 74 ; 13 19 ; 0 ; 'Bunker carry green' ; ;{: each bunkcarry NB. Just the last one
+2 write_xl hole ; tee ; gender ; (hole+1) ; 19 ; 13 19 ; 0 ; 'Bunker carry green input' ; <boxnonzero ;{: each bunkcarry NB. Just the last one
 NB. Extreme (not yet implemented)
 fname fappend~ write_row_head 8 19 ; 2.5 0.5; '<i>Extreme</i>'; '<b>E</b>'
 fw=. ('glPlanBunkExtreme' ; 'glGrBunkExtreme') matrix_pull hole ; tee ; gender
@@ -1070,8 +1085,14 @@ fname fappend~ write_cell 8 21 ; 0.5 ; <<'S'
 fname fappend~ 'C' write_input 8.3571 21 ; (2{.((#>0{lz)$0.3571),2$_0.3571) ; <<"0 (>0{lz){' y'
 fname fappend~ write_cell 9.0713 21 ; 0.5 ; <<'B'
 fname fappend~ 'C' write_input 9.4284 21 ; (3{.((#>1{lz)$0.3571),3$_0.3571) ; <<"0 (>1{lz){' y'
+msk=. #each lz 
+msk=. ; (2;3) {. each msk $ each <1
+2 write_xl hole ; tee ; gender ; (hole+1) ; 21 ; 13 15 19 21 23 ; 0 ; 'Bunker in LZ input' ; <(msk #inv ;lz) { '' ; 'Y'
 fname fappend~ write_cell 8 22 ; 2 ; <<'Bog Ln/Play'
 fname fappend~ write_input 10 22 ; 0.5 ; (+. / >1{lopfull){' y'
+msk=. #>1{lopfull 
+msk=.  4 {. msk $ 1
+2 write_xl hole ; tee ; gender ; (hole+1) ; 22 ; 19 21 23  25 ; 0 ; 'Bunker in bogey LOP input' ; <(msk #inv >1{lopfull) { '' ; 'Y'
 fname fappend~ 'black' oN 'white'
 fname fappend~ LF,'$pdf->',pdfMulti 10.5 21 ; 0.5 2 ; ('<b>N</b>') ; 1
 NB. Calculate Negative adjustment
@@ -1098,6 +1119,7 @@ NB. Does bunker exist for Scratch
 fname fappend~ write_row_head 8 25 ; 2.9 0.1 ; '<i>Scratch LoP</i>' ; ''
 fw=. 1< ; +/each lz NB. Must be at least two fairway bunkers in LZ
 fname fappend~ write_calc  11 25 ; 3 _4 ;  (+. / ;(0{lz),0{lopfull) # 'y'
+2 write_xl hole ; tee ; gender ; (hole+1) ; 23 ; 17 ; 0 ; 'Bunker in scratch LOP input' ; (+. / ;(0{lz),0{lopfull) { '' ; 'Y'
 NB. Total
 fwtot=. fwtot >. ; +./ each lz,each lopfull NB. Must be a minimum of one if it exists
 fname fappend~ 'R' write_footer 8 26 ; 3 ; <<'Bunker Rating'
@@ -1129,10 +1151,10 @@ NB. Distance from landing zone
 fname fappend~ 'R' write_cell 8 28 ; 3 ; '<i>Centre LZ to OOB/ER</i>' 
 fname fappend~ write_input 11 28 ; sz ; (;oobdist)
 msk=. _1 1 i. sz
-write_xl hole ; tee ; gender ; (hole+1) ; 85 ; 13 15 17 19 21 23 25 ; 0 ; 'OOB distance' ; <msk #inv <"0  ;oobdist
+write_xl hole ; tee ; gender ; (hole+1) ; 85 ; 13 15 17 19 21 23 25 ; 0 ; 'OOB distance' ; <msk #inv boxnonzero  ;oobdist
 msk=. (<_1 )+each #each oobdist NB. remove last one
 msk=. ; (3;4) {. each msk $ each <1
-2 write_xl hole ; tee ; gender ; (hole+1) ; 28 ; 13 15 17 19 21 23 25 ; 0 ; 'OOB distance' ; <msk #inv <"0  ;}: each oobdist NB. Drop last one
+2 write_xl hole ; tee ; gender ; (hole+1) ; 28 ; 13 15 17 19 21 23 25 ; 0 ; 'OOB distance' ; <msk #inv boxnonzero  ;}: each oobdist NB. Drop last one
 NB. Behind only applies to lateral distance
 fname fappend~ write_row_head 8 29 ; 2.5 0.5 ; '<i>Behind</i>' ; ''
 fwtot=. lookup_oob gender ; hityards ; <oobdist
@@ -1166,6 +1188,11 @@ oobpercent=.  (' ' cut 'glPlanOOBPercent glGrOOBPercent') matrix_pull hole ; tee
 oobpercent=. (<glOOBPercentVal) i. each oobpercent
 fw=. (;oobpercent) { glOOBPercentDesc
 fname fappend~ 'C' write_input 11 33 ; sz ; <fw 
+msk=. _1 1 i. sz
+write_xl hole ; tee ; gender ; (hole+1) ; 95 ; 13 15 17 19 21 23 25 ; 0 ; 'OOB Percent' ; msk #inv 100*(;oobpercent) { glOOBPercentNum
+msk=. (<_1 )+each #each oobpercent NB. remove last one
+msk=. ; (3;4) {. each msk $ each <1
+2 write_xl hole ; tee ; gender ; (hole+1) ; 35 ; 13 15 17 19 21 23 25 ; 0 ; 'OOB Percent input' ; <msk #inv boxnonzero 100*(;}: each oobpercent) { glOOBPercentNum 
 fw=. (oobpercent) { each < glOOBPercentNum
 fw=. <. each (<0.5) + each fwtot * each fw NB. Round the reduction, not the total remaining WRONG ANSWER IMHO!
 NB. fname fappend~ 'R' write_calc 11 33 ; sz ; <('bm<(>n<)>' 8!:0 ;fw)
