@@ -919,7 +919,7 @@ NB. In Play Twice
 fname fappend~ write_row_head 18 15 ; 2.5 0.5 ; '<i>In Play Twice</i>' ; '2'
 fname fappend~ 'C' write_calc 21 15 ; 3 4 ; (;wattwice)
 fwtot=. fwtot + wattwice
-NB. OOB anywhere
+NB. Water anywhere
 fname fappend~ 'L' write_cell 18 16 ; 3 ; '<i>On Line of Play</i>' 
 waterline=. 'glPlanWaterLine' matrix_pull hole ; tee ; gender
 waterline=. ; +. / each waterline

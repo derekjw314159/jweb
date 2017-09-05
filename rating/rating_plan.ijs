@@ -133,7 +133,7 @@ stdout LF,'<br><a href="/jw/rating/xl/',glFilename,'">XL Macro</a>'
 	
 stdout LF,'</div>' NB. container
 stdout '</body></html>'
-exit ''
+exitexit 2
 )
 
 NB. =========================================================
@@ -728,4 +728,9 @@ end.
 NB. End of hh loop
     stdout LF,'google.maps.event.addDomListener(window, ''load'', initialize);'
     stdout LF,'</script>'
+)
+
+jweb_rating_test=: 3 : 0
+stdout 'done'
+exitexit 2
 )
