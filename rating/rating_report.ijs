@@ -691,7 +691,7 @@ alt=. _40 >. alt <. 40
 fname fappend~ (' ' cut 'cell input') write_row_head 3 15 ; 1.2  0.8 ; 'App S:' ; ;'p<+>' 8!:0 (0{alt)
 fname fappend~ (' ' cut 'cell input') write_row_head 5 15 ; 2 1 ; 'App Elev B:' ; ;'p<+>' 8!:0 (1{alt)
 write_xl hole ; tee ; gender ; (hole+1) ; 73 ; 6 9 ; 0 ; 'Approach elevation' ; |alt
-2 write_xl hole ; tee ; gender ; (hole+1) ; 24 ; 6 9 ; 0 ; 'Approach elevation' ; <boxnonzero |alt NB. Absolute value
+2 write_xl hole ; tee ; gender ; (hole+1) ; 24 ; 6 9 ; 0 ; 'Approach elevation' ; <boxnonzero alt NB. Absolute value
 fname fappend~ 'R' write_cell 0 16 ; 3 ; '<i>(LZtoLZ or Appr)</i>'
 ww=. ' ' cut 'LZ1-2 Appr LZ1-2 LZ2-3 Appr'
 ww=. (<'<b>'), each ww, each <'</b>'
