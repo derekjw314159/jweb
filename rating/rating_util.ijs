@@ -32,6 +32,7 @@ glRRRiseDropText=: (<''),':' cut '5-10'':gt 10'''
 glTopogStanceVal=: (<''),':' cut 'MP-MA:MA:SA:EA'
 glTopogStanceDesc=: ':' cut 'Minor Problem:MP-MA:Moderately Awkward:Signif Awkward:Extremely Awkward'
 glTopogStanceText=: ':' cut 'MP:MP/A:MA:SA:EA'
+glTopogStanceXL=: ':' cut 'MP:MP-MA:MA:SA:EA'
 NB. glTopogStanceNum=: 1 2 3 4 5
 glBunkFractionVal=: (<''),':' cut '<1/4:<1/2:<3/4:>3/4'
 glBunkFractionDesc=: ':' cut 'Zero:0 - 1/4:1/4 - 1/2:1/2 - 3/4:Greater than 3/4'

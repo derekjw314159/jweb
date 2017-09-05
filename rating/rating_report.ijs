@@ -579,8 +579,8 @@ end.
 fname fappend~ 'C' write_input 3 23 ; sz ; (;wid)  * 999> ;wid NB. Suppress 999
 fname fappend~ 'C' write_calc 3 24 ; sz ; (;fwtot) 
 msk=. _1 1 i. sz
-write_xl hole ; tee ; gender ; (hole+1) ; 79 ; 5 6 7 8 9 ; 0 ; 'Fairway width' ; <msk #inv <"0  ;wid
-2 write_xl hole ; tee ; gender ; (hole+1) ; 26 ; 5 6 7 8 9 ; 0 ; 'Fairway width' ; <msk #inv <"0  ;wid
+write_xl hole ; tee ; gender ; (hole+1) ; 79 ; 5 6 7 8 9 ; 0 ; 'Fairway width' ; <msk #inv <"0  (+./ msk)#;wid NB. Have to alow for Par 3 can't readh
+2 write_xl hole ; tee ; gender ; (hole+1) ; 26 ; 5 6 7 8 9 ; 0 ; 'Fairway width' ; <msk #inv <"0 (+. /msk)# ;wid
 NB. Fairway Layup
 fname fappend~ write_row_head 0 25 ; 2.5 0.5; '<i>Lay-up</i>'; '<b>L</b>'
 lay=. - each 'L' =each }: each 'glPlanLayupType' matrix_pull hole ; tee ; gender NB. -1 if Layup
@@ -690,8 +690,8 @@ NB. if. (gender{glTePar) = 3 do. alt=. _40 >. alt <. 40 end.
 alt=. _40 >. alt <. 40 
 fname fappend~ (' ' cut 'cell input') write_row_head 3 15 ; 1.2  0.8 ; 'App S:' ; ;'p<+>' 8!:0 (0{alt)
 fname fappend~ (' ' cut 'cell input') write_row_head 5 15 ; 2 1 ; 'App Elev B:' ; ;'p<+>' 8!:0 (1{alt)
-write_xl hole ; tee ; gender ; (hole+1) ; 73 ; 6 9 ; 0 ; 'Approach elevation' ; alt
-2 write_xl hole ; tee ; gender ; (hole+1) ; 24 ; 6 9 ; 0 ; 'Approach elevation' ;  <((0 ~: alt)* 1+ i.$alt){ '' ; <"0 alt
+write_xl hole ; tee ; gender ; (hole+1) ; 73 ; 6 9 ; 0 ; 'Approach elevation' ; |alt
+2 write_xl hole ; tee ; gender ; (hole+1) ; 24 ; 6 9 ; 0 ; 'Approach elevation' ; <boxnonzero |alt NB. Absolute value
 fname fappend~ 'R' write_cell 0 16 ; 3 ; '<i>(LZtoLZ or Appr)</i>'
 ww=. ' ' cut 'LZ1-2 Appr LZ1-2 LZ2-3 Appr'
 ww=. (<'<b>'), each ww, each <'</b>'
@@ -702,16 +702,24 @@ wid=. }: each 'glPlanTopogStance' matrix_pull hole ; tee ; gender
 select. z=. j. / > #each wid
     case. 0j0 do. sz=. 2, 3  
 		wid=. (2$,<,<'Par3') NB. Append special value for Par 3
+		xl=. 0 1, 0 0 1
     case. 0j1 do. sz=. 2, _1 _1  1 NB. Append special value for Par 3
 		wid=. (<,<'Par3'),}.wid NB. Append special value for Par 3
+		xl=. 0 1 , 0 0 1
     case. 1j1 do. sz=. _1  1,  _1 _1 1
+		    xl=. 0 >. sz
     case. 1j2 do. sz=. _1  1,  1 _1  1
+		    xl=. 0 >. sz
     case. 2j2 do. sz=.  1  1 , 1 _1  1
+		    xl=. 0 >. sz
     case. 2j3 do. sz=.  1  1 , 1  1  1
+		    xl=. 0 >. sz
 end.
 sh=. wid
 wid=. (<glTopogStanceVal,<'Par3') i. each wid
 fname fappend~ 'C' write_input 3 17 ; sz ; < (;wid) { glTopogStanceText,<'Par 3'
+write_xl hole ; tee ; gender ; (hole+1) ; 72 ; 5 ; 0 ; 'Stance' ; <xl #inv (;wid) { glTopogStanceXL,<'PAR3'
+2 write_xl hole ; tee ; gender ; (hole+1) ; 23 ; 5 ; 0 ; 'Stance' ; <xl #inv (;wid) { glTopogStanceVal,<'PAR3'
 fname fappend~ 'R' write_cell 0 18 ; 3 ; 'Table Value'
 wid=. lookup_topog_rating alt ; <sh
 fname fappend~ 'C' write_calc  3 18 ; sz ; (;wid) 
