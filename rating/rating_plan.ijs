@@ -729,8 +729,3 @@ NB. End of hh loop
     stdout LF,'google.maps.event.addDomListener(window, ''load'', initialize);'
     stdout LF,'</script>'
 )
-
-jweb_rating_test=: 3 : 0
-stdout 'done'
-exitexit 2
-)
