@@ -133,7 +133,7 @@ stdout LF,'<br><a href="/jw/rating/xl/',glFilename,'">XL Macro</a>'
 	
 stdout LF,'</div>' NB. container
 stdout '</body></html>'
-exitexit 2
+exit 2
 )
 
 NB. =========================================================
