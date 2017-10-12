@@ -617,8 +617,13 @@ stdout LF,'     mapTypeId: google.maps.MapTypeId.SATELLITE,'
 stdout LF,'     mapTypeControl: false'
 stdout LF,'     };'
 stdout LF,'  map = new google.maps.Map(document.getElementById(''map-canvas''),mapOptions);'
-
-
+NB. Add listener for elevation within the initialise function
+stdout LF,'  var elevator = new google.maps.ElevationService;'
+stdout LF,'  var infowindow = new google.maps.InfoWindow ( {map: map} );'
+stdout LF,'      map.addListener(''click'', function(event) {'
+stdout LF,'      displayLocationElevation(event.latLng, elevator, infowindow);'
+stdout LF,'      });'
+NB. Loop round the points for this hold
 for_hh. hole do.
     NB. Add the various points here, starting with tees
     NB. Only do the tees if a single hole
@@ -724,7 +729,19 @@ for_hh. hole do.
 	stdout LF,'flightPathCarry',(":rr_index),'.setMap(map);'
     end.
 end.
-    stdout LF,'}'
+stdout LF,'}'
+NB. Add display for elevator outside the initalize loop
+stdout LF,'// Listener to show elevation'
+stdout LF,'function displayLocationElevation(location, elevator, infowindow) {'
+stdout LF,'    elevator.getElevationForLocations({'
+stdout LF,'	''locations'': [location]'
+stdout LF,'	}, function(results, status ) {'
+stdout LF,'	    infowindow.setPosition(location);'
+stdout LF,'	    infowindow.setContent(''The elevation is '' + Math.round(3.28084 * results[0].elevation) + ''ft'');'
+stdout LF,'	    })'
+stdout LF,'	};'
+
+NB.    stdout LF,'}'
 NB. End of hh loop
     stdout LF,'google.maps.event.addDomListener(window, ''load'', initialize);'
     stdout LF,'</script>'
