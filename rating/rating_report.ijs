@@ -1538,6 +1538,8 @@ res=. res
 )
 
 NB. ==============================================================
+merge_pdfs=: 3 : 0
+NB. ==============================================================
 NB. merge pdfs
 NB. ==============================================================
 NB. Usage:
@@ -1545,7 +1547,6 @@ NB.   merge_pdfs
 NB. y is string of tees ('' does all)
 NB. x is whether to restrict to just measured tees (e.g. x=1 will do all yellows, x=0 will just do those flagged)
 NB. Returns a LF delimited string of distances
-merge_pdfs=: 3 : 0
 (,<'') merge_pdfs y
 :
 if. y -: '' do.
@@ -1581,11 +1582,16 @@ for_gender. ,0  do.
 		res=. res,' ',fname
 	end.
 end.
-res=. res, ' cat output ',glDocument_Root,'/tcpdf/',glBasename,'/',glFilename,'_all.pdf'
+if. 1=#y do.
+    outputname=. '_men_',;(glTees i. y){glTeesName
+else.
+    outputname=. '_all'
+end.
+res=. res, ' cat output ',glDocument_Root,'/tcpdf/',glBasename,'/',glFilename,outputname,'.pdf'
 res1=. res1,LF,'echo "Catenating files"'
 res1=. res1,LF,res
 
-(}.res1) fwrite glDocument_Root,'/tcpdf/',glBasename,'/',glFilename,'_all.sh'
+(}.res1) fwrite glDocument_Root,'/tcpdf/',glBasename,'/',glFilename,outputname,'.sh'
 )
 
 NB. ==============================================================

@@ -40,8 +40,11 @@ if. -. keyy e. keydir (glFilepath,'_green') do.
 end.
 
 NB. Read the single green record, and relevant tee record
+NB. Sort by distance from back tee, and re-read
 keyy utKeyRead glFilepath,'_green'
-((glTeHole=''$glGrHole)#glTeID) utKeyRead glFilepath,'_tee'
+ww=. I. (glTeHole=''$glGrHole)
+ww=. ww /: glTees i. ww{glTeTee
+(ww{glTeID) utKeyRead glFilepath,'_tee'
 
 stdout LF,'<h2>Course : ', glCourseName,EM,EM,'Green Measurements</h2>'
 
@@ -76,7 +79,7 @@ stdout LT1,'<h4>Tree Difficulty</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
 stdout LT4,'<th>From Tee</th><th>Men / Women</th><th>Scratch</th><th>Bogey</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 ind=. 0
-for_t. glTeTee do.
+for_t. glTeTee do. NB. Already sorted into correct order
     for_g. i. 2 do.
 	stdout LT3,'<tr>'
 	stdout LT4,'<td>',(>(glTees i. t){glTeesName),'</td><td>',>g{' ' cut 'Men Women'
@@ -88,7 +91,7 @@ for_t. glTeTee do.
 			djwSelect ('tree',t,(":g),(":ab)) ; ind ; (msk#glTreeDesc) ; (msk#glTreeVal) ; <(<t_index,g,ab){glTeTree 
 			stdout LT4,'</td>'
 		else.
-			stdout LT4,'<td><input type="hidden" name="',('tree',t,(":g),(":ab)),'" value="',(>(<t_index,g,ab){glTeTree),'"></td>'
+		    stdout LT4,'<td><input type="hidden" name="',('tree',t,(":g),(":ab)),'" value="',(>(<t_index,g,ab){glTeTree),'"></td>'
 		end.
 	end.
 	stdout LT3,'</tr>'
