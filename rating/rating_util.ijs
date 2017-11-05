@@ -904,31 +904,42 @@ glPlanDoglegNeg=: ,(#glPlanID)$0
 glPlanBunkCarry=: ,(#glPlanID)$<''
 )
 
+InitiateCourse=: 3 : 0
 NB. =====================================================================
 NB. InitiateCourse
 NB. =====================================================================
 NB. Usage:
-NB.    InitiateCourse ''
+NB.    InitiateCourse pi ; 4 4 , 5 5 , ..  (pars)
 NB.
 NB. 1. Copy seven files from the latest one
 NB. 2. Alter glCourseName, glCourseLead, glCourseDate and write to glFilepath
 NB. 3. Alter glTeesYards and write to glFilepath
-NB. 4. Write pars:  glTePar=: 54 2$,|:6 18$4 4 5 3 4 ... and write to '.._tee'
+NB. 4. Alter glTees and glTeesName and write to glFilepath
 NB. 5. Create kml file in GoogleEarth
 NB. 6. Use gpsbabel to convert to unicsv, saving as ".txt" file
 NB. 7. Run ReadGPS and save to glFilepath
 NB. 8. Run this function InitiateCourse pi (for safety)
-InitiateCourse=: 3 : 0
-if. y ~: 3.14159 do. return. end.
+NB. 4. Execute:  glTePar=: ((18*$glTees),2)$,1 0 2 |:(($glTees),18 2)$,18 2 $ 4 4, 5 5 , 3 3 5 3 4 ... and write to '.._tee'
+'pi par'=. y
+if. pi ~: 3.14159 do. return. end.
 utFileGet glFilepath
 NB. Clear out the plan records
 utKeyRead glFilepath,'_plan'
 ((glPlanHole>:0)#glPlanID) utKeyDrop glFilepath,'_plan' NB. Ignore '_default'
 NB. Clear tee altitudes
 utKeyRead glFilepath,'_tee'
-glTeAlt=: 0 * glTeAlt
+glTeID utKeyDrop glFilepath,'_tee'
+glTeUpdateName=: (18*$glTees)$<''
+glTeUpdateTime=: glTeUpdateName
+glTeAlt=: ($glTeUpdateName)$0
+glTePar=: ((18*$glTees),2)$,1 0 2 |:(($glTees),18 2)$,18 2 $ par
 ww=.(3 4 5 i. glTePar){('' ; '.' ; '.')
-glTeTree=. (($ww),2)$,ww,"1 ww NB. Have to add extra dimension for the ability
+glTeTree=: (($ww),2)$,ww,"1 ww NB. Have to add extra dimension for the ability
+glTeTee=: ($glTeUpdateName)$ ; {. each glTeesName
+glTePlayer=: (($glTeUpdateName),2)$1 0
+glTeMeasured=: glTePlayer
+glTeHole=: , |: (($glTees),18)$i. 18
+glTeID=: (,|: (($glTees),18)$'r<0>2.0' 8!:0 i. 18),each ($glTeUpdateName)${. each glTeesName
 utKeyPut glFilepath,'_tee'
 NB. Clear green 
 utKeyRead glFilepath,'_green'
@@ -938,11 +949,11 @@ glGrWidth=: ($glGrWidth)$0
 glGrDiam=: ($glGrID)$0
 glGrCircleConcept=: ($glGrID)$0
 glGrVisibility=: ($glGrID)$<''
-glGrObstructed=: ($glGrID)$0 NB. Not used
+glGrObstrcted=: ($glGrID)$0 NB. Not used
 glGrTiered=: ($glGrID)$0
 glGrFirmness=: ($glGrID)$<''
 glGrWaterPercent=: ($glGrID)$<''
-glGrWaterDist=: ($glGrID)$0
+glGrWateDist=: ($glGrID)$0
 glGrContour=: ($glGrID)$<''
 glGrTee=: ($glGrID)$'W'
 glGrOOBDist=: ($glGrID)$0
