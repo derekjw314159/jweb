@@ -1104,7 +1104,7 @@ msk=.  4 {. msk $ 1
 fname fappend~ 'black' oN 'white'
 fname fappend~ LF,'$pdf->',pdfMulti 10.5 21 ; 0.5 2 ; ('<b>N</b>') ; 1
 NB. Calculate Negative adjustment
-greensideexists=. fwtot NB. Is there a positive score
+greensideexists=. 0<fwtot NB. Is there a positive score
 fw=. ((+. / >0{lz) {_1 0 ), ((+. / (>1{lz),(>1{lopfull)){_1 0) 
 fw=. _1 >. fw - 0=># each lz NB. Par 3
 fw=. fw * 0 ~: fwtot NB. Don't apply -1 adjustment if no bunkers at all
