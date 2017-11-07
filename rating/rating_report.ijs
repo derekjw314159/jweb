@@ -1104,6 +1104,7 @@ msk=.  4 {. msk $ 1
 fname fappend~ 'black' oN 'white'
 fname fappend~ LF,'$pdf->',pdfMulti 10.5 21 ; 0.5 2 ; ('<b>N</b>') ; 1
 NB. Calculate Negative adjustment
+greensideexists=. fwtot NB. Is there a positive score
 fw=. ((+. / >0{lz) {_1 0 ), ((+. / (>1{lz),(>1{lopfull)){_1 0) 
 fw=. _1 >. fw - 0=># each lz NB. Par 3
 fw=. fw * 0 ~: fwtot NB. Don't apply -1 adjustment if no bunkers at all
@@ -1130,6 +1131,7 @@ fname fappend~ write_calc  11 25 ; 3 _4 ;  (+. / ;(0{lz),0{lopfull) # 'y'
 2 write_xl hole ; tee ; gender ; (hole+1) ; 23 ; 17 ; 0 ; 'Bunker in scratch LOP input' ; (+. / ;(0{lz),0{lopfull) { '' ; 'Y'
 NB. Total
 fwtot=. fwtot >. ; +./ each lz,each lopfull NB. Must be a minimum of one if it exists
+fwtot=. fwtot >. greensideexists
 fname fappend~ 'R' write_footer 8 26 ; 3 ; <<'Bunker Rating'
 fname fappend~ 'C' write_footer 11 26 ;  3 4 ; fwtot
 psych=. psych, fwtot
