@@ -362,7 +362,7 @@ stdout LT3,'<td class="total" style="text-align: left;">Slope</td>'
 total3=. 0 round 2 * 5.381 * (- -/total3)
 stdout LT3,'<td class="grandtotal">',(0j0 ": 0{total3 ),'</td>'
 stdout LT3,'<td class="grandtotal">',(0j0 ": 1{total3 ),'</td>'
-stdout LT3,'<td class="grandtotal" style="background-color: yellow;">',(0j0 ": 0.5 * +/total3 ),'</td>'
+stdout LT3,'<td class="grandtotal" style="background-color: yellow;">',(0j0 ": 0 round 0.5 * +/total3 ),'</td>'
 stdout LT2,'</tr>',LT1,'</tbody>',LF,'</table>'
 
 
