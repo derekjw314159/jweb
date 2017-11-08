@@ -866,6 +866,7 @@ NB. Water carry
 watcarry=. lookup_carry_water gender ; <carryyards
 fname fappend~ 'R' write_calc 21 5 ; sz ; <('bp' 8!:0 ;watcarry)
 fwtot=. watlat >. each watcarry
+waterexists=.  +. / ; fwtot NB. Either scratch or bogey
 for_i. i. 7 do. 
 	if. _1 ~: i{sz do. fname fappend~ pdfDiag ((21.33+i), 5) ; 0.33 1  end.
 end.
@@ -931,6 +932,7 @@ NB. Water anywhere
 fname fappend~ 'L' write_cell 18 16 ; 3 ; '<i>On Line of Play</i>' 
 waterline=. 'glPlanWaterLine' matrix_pull hole ; tee ; gender
 waterline=. ; +. / each waterline
+waterline=. waterline >. waterexists NB. Override if not entered as LOP
 fname fappend~ 'C' write_input 21 16 ;  3 4  ; <<"0 (;waterline){' y'
 NB. Overall rating
 fname fappend~ 'R' write_footer 18 17 ; 3 ; 'Water Rating'
