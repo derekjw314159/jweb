@@ -866,7 +866,7 @@ NB. Water carry
 watcarry=. lookup_carry_water gender ; <carryyards
 fname fappend~ 'R' write_calc 21 5 ; sz ; <('bp' 8!:0 ;watcarry)
 fwtot=. watlat >. each watcarry
-waterexists=.  +. / ; fwtot NB. Either scratch or bogey
+waterexists=.  +. / 0< ; fwtot NB. Either scratch or bogey
 for_i. i. 7 do. 
 	if. _1 ~: i{sz do. fname fappend~ pdfDiag ((21.33+i), 5) ; 0.33 1  end.
 end.
