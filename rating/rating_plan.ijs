@@ -581,6 +581,7 @@ stdout LF,'  margin-bottom: 5px;'
 stdout LF,'  }'
 stdout LF,'</style>'
 stdout LF,'<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAenjNEmfxxMDt3XnAXyY6jXwVgYmC5wjc&v=3.exp"></script>'
+stdout LF,'<script src="/javascript/myLatLon.js"></script>'
 stdout LF,'<script>',LF,'var map;'
 NB. Work out map centre from tees and greens
 path=. glGPSName i. ('r<0>2.0' 8!:0 (1+hole)),each <'TW'
@@ -591,6 +592,8 @@ path=. ( +/path ) % #path
 path=.;  +. FullOStoLatLon path
 ww=. 9!:11 (9)  NB. Print precision
 stdout LF,'var myCenter=new google.maps.LatLng(',(>'' 8!:0  (0{path)),',',(>'' 8!:0 (1{path)),');'
+stdout LF,'oldclick=[91,181];  // Global variable with impossible Lat, Lon'
+stdout LF,'newclick=[91,181];'
 NB. stdout LF,'var myCenter=new google.maps.LatLng(51.5,-0.57);'
 
 stdout LF,'function dyncircle(inner, outer) {'
@@ -603,7 +606,7 @@ stdout LF,'      strokeColor: outer,'
 stdout LF,'      strokeWeight: 2.5'
 stdout LF,'      };'
 stdout LF,'   return circ;'
-stdout LF,'}'
+stdout LF,'   }'
 
 stdout LF,'function initialize() {'
 stdout LF,'   var mapOptions = {'
@@ -619,8 +622,12 @@ stdout LF,'     };'
 stdout LF,'  map = new google.maps.Map(document.getElementById(''map-canvas''),mapOptions);'
 NB. Add listener for elevation within the initialise function
 stdout LF,'  var elevator = new google.maps.ElevationService;'
+stdout LF,'  // Click and infowindow setup'
 stdout LF,'  var infowindow = new google.maps.InfoWindow ( {map: map} );'
-stdout LF,'      map.addListener(''click'', function(event) {'
+stdout LF,'  map.addListener(''click'', function(event) {'
+stdout LF,'      oldclick = newclick.slice();'
+stdout LF,'      newclick[0] = event.latLng.lat();'
+stdout LF,'      newclick[1] = event.latLng.lng();'
 stdout LF,'      displayLocationElevation(event.latLng, elevator, infowindow);'
 stdout LF,'      });'
 NB. Loop round the points for this hold
@@ -679,23 +686,23 @@ for_hh. hole do.
 
     NB. Flightpath
     path=. PathTeeToGreen hh ; 0{glTees
-    stdout LF,'var flightPathCoord',(":hh),' = ['
+    stdout LF,'   var flightPathCoord',(":hh),' = ['
     for_p. path do.
 	    pp=. +. p
-	    stdout LF,'   new google.maps.LatLng(', (>'' 8!:0  (0{pp)),', ',(>'' 8!:0 (1{pp)),')'
+	    stdout LF,'      new google.maps.LatLng(', (>'' 8!:0  (0{pp)),', ',(>'' 8!:0 (1{pp)),')'
 	    if. p_index < _1 + #path do.
 		    stdout ','
 	    end.
     end.
-    stdout LF,'   ];'
-    stdout LF,'var flightPath',(":hh),' = new google.maps.Polyline({'
+    stdout LF,'      ];'
+    stdout LF,'   var flightPath',(":hh),' = new google.maps.Polyline({'
     stdout LF,'       path: flightPathCoord',(":hh),','
     stdout LF,'       geodesic: true,'
     stdout LF,'       strokeColor: ''#FFFFFF'','
     stdout LF,'       strokeOpacity: 1,'
     stdout LF,'       strokeWeight: 1,'
     stdout LF,'       });'
-    stdout LF,'flightPath',(":hh),'.setMap(map);'
+    stdout LF,'   flightPath',(":hh),'.setMap(map);'
 
     NB. Carry Point .. draw perpendicular line
     ww=. glPlanHole = hh
@@ -710,26 +717,26 @@ for_hh. hole do.
 	width=. 0.5 * ('Q'=rr{glPlanRecType){ 40, rr{glPlanSqueezeWidth
 	latlon=. latlon + _1 1 * ( width % glMY) * 0j1 * 2{ww NB. Multiply by 0j1 rotates vector by 90 degrees.  25 yards either side
 	latlon=. FullOStoLatLon latlon
-	stdout LF,'var flightPathCoordCarry',(":rr_index),' = ['
+	stdout LF,'   var flightPathCoordCarry',(":rr_index),' = ['
 	pp=. +. 0{latlon
-	stdout LF,'   new google.maps.LatLng(', (>'' 8!:0  (0{pp)),', ',(>'' 8!:0 (1{pp)),'),'
+	stdout LF,'      new google.maps.LatLng(', (>'' 8!:0  (0{pp)),', ',(>'' 8!:0 (1{pp)),'),'
 	pp=. +. 1{latlon
-	stdout LF,'   new google.maps.LatLng(', (>'' 8!:0  (0{pp)),', ',(>'' 8!:0 (1{pp)),'),'
-	stdout LF,'   ];'
-	stdout LF,'var flightPathCarry',(":rr_index),' = new google.maps.Polyline({'
-	stdout LF,'       path: flightPathCoordCarry',(":rr_index),','
-	stdout LF,'       geodesic: true,'
+	stdout LF,'      new google.maps.LatLng(', (>'' 8!:0  (0{pp)),', ',(>'' 8!:0 (1{pp)),'),'
+	stdout LF,'      ];'
+	stdout LF,'   var flightPathCarry',(":rr_index),' = new google.maps.Polyline({'
+	stdout LF,'          path: flightPathCoordCarry',(":rr_index),','
+	stdout LF,'          geodesic: true,'
 	rgb=. 'FWBR' i. rr{glPlanCarryType
 	rgb=. >rgb { ' ' cut '#007F00 #3333FF gold white pink'
-	stdout LF,'       strokeColor: ''',(rgb),''',' NB. Colour based on carry
-	stdout LF,'       strokeOpacity: 1,'
+	stdout LF,'          strokeColor: ''',(rgb),''',' NB. Colour based on carry
+	stdout LF,'          strokeOpacity: 1,'
 	weight=. ('Q'=rr{glPlanRecType) { 1.5 2.5
-	stdout LF,'       strokeWeight: ',(":weight),','
-	stdout LF,'       });'
-	stdout LF,'flightPathCarry',(":rr_index),'.setMap(map);'
+	stdout LF,'          strokeWeight: ',(":weight),','
+	stdout LF,'          });'
+	stdout LF,'   flightPathCarry',(":rr_index),'.setMap(map);'
     end.
 end.
-stdout LF,'}'
+stdout LF,'   }'
 NB. Add display for elevator outside the initalize loop
 stdout LF,'// Listener to show elevation'
 stdout LF,'function displayLocationElevation(location, elevator, infowindow) {'
@@ -737,7 +744,14 @@ stdout LF,'    elevator.getElevationForLocations({'
 stdout LF,'	''locations'': [location]'
 stdout LF,'	}, function(results, status ) {'
 stdout LF,'	    infowindow.setPosition(location);'
-stdout LF,'	    infowindow.setContent(''The elevation is '' + Math.round(3.28084 * results[0].elevation) + ''ft'');'
+stdout LF,'	    var content = ''Elevation is '' + Math.round(3.28084 * results[0].elevation) + ''ft'';'
+stdout LF,'         content = content + ''<br>Lat-Lon is ('' + newclick[0].toFixed(4);'
+stdout LF,'         content = content +  '', '' + newclick[1].toFixed(4) + '')'';'
+stdout LF,'         if (oldclick[0] <= 90) { // Only call this if second click or later'
+stdout LF,'            var dist = getDistance(newclick, oldclick);'
+stdout LF,'            content = content + ''<br>Distance from last click is ('' + dist.toFixed(0) + ''yds)'';'
+stdout LF,'            }'
+stdout LF,'         infowindow.setContent(content);'
 stdout LF,'	    })'
 stdout LF,'	};'
 
