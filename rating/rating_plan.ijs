@@ -130,6 +130,7 @@ for_h. i. 18 do.
 		stdout '    <a href="/jw/rating/plan',((-. showmap)#'nomap'),'/v/',glFilename,'/',(": 1+h),'">',(":1+h),'</a>'
 end.
 stdout LF,'<br><a href="/jw/rating/xl/',glFilename,'">XL Macro</a>'
+stdout LF,'<br><a href="/pw/rating/report/summary/',glFilename,'/0/',(0{glTees),'">Report Summary</a>'
 	
 stdout LF,'</div>' NB. container
 stdout '</body></html>'
@@ -617,7 +618,7 @@ else.
 end.
 stdout LF,'     center: myCenter,'
 stdout LF,'     mapTypeId: google.maps.MapTypeId.SATELLITE,'
-stdout LF,'     mapTypeControl: false'
+NB. stdout LF,'     mapTypeControl: false'
 stdout LF,'     };'
 stdout LF,'  map = new google.maps.Map(document.getElementById(''map-canvas''),mapOptions);'
 NB. Add listener for elevation within the initialise function
@@ -744,12 +745,12 @@ stdout LF,'    elevator.getElevationForLocations({'
 stdout LF,'	''locations'': [location]'
 stdout LF,'	}, function(results, status ) {'
 stdout LF,'	    infowindow.setPosition(location);'
-stdout LF,'	    var content = ''Elevation is '' + Math.round(3.28084 * results[0].elevation) + ''ft'';'
-stdout LF,'         content = content + ''<br>Lat-Lon is ('' + newclick[0].toFixed(4);'
+stdout LF,'	    var content = ''Elevation = '' + Math.round(3.28084 * results[0].elevation) + ''ft'';'
+stdout LF,'         content = content + ''<br>Lat-Lon = ('' + newclick[0].toFixed(4);'
 stdout LF,'         content = content +  '', '' + newclick[1].toFixed(4) + '')'';'
 stdout LF,'         if (oldclick[0] <= 90) { // Only call this if second click or later'
 stdout LF,'            var dist = getDistance(newclick, oldclick);'
-stdout LF,'            content = content + ''<br>Distance from last click is ('' + dist.toFixed(0) + ''yds)'';'
+stdout LF,'            content = content + ''<br>Distance from last click = '' + dist.toFixed(0) + ''yds'';'
 stdout LF,'            }'
 stdout LF,'         infowindow.setContent(content);'
 stdout LF,'	    })'

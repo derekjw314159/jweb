@@ -314,6 +314,15 @@ for_rr. size do.
 end.
 )
 
+NB. =========================================================
+NB. rating_reportsingle
+NB. =========================================================
+NB. Run report PHP in batch mode
+jweb_rating_reportsingle=: 3 : 0
+1 jweb_rating_report y
+)
+
+
 
 NB. =========================================================
 NB. rating_report

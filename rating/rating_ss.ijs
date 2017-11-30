@@ -10,7 +10,7 @@ NB. Retrieve the details
 
 NB. y has two elements only
 
-'filename tee gender'=. y
+'filename gender tee'=. y
 gender=. ''$0 ". gender
 tee=. ''$tee
 glFilename=: dltb filename
