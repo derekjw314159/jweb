@@ -217,16 +217,19 @@ function rating_report_collate($params, $url, $post) {
 			$gender = 'W';
 			break;
 		}
-	if (file_exists('/usr/local/bin/PDFconcat')){
-		$collate= '/usr/local/bin/PDFconcat -o ';
-		}
-	else{
-		$collate= 'pdftk cat output ';
-		}
 	$webname = '/tcpdf/rating/' . $course . '_all_' . $gender . $tee . '.pdf';
 	$filename = $GLOBALS['document_root'] . $webname ;
-	$collate .= $filename;
 	
+	if (file_exists('/usr/local/bin/PDFconcat')){
+		$collate= '/usr/local/bin/PDFconcat -o ';
+		$collate .= $filename;
+		$post= '' ;
+		}
+	else{
+		$collate= 'pdftk ';
+		$post= ' cat output ' ;
+		$post .= $filename ;
+		}
 
 	for($h=0; $h<18 ; $h++){
 		// Then executing PHP to create PDF
@@ -237,6 +240,7 @@ function rating_report_collate($params, $url, $post) {
 			}
 		}
 	// Run the collation
+	$collate .= $post ; // Add the post string
 	exec($collate, $res);
 	header( 'Location: /pw/rating/report/summary/' . $course . '/' . $g . '/' . $tee) ;
 	
