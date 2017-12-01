@@ -81,7 +81,7 @@ for_i. ww do.
 end.
 
 stdout LF,'<div class="span-20 last">'
-stdout LF,'<a href="/jw/rating/plannomap/v/',(glFilename),'">Return to plan</a>'
+stdout LF,''' <a href="/jw/rating/plannomap/v/',(glFilename),'">Return to plan</a>'
 stdout LF,'</div>' 
 stdout LF,'</div>' NB. end main container
 stdout '</body></html>'
