@@ -35,7 +35,7 @@ if. 0<#err do.
     djwErrorPage err ; ('No such course name : ',glFilename) ; '/jw/rating/plan/v' ; 'Back to rating plan'
 end.
 
-stdout LF,'<h2>Macros for ', glCourseName,'</h2>'
+stdout LF,'<h2>''Macros for ', glCourseName,'</h2>'
 tab=. ;4$<'&nbsp;'
 NB. file exists if we have got this far
 NB. Work out the unique values and loop round by hole, tee and gender
