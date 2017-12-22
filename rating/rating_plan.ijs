@@ -87,7 +87,7 @@ end.
 NB. Print tees and yardages
 stdout LF,'<h2>Course : ', glCourseName,'</h2><h3>All holes</h3>'
 stdout LF,'<a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/rating/plan',(showmap#'nomap'),'/v/',glFilename,'">',(>showmap{'/' cut 'Show Map/Suppress map'),'</a>'
-stdout LF,TAB,'<div class="span-14 last">'
+stdout LF,TAB,'<div class="span-15">'
 
 stdout LT1,'<table><thead>'
 stdout LT2,'<tr><th></th>'

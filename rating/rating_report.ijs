@@ -462,8 +462,9 @@ fname fappend~ LF,'$pdf->',pdfMulti 11 0 ; 3 1 ; ('<b>LENGTH</b>: ',":(<t_index,
 1 write_xl hole ; tee ; gender ; 'Information' ; 25 ; (3+hole) ; 0 ; 'Shot distance input' ; (<t_index,hole){glTeesYards NB. Hole length
 write_xl hole ; tee ; gender ; (hole+1) ; 51 ; 6 ; 0 ; 'Hole length' ; (<t_index,hole){glTeesYards NB. Hole length
 glSSYards=: , (<t_index,hole){glTeesYards
-fname fappend~ LF,'$pdf->',pdfMulti 14 0 ; 2 1 ; ('<b>PAR</b>: ',":gender{,glTePar); 1
-write_xl hole ; tee ; gender ; (hole+1) ; 51 ; 8 ; 0 ; 'Hole par' ; gender{,glTePar NB. Hole par
+fname fappend~ LF,'$pdf->',pdfMulti 14 0 ; 2 1 ; ('<b>PAR</b>: ',": gender{,glTePar); 1
+write_xl hole ; tee ; gender ; (hole+1) ; 51 ; 8 ; 0 ; 'Hole par' ; gender{,glTePar NB. Hole par 
+1 write_xl hole ; tee ; gender ; 'Information' ; 28 ; (3+hole) ; 0 ; 'Information - Par' ; gender{,glTePar NB. Hole par
 glSSPar=: ,gender{,glTePar
 glSSObsFactor=: (''$glSSPar>3){2 10$0.08 0 0.09 0.13 0.06 0.08 0.13 0.07 0.11 0.05, 0.1 0.11 0.09 0.14 0.07 0.1 0.14 0.09 0.11 0.05 NB. Scratch
 glSSObsFactor=: 1 10 2$, glSSObsFactor,. (''$glSSPar>3){2 10$0.08 0 0.07 0.13 0.10 0.07 0.11 0.11 0.09 0.04,0.12 0.09 0.06 0.15 0.10 0.09 0.14 0.14 0.08 0.03 NB. Bogey
@@ -606,8 +607,14 @@ lay=.  }: each 'glPlanFWWidthAdj' matrix_pull hole ; tee ; gender
 lay=. ((<glFWWidthAdjVal) i. each lay) { each <glFWWidthAdjNum
 fname fappend~ 'C' write_input 3 27 ; sz ; (0>. ; lay)
 fwtot=. fwtot +each lay NB. Only need to add once
+msk=. _1 1 i. sz
+write_xl hole ; tee ; gender ; (hole+1) ; 83 ; 5 6 7 8 9 ; 0 ; 'Fairway W+' ; <msk #inv 0 >. ;lay NB. Expand with zeros
+2 write_xl hole ; tee ; gender ; (hole+1) ; 28 ; 5 6 7 8 9 ; 0 ; 'Fairway W+' ; <msk #inv <"0  (0 >. ;lay) NB. Expand with null boxes
+NB. Fairwidth negative adjustment
 fname fappend~ write_row_head 0 28 ; 2.1 0.9; '<i>Width</i>'; '<b>-W</b>'
 fname fappend~ 'C' write_input 3 28 ; sz ; (0<.;lay)
+write_xl hole ; tee ; gender ; (hole+1) ; 84 ; 5 6 7 8 9 ; 0 ; 'Fairway W-' ; <msk #inv (0 <. ;lay) NB. Expand with zeros
+2 write_xl hole ; tee ; gender ; (hole+1) ; 29 ; 5 6 7 8 9 ; 0 ; 'Fairway W-' ; <msk #inv <"0  (0 <. ;lay) NB. Expand with null boxes
 NB. Fairway Obstructed
 fname fappend~ write_row_head 0 29 ; 2.5 0.5; '<i>Obtructed</i>'; '<b>O</b>'
 lay=. _2}. each 0, each 'glPlanFWObstructed' matrix_pull hole ; tee ; gender NB. Push to the shot after
@@ -824,8 +831,10 @@ fname fappend~ ('L';0) write_cell 5.5 46 ; 1 ; (<t_index,hole){glTeesYards
 NB. ------------------------
 NB. Notes
 NB. -------------------------
-fname fappend~ ('L';0) write_cell 8 46 ; 2 ; 'Notes:'
-fname fappend~ ('L';0) write_input 9.5 46 ; 18.5 ;  (;glGrNotes)
+fname fappend~ ('L';0) write_cell 8 46 ; 2 ;  'Notes:'
+fname fappend~ ('L';0) write_input 9.5 46 ; 18.5 ;('''' ; '&#39;' ; '"' ; '&#34;' ; '<' ; '&lt;' ; '>' ; '&gt;') stringreplace  (;glGrNotes)
+2 write_xl hole ; tee ; gender ; (hole+1) ; 44 ; 7 ; 0 ; 'Notes' ; ( '"' ; '""' ) stringreplace  (;glGrNotes)
+
 
 NB. ------------------------
 NB. Water
@@ -2173,6 +2182,9 @@ NB. =========================================================
 NB. Usage:
 NB.    write_xl hole ; tee ; gender ; sheet ; row ; column ; null ; note ; value
 NB.    x is whether to overwrite
+NB.    x=0 is check only
+NB.    x=1 is check and input
+NB.    x=2 is input only
 0 write_xl y
 :
 'hole tee gender sheet row column null note value'=. y

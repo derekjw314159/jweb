@@ -214,7 +214,8 @@ stdout '</tbody></table></div>'
 NB. Submit buttons
 stdout LT1,'<div class="span-24 last">'
 stdout LT1,'Notes:',EM
-stdout LT4,'<input name="notes" value="',(;glGrNotes),'" tabindex="52" ',(InputField 100),'>',LT4,'</br>'
+NB. Have to cater for double quote
+stdout LT4,'<input name="notes" value="',(('"'; '&#34;' ) stringreplace ;glGrNotes),'" tabindex="52" ',(InputField 100),'>',LT4,'</br>'
 
 stdout LF,'<input type="submit" name="control_calc" value="Calc" tabindex="',(":53 ),'">'
 stdout LF,'     <input type="submit" name="control_done" value="Done" tabindex="',(,":54 ),'">'
