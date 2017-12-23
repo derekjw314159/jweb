@@ -511,6 +511,18 @@ ww=. ' ' cut '<b>S1</b> <b>B1</b>'
 fname fappend~ 'C' write_cell 3 5 ; 2.5 ; <ww
 NB. Roll Slope
 fname fappend~ write_cell 0 6 ; 3 ; '<i>Slope in Tee Shot LZ</i>'
+NB. Spreadsheet check first
+lay=. (glRollLevelVal i. >0{ each rolllevel) { glRollLevelDesc
+write_xl hole ; tee ; gender ; (hole+1) ; 57 ; 5 7 ; 0 ; 'Roll Up/Down' ; <lay
+2 write_xl hole ; tee ; gender ; (hole+1) ; 12 ; 5 7 ; 0 ; 'Roll Up/Down' ; <lay
+lay=. (glRollSlopeVal i. >0{ each rollslope) { glRollSlopeDesc
+ww1=. ( 0 < ; # each > 0{each rolllevel) 
+write_xl hole ; tee ; gender ; (hole+1) ; 57 ; 6 8 ; 0 ; 'Roll Severity' ; <ww1 #inv ww1 # lay
+2 write_xl hole ; tee ; gender ; (hole+1) ; 12 ; 6 8 ; 0 ; 'Roll Severity' ; <ww1 #inv ww1 # lay
+
+
+
+
 lay=. (glRollLevelVal i. >0{ each rolllevel) { glRollLevelNum
 lay=. lay, each (<' '),each (glRollSlopeVal i. >0{ each rollslope) { glRollSlopeNum
 NB. Clear the display if it level, ie. rolllevel is null 
@@ -665,18 +677,44 @@ fname fappend~ write_cell 3 12 ; 2 ; 'Forc / DLeg'
 sh=. 'glPlanDefaultHit' matrix_pull hole ; tee ; gender
 NB. Have to do the 0 >. maximum in case of a transition as well as a layup
 NB. Also have to drop the last item, replaced by logic to see if the Layup Type is 'L'
-sh=. 50 <. >+/ each ('L'=each 'glPlanLayupType' matrix_pull hole; tee ; gender) * each 0 >. each sh - each 'glPlanHitYards' matrix_pull hole ; tee ; gender
+NB. sh=. 50 <. >+/ each ('L'=each 'glPlanLayupType' matrix_pull hole; tee ; gender) * each 0 >. each sh - each 'glPlanHitYards' matrix_pull hole ; tee ; gender
+sh=. ('L'=each 'glPlanLayupType' matrix_pull hole; tee ; gender) * each 0 >. each sh - each 'glPlanHitYards' matrix_pull hole ; tee ; gender
 NB. Look for negative dogleg
-sh=. sh - 50 <. >+/ each | each 'glPlanDoglegNeg' matrix_pull hole ; tee ; gender
-ww=. ('Sc: ';'Bo: ') , each 'bp<+>' 8!:0 sh
-fname fappend~ 'C' write_input 5 12 ; 1.5 ;  <(<"0 (0 ~: sh))#each ww
-write_xl hole ; tee ; gender ; (hole+1) ; 64 ; 9 ; 0 ; 'Layup Scratch' ; 0{sh NB. Layup scratch
-write_xl hole ; tee ; gender ; (hole+1) ; 66 ; 9 ; 0 ; 'Layup Bogey' ; 1{sh NB. Layup bogey
-glSSDogleg=: 1 2$sh
+NB. sh=. sh - 50 <. >+/ each | each 'glPlanDoglegNeg' matrix_pull hole ; tee ; gender
+sh=. sh -  each | each 'glPlanDoglegNeg' matrix_pull hole ; tee ; gender
+NB. ww=. ('Sc: ';'Bo: ') , each 'bp<+>' 8!:0 sh
+ww=. ('Sc: ';'Bo: ') , each 'bp<+>' 8!:0 (_50 >. 50 <. >+/each sh) NB. Calc totals, and must be 50 max
+fname fappend~ 'C' write_input 5 12 ; 1.5 ;  <(<"0 (0 ~: (>+/each sh)))#each ww
+write_xl hole ; tee ; gender ; (hole+1) ; 64 ; 9 ; 0 ; 'Layup Scratch' ; +/> 0{sh NB. Layup scratch total
+write_xl hole ; tee ; gender ; (hole+1) ; 66 ; 9 ; 0 ; 'Layup Bogey' ; +/> 1{sh NB. Layup bogey total
+NB. Need to pad out zeros and write individual elements
+select. z=. j. / > #each sh
+    case. 0j0 do. sz=. _1 _1 _1, _1 _1 _1 _1
+    case. 0j1 do. sz=. _1 _1 _1,  1 _1 _1 _1
+    case. 1j1 do. sz=.  1 _1 _1,  1 _1 _1 _1
+    case. 1j2 do. sz=.  1 _1 _1,  1  1 _1 _1
+    case. 2j2 do. sz=.  1  1 _1,  1  1 _1 _1
+    case. 2j3 do. sz=.  1  1 _1,  1  1  1 _1
+    case. 3j3 do. sz=.  1  1  1,  1  1  1 _1
+    case. 3j4 do. sz=.  1  1  1,  1  1  1  1
+end.
+msk=. _1 1 i. sz
+write_xl hole ; tee ; gender ; (hole+1) ; 64 ; 5 6 7 ; 0 ; 'Layup Scratch' ; (3{. msk) #inv > 0{sh NB. Layup scratch individual
+2 write_xl hole ; tee ; gender ; (hole+1) ; 17 ; 5 6 7 ; 0 ; 'Layup Scratch' ; <(3{. msk) #inv <"0 > 0{sh NB. Layup scratch individual
+write_xl hole ; tee ; gender ; (hole+1) ; 66 ; 5 6 7 8 ; 0 ; 'Layup Bogey' ; (_4{. msk) #inv > 1{sh NB. Layup bogey individual
+2 write_xl hole ; tee ; gender ; (hole+1) ; 19 ; 5 6 7 8 ; 0 ; 'Layup Bogey' ; <(_4{. msk) #inv <"0 > 1{sh NB. Layup bogey individual
+glSSDogleg=: 1 2$ > +/each sh
 NB. Layup Type
 sh=. 'glPlanLayupCategory' matrix_pull hole ; tee ; gender
 sh=. (<glLayupCategoryVal) i. each sh
 sh=. sh {each <glLayupCategoryText,<''
+ww=. 'L'=each 'glPlanLayupType' matrix_pull hole ; tee ; gender NB. Has to be Layuptype = 'L'
+sh=. ww (#inv) each ww # each sh 
+write_xl hole ; tee ; gender ; (hole+1) ; 65 ; 5 6 7 ; 0 ; 'Layup Scratch' ; <(3{. msk) #inv > 0{sh NB. Layup reason scratch individual
+2 write_xl hole ; tee ; gender ; (hole+1) ; 16 ; 5 6 7 ; 0 ; 'Layup Scratch' ; <(3{. msk) #inv > 0{sh NB. Layup reason scratch individual
+write_xl hole ; tee ; gender ; (hole+1) ; 67 ; 5 6 7 8 ; 0 ; 'Layup Bogey' ; <(_4{. msk) #inv > 1{sh NB. Layup reason bogey individual
+2 write_xl hole ; tee ; gender ; (hole+1) ; 18 ; 5 6 7 8 ; 0 ; 'Layup Bogey' ; <(_4{. msk) #inv > 1{sh NB. Layup reason bogey individual
+
 sh=. ('L'=each 'glPlanLayupType' matrix_pull hole ; tee ; gender) #each sh
 sh=. <>{. each sh
 fname fappend~ 'R' write_cell 0 13 ; 3 ; 'Layup Type'
