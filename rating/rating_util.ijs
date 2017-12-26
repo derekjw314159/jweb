@@ -16,6 +16,7 @@ glTreeTweener=: 0 0 0 0 _1 0 _1 0 _1 0 _1 0 0 0
 glRollLevelVal=: 1 0 2{ (<''),':' cut 'Down:Up'
 glRollLevelDesc=: 1 0 2 { (<''),':' cut 'Downhill:Uphill'
 glRollLevelNum=: ':' cut 'Down:Level:Up'
+glRollLevelText=: ':' cut 'Downhill:Level:Uphill'
 glRollSlopeVal=:  (<''),':' cut 'Mod:Sig'
 glRollSlopeDesc=: ':' cut 'Minor:Moderate:Significant'
 glRollSlopeNum=: ':' cut 'Minor:Mod:Sig'

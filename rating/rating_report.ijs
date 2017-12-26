@@ -513,16 +513,12 @@ NB. Roll Slope
 fname fappend~ write_cell 0 6 ; 3 ; '<i>Slope in Tee Shot LZ</i>'
 NB. Spreadsheet check first
 lay=. (glRollLevelVal i. >0{ each rolllevel) { glRollLevelDesc
-write_xl hole ; tee ; gender ; (hole+1) ; 57 ; 5 7 ; 0 ; 'Roll Up/Down' ; <lay
+write_xl hole ; tee ; gender ; (hole+1) ; 57 ; 5 7 ; 0 ; 'Roll Up/Down' ; < (glRollLevelVal i. >0{ each rolllevel) { glRollLevelText
 2 write_xl hole ; tee ; gender ; (hole+1) ; 12 ; 5 7 ; 0 ; 'Roll Up/Down' ; <lay
 lay=. (glRollSlopeVal i. >0{ each rollslope) { glRollSlopeDesc
 ww1=. ( 0 < ; # each > 0{each rolllevel) 
 write_xl hole ; tee ; gender ; (hole+1) ; 57 ; 6 8 ; 0 ; 'Roll Severity' ; <ww1 #inv ww1 # lay
 2 write_xl hole ; tee ; gender ; (hole+1) ; 12 ; 6 8 ; 0 ; 'Roll Severity' ; <ww1 #inv ww1 # lay
-
-
-
-
 lay=. (glRollLevelVal i. >0{ each rolllevel) { glRollLevelNum
 lay=. lay, each (<' '),each (glRollSlopeVal i. >0{ each rollslope) { glRollSlopeNum
 NB. Clear the display if it level, ie. rolllevel is null 
@@ -1056,7 +1052,7 @@ fname fappend~ write_input 8  9 ; 1.25 ; <(*lay ){':' cut 'Frac:&gt;&frac12;'
 fname fappend~ write_input 9.25  9 ; 1.25 ; <lay {':' cut 'Ft:5&#39;-10&#39;:&gt;10&#39;'
 fname fappend~ write_cell 10.5  9 ; 0.5 ; <<'<b>R</b>'
 fname fappend~ write_calc 11  9 ; 3 4 ; 2$lay
-write_xl hole ; tee ; gender ; (hole+1) ; 61 ; 13 19 ; 0 ; 'R&R: Rise & Drop' ; 2$lay
+write_xl hole ; tee ; gender ; (hole+1) ; 61 ; 13 19 ; 0 ; 'R&R: Rise & Drop' ; <boxnonzero 2$lay
 fwtot=. fwtot + lay
 NB. Unpleasant
 fname fappend~ write_row_head 8 10 ; 2.5 0.5; '<i>Unpleasant</i>'; '<b>U</b>'
