@@ -819,6 +819,8 @@ write_xl hole ; tee ; gender ; (hole+1) ; 93 ; 5 7 ; 0 ; 'Transition adjustment'
 NB. Visibility
 fname fappend~ write_row_head 0 37 ; 2.5 0.5 ; ' ' cut '<i>Visibility</i> <b>V</b>'
 fname fappend~ write_input 3 37 ; 2.5 2.5 ; > _1 { each targvisible
+write_xl hole ; tee ; gender ; (hole+1) ; 94 ; 5 7 ; 0 ; 'Green target visibility' ;  > _1 { each targvisible
+2 write_xl hole ; tee ; gender ; (hole+1) ; 38 ; 5 7 ; 0 ; 'Green target visibility' ; <boxnonzero > _1 { each targvisible
 greenval=. greenval + > _1 { each targvisible
 NB. Target obstructed
 treeobs=. ('glPlanTreeLZObstructed') matrix_pull hole ; tee ; gender NB. Shot TO landing zone
@@ -940,6 +942,9 @@ percent=. (' ' cut 'glPlanWaterPercent glGrWaterPercent') matrix_pull hole ; tee
 percent=. (<glWaterPercentVal) i. each percent
 fw=. (;percent) { glWaterPercentDesc
 fname fappend~ 'C' write_input 21 8 ; sz ; <fw 
+msk=. sz >: 0
+write_xl hole ; tee ; gender ; (hole+1) ; 64 ; 30 32 34 36 38 40 42 ; 0 ; 'Water Percentage' ; msk #inv 100 * (;percent) { glWaterPercentNum
+2 write_xl hole ; tee ; gender ; (hole+1) ; 13 ; 30 32 34 36 38 40 42 ; 0 ; 'Water Percentage' ; <boxnonzero msk #inv 100 * (;percent) { glWaterPercentNum
 fw=. (percent) { each <glWaterPercentNum NB. Round the reduction, not the remaining.  Wrong IMHO.
 fw=. <. each (<0.5) + each fwtot * each fw 
 fwtot=. fwtot - each fw
@@ -990,6 +995,8 @@ waterline=. 'glPlanWaterLine' matrix_pull hole ; tee ; gender
 waterline=. ; +. / each waterline
 waterline=. waterline >. waterexists NB. Override if not entered as LOP
 fname fappend~ 'C' write_input 21 16 ;  3 4  ; <<"0 (;waterline){' y'
+2 write_xl hole ; tee ; gender ; (hole+1) ; 18; 34 ; 0 ; 'Water LoP Scratch' ; <(0{waterline) { (<'') ; 'Y'
+2 write_xl hole ; tee ; gender ; (hole+1) ; 19; 34 ; 0 ; 'Water LoP Bogey' ; <(1{waterline) { (<'') ; 'Y'
 NB. Overall rating
 fname fappend~ 'R' write_footer 18 17 ; 3 ; 'Water Rating'
 fwtot=. fwtot + (0=fwtot) * +. / ; waterline NB. Minimum of 1 if water exists
@@ -1028,6 +1035,8 @@ NB. Mounds
 fname fappend~ write_row_head 8 6 ; 2.5 0.5; '<i>Mounds</i>'; '<b>M</b>'
 lay=. ('glPlanRRMounds' ; 'glGrRRMounds') matrix_pull hole ; tee ; gender 
 fname fappend~ 'C' write_input 11 6 ; sz ; (;lay)
+write_xl hole ; tee ; gender ; (hole+1) ; 56 ; 13 15 17 19 21 23 25 ; 0 ; 'R&R Mounds' ; ; (3;4) {. each lay
+2 write_xl hole ; tee ; gender ; (hole+1) ; 7 ; 13 15 17 19 21 23 25 ; 0 ; 'R&R Mounds' ; ; (3;4) {. each }: each lay
 fwtot=. fwtot + > +/each lay
 NB. Carry
 fname fappend~ ('cell' ; 'input') write_row_head 8 7 ; 0.55 0.7 ; '<i>Y</i>' ; ":0{>0{carryyards
@@ -1047,6 +1056,7 @@ fname fappend~ write_input 8  9 ; 1.25 ; <(*lay ){':' cut 'Frac:&gt;&frac12;'
 fname fappend~ write_input 9.25  9 ; 1.25 ; <lay {':' cut 'Ft:5&#39;-10&#39;:&gt;10&#39;'
 fname fappend~ write_cell 10.5  9 ; 0.5 ; <<'<b>R</b>'
 fname fappend~ write_calc 11  9 ; 3 4 ; 2$lay
+write_xl hole ; tee ; gender ; (hole+1) ; 61 ; 13 19 ; 0 ; 'R&R: Rise & Drop' ; 2$lay
 fwtot=. fwtot + lay
 NB. Unpleasant
 fname fappend~ write_row_head 8 10 ; 2.5 0.5; '<i>Unpleasant</i>'; '<b>U</b>'
@@ -1096,6 +1106,7 @@ for_i. ww do.
 end. 
 NB. Table Value
 lay=. lookup_bunker_rating greenval ; (glBunkFractionVal i. glGrBunkFraction){glBunkFractionNum
+greenval=. lay
 fname fappend~ write_calc  11 16 ; 3 4 ; lay
 fwtot=. lay
 NB. Bunker squeeze
@@ -1119,6 +1130,8 @@ msk=. sq > 0
 NB. Carry
 bunkcarry=. ('glPlanBunkLZCarry') matrix_pull hole ; tee ; gender NB. Shot TO landing zone
 bunkcarry=. bunkcarry +.each }:each (<0),each ('glPlanBunkTargCarry') matrix_pull hole ; tee ; gender NB. OR shot FROM LZ, shifted
+NB. Bunker carry scratch must be table value 5 or greater
+bunkcarry=. bunkcarry * each  ((-$>0{bunkcarry){.1 1 1 1,(0{greenval)>:5);(($>1{bunkcarry)$1)
 fname fappend~ write_row_head 8 18 ; 2.5 0.5 ; '<i>Carry</i>' ; '<b>C</b>'
 fname fappend~ 'L' write_input 11 18 ; sz ; (;carryyards)
 fname fappend~ 'R' write_input 11 18 ; sz ; (;bunkcarry) 
