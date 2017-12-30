@@ -577,10 +577,15 @@ select. z=. j. / > #each wid
     case. 0j0 do.
 	sz=. _1 _1, _1 _1 _1
     case. 0j1 do. 
-	NB. Bogey can't reach Par 3 is recorded under R&R
-	NB. Clear out the reading
-	sz=. _1 _1,  _1 _1 _1
-	wid=. (0$0) ; ,999
+		NB. Bogey can't reach Par 3 is recorded under R&R
+		NB. Clear out the reading, but only if it is a Par 3
+		NB. It may be a Par 4 which Scratch can reach!!
+		if. 3=(<0,gender){glTePar do.
+			sz=. _1 _1,  _1 _1 _1
+			wid=. (0$0) ; ,999
+		else. 
+			sz=. _1 _1, 1 _1 _1
+		end.
     case. 1j1 do. sz=.  1 _1,  1 _1 _1
     case. 1j2 do. sz=.  1 _1,  1  1 _1
     case. 2j2 do. sz=.  1  1 , 1  1 _1
@@ -767,7 +772,7 @@ select. z=. j. / > #each wid
 end.
 sh=. wid
 wid=. (<glTopogStanceVal,<'Par3') i. each wid
-fname fappend~ 'C' write_input 3 17 ; sz ; < (;wid) { glTopogStanceText,<'Par 3'
+fname fappend~ 'C' write_input 3 17 ; sz ; < (;wid) { glTopogStanceText,<'N/A' NB. Could be Par 3 OR scratch reaches short Par 4
 write_xl hole ; tee ; gender ; (hole+1) ; 72 ; 5 ; 0 ; 'Stance' ; <xl #inv (;wid) { glTopogStanceXL,<'PAR3'
 2 write_xl hole ; tee ; gender ; (hole+1) ; 23 ; 5 ; 0 ; 'Stance' ; <xl #inv (;wid) { glTopogStanceVal,<'PAR3'
 fname fappend~ 'R' write_cell 0 18 ; 3 ; 'Table Value'
