@@ -512,7 +512,8 @@ fname fappend~ 'C' write_cell 3 5 ; 2.5 ; <ww
 NB. Roll Slope
 fname fappend~ write_cell 0 6 ; 3 ; '<i>Slope in Tee Shot LZ</i>'
 NB. Spreadsheet check first
-lay=. (glRollLevelVal i. >0{ each rolllevel) { glRollLevelDescwrite_xl hole ; tee ; gender ; (hole+1) ; 57 ; 5 7 ; 0 ; 'Roll Up/Down' ; < (glRollLevelVal i. >0{ each rolllevel) { glRollLevelText
+lay=. (glRollLevelVal i. >0{ each rolllevel) { glRollLevelDesc
+write_xl hole ; tee ; gender ; (hole+1) ; 57 ; 5 7 ; 0 ; 'Roll Up/Down' ; < (glRollLevelVal i. >0{ each rolllevel) { glRollLevelText
 NB. write_xl hole ; tee ; gender ; (hole+1) ; 57 ; 5 7 ; 0 ; 'Roll Up/Down' ; < lay
 2 write_xl hole ; tee ; gender ; (hole+1) ; 12 ; 5 7 ; 0 ; 'Roll Up/Down' ; <lay
 lay=. (glRollSlopeVal i. >0{ each rollslope) { glRollSlopeDesc
