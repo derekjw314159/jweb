@@ -512,9 +512,15 @@ fname fappend~ 'C' write_cell 3 5 ; 2.5 ; <ww
 NB. Roll Slope
 fname fappend~ write_cell 0 6 ; 3 ; '<i>Slope in Tee Shot LZ</i>'
 NB. Spreadsheet check first
+NB. The spreadsheet has weird logic.  "Text" has Level spelled out (for the check row 57)
+NB. whereas row 12 has "Desc" with blank for level
+NB. BUT par 3 check has blank
 lay=. (glRollLevelVal i. >0{ each rolllevel) { glRollLevelDesc
-write_xl hole ; tee ; gender ; (hole+1) ; 57 ; 5 7 ; 0 ; 'Roll Up/Down' ; < (glRollLevelVal i. >0{ each rolllevel) { glRollLevelText
-NB. write_xl hole ; tee ; gender ; (hole+1) ; 57 ; 5 7 ; 0 ; 'Roll Up/Down' ; < lay
+if. 3<(<0,gender){glTePar do.
+	write_xl hole ; tee ; gender ; (hole+1) ; 57 ; 5 7 ; 0 ; 'Roll Up/Down' ; < (glRollLevelVal i. >0{ each rolllevel) { glRollLevelText
+else.
+	write_xl hole ; tee ; gender ; (hole+1) ; 57 ; 5 7 ; 0 ; 'Roll Up/Down' ; < lay
+end.
 2 write_xl hole ; tee ; gender ; (hole+1) ; 12 ; 5 7 ; 0 ; 'Roll Up/Down' ; <lay
 lay=. (glRollSlopeVal i. >0{ each rollslope) { glRollSlopeDesc
 ww1=. ( 0 < ; # each > 0{each rolllevel) 
@@ -650,6 +656,8 @@ lay=. +. /"1 > lay
 fname fappend~ 'C' write_input 3 32 ;  2 3 ; (;lay)
 fwtot=. fwtot + lay
 NB. Fairway Overall rating
+NB. Minimum of 1 if par 4 or 5
+fwtot=. fwtot >. 3<(<0,gender){glTePar
 fname fappend~ 'R' write_footer 0 33 ; 3 ; 'Fairway Rating'
 fname fappend~ 'C' write_footer 3 33 ;  2 3 ; fwtot
 psych=. psych, fwtot
@@ -1077,8 +1085,8 @@ width=. }: each 'glPlanFWWidth' matrix_pull hole ; tee ; gender
 z=. j. / > #each width NB. later will check it is 0j1
 fname fappend~ write_row_head 8 12 ; 2.5 0.5; '<i>Bgy not reach P3</i>'; '<b>3</b>'
 width=.  _1 { ; {: each width
-fname fappend~ ('cell' ; 'input') write_row_head 11 12 ; 5 1 ; '<b>LZ cut to FW height</b>' ; (z=0j1) * width
-width=. (z=0j1) * (width < 20) { 1 2 NB. Zero if not par 3
+fname fappend~ ('cell' ; 'input') write_row_head 11 12 ; 5 1 ; '<b>LZ cut to FW height</b>' ; (z=0j1) * (3=(<0,gender){glTePar) * width
+width=. (z=0j1) * (3=(<0,gender){glTePar) * (width < 20) { 1 2 NB. Zero if not par 3
 fname fappend~ write_input 17 12 ; 1 ; width
 fwtot=. fwtot + 0,width
 NB. Surround
