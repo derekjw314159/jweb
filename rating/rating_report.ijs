@@ -692,11 +692,12 @@ sh=. ('L'=each 'glPlanLayupType' matrix_pull hole; tee ; gender) * each 0 >. eac
 NB. Look for negative dogleg
 NB. sh=. sh - 50 <. >+/ each | each 'glPlanDoglegNeg' matrix_pull hole ; tee ; gender
 sh=. sh -  each | each 'glPlanDoglegNeg' matrix_pull hole ; tee ; gender
+sh=. (<_50) >. each (<50) <. each sh NB. Make individuals between _50 and 50
 NB. ww=. ('Sc: ';'Bo: ') , each 'bp<+>' 8!:0 sh
 ww=. ('Sc: ';'Bo: ') , each 'bp<+>' 8!:0 (_50 >. 50 <. >+/each sh) NB. Calc totals, and must be 50 max
 fname fappend~ 'C' write_input 5 12 ; 1.5 ;  <(<"0 (0 ~: (>+/each sh)))#each ww
-write_xl hole ; tee ; gender ; (hole+1) ; 64 ; 9 ; 0 ; 'Layup Scratch' ; +/> 0{sh NB. Layup scratch total
-write_xl hole ; tee ; gender ; (hole+1) ; 66 ; 9 ; 0 ; 'Layup Bogey' ; +/> 1{sh NB. Layup bogey total
+write_xl hole ; tee ; gender ; (hole+1) ; 64 ; 9 ; 0 ; 'Layup Scratch' ; _50 >. 50 <. (+/> 0{sh) NB. Layup scratch total
+write_xl hole ; tee ; gender ; (hole+1) ; 66 ; 9 ; 0 ; 'Layup Bogey' ; _50 >. 50 <. (+/> 1{sh) NB. Layup bogey total
 NB. Need to pad out zeros and write individual elements
 select. z=. j. / > #each sh
     case. 0j0 do. sz=. _1 _1 _1, _1 _1 _1 _1
