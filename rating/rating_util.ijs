@@ -560,7 +560,7 @@ label_shot.
     NB. New logic for transition within 10 yards of 
 	NB. of the green for a Par 3 or 20 for Par 4/5
 	trans_dist=. shot { 10 20 20 20 20 20 
-	rem=. remgroundyards - <. 0.5 + 1{ww
+	rem=. remgroundyards - <. 0.5 + 1{ww NB. THIS LINE
 	NB. Logic is now changed to only add 'T' if within 20 yards
 	NB. i.e. don'e extend previous shot
 	NB. if. ( 0 < rem) *. (trans_dist >: rem) *. (glPlanLayupType=' ') do.
@@ -579,7 +579,7 @@ label_shot.
 	ClearPlanRecord '' NB. Zero numerics
 	glPlanHitYards=: , <. 0.5+ 1{ww
 	cumgroundyards=. <. 0.5 + cumgroundyards + 1{ww
-	remgroundyards=. <. 0.5  + remgroundyards - 1{ww
+	remgroundyards=. <. 0.5  + remgroundyards - 1{ww NB. THIS LINE
 	cumbackyards=. <. 0.5 + cumbackyards + 1{ww
 	glPlanCumGroundYards=: ,cumgroundyards
 	glPlanLatLon=: , 0{ww
