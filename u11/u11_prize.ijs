@@ -50,19 +50,14 @@ scroll=. x
 glFilename=: dltb > 0{ y
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
-if. fexist glFilepath,'.ijf' do.
-	xx=. utFileGet glFilepath
-	xx=. utKeyRead glFilepath,'_player'
-	err=. ''
-else.
-	err=. 'No such course'
-end.
+err=. ReadAll glFilepath
 
 stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 if. scroll do.
-	stdout LF,'<script>setTimeout(function(){window.location.href=''/jw/u11/startscroll/v/',glFilename,'''},10000);</script>'
+	tm=. ": <.0.5 + 1000 * 2{glPageDelay
+	stdout LF,'<script>setTimeout(function(){window.location.href=''/jw/u11/startscroll/v/',glFilename,'''},',tm,');</script>'
 end.
 djwBlueprintCSS ''
 
@@ -82,19 +77,19 @@ end.
 NB. Print tees and yardages
 user=. getenv 'REMOTE_USER'
 if. 0 -: user do. user=.'' end.
-stdout LF,'<h2>BB&O Nike U11 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>Prize Leaders</h3>'
+stdout LF,'<h2>BB&O U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>Prize Leaders</h3>'
 
 NB. Order by prize time and get unique entries
 ww=.  /: >glPlFirstName
 ww=. ww /: >ww{glPlLastName
-ww=. ww /: (+/"1 (_1{."1 (7 <. ww{glPlGross)))  NB. back one
-ww=. ww /: (+/"1 (_3{."1 (7 <. ww{glPlGross)))  NB. back one
-ww=. ww /: (+/"1 (_6{."1 (7 <. ww{glPlGross)))  NB. back one
-ww=. ww /: (+/"1 (_9{."1  (7 <. ww{glPlGross)))  NB. back one
-ww=. ww /: (+/"1 (7 <. ww{glPlGross))  NB. Gross
+ww=. ww /: (+/"1 (_1{."1 (glMax <. ww{glPlGross)))  NB. back one
+ww=. ww /: (+/"1 (_3{."1 (glMax <. ww{glPlGross)))  NB. back one
+ww=. ww /: (+/"1 (_6{."1 (glMax <. ww{glPlGross)))  NB. back one
+ww=. ww /: (+/"1 (_9{."1 (glMax <. ww{glPlGross)))  NB. back one
+ww=. ww /: (+/"1 (glMax <. ww{glPlGross))  NB. Gross
 (ww{glPlID) utKeyRead glFilepath,'_player'
     
-stdout LF,'<div class="span-10">'
+stdout LF,'<div class="span-12">'
 stdout LT1,'<table>'
 stdout LT1,'<thead>',LT2,'<tr>'
 stdout LT3,'<th>Gross</th><th>Player</th><th>Score</th>'
@@ -103,7 +98,7 @@ NB. Loop round the prize times
 last=. _1
 for_ll. i. 6 <. #glPlID do. NB. Start of person loop
 	stdout LT2,'<tr>'
-	gr=. +/(7<. ll{glPlGross)
+	gr=. +/(glMax <. ll{glPlGross)
 	if. gr = last do.
 		stdout LT3,'<td>=</td>'
 	else.
@@ -127,14 +122,14 @@ stdout LT1,'</tbody></table></div>'
 NB. Order by prize time and get unique entries
 ww=.  /: >glPlFirstName
 ww=. ww /: >ww{glPlLastName
-ww=. ww /: (+/"1 (_1{."1 (7 <. ww{glPlGross))) - (ww{glPlHCP)%18 NB. back one
-ww=. ww /: (+/"1 (_3{."1 (7 <. ww{glPlGross))) - (ww{glPlHCP)%6  NB. back one
-ww=. ww /: (+/"1 (_6{."1 (7 <. ww{glPlGross))) - (ww{glPlHCP)%3 NB. back one
-ww=. ww /: (+/"1 (_9{."1  (7 <. ww{glPlGross))) - (ww{glPlHCP)%2 NB. back one
-ww=. ww /: (+/"1 (7 <. ww{glPlGross)) - ww{glPlHCP  NB. Gross
+ww=. ww /: (+/"1 (_1{."1 (glMax <. ww{glPlGross))) - (ww{glPlHCP)%18 NB. back one
+ww=. ww /: (+/"1 (_3{."1 (glMax <. ww{glPlGross))) - (ww{glPlHCP)%6  NB. back one
+ww=. ww /: (+/"1 (_6{."1 (glMax <. ww{glPlGross))) - (ww{glPlHCP)%3 NB. back one
+ww=. ww /: (+/"1 (_9{."1  (glMax <. ww{glPlGross))) - (ww{glPlHCP)%2 NB. back one
+ww=. ww /: (+/"1 (glMax <. ww{glPlGross)) - ww{glPlHCP  NB. Gross
 (ww{glPlID) utKeyRead glFilepath,'_player'
     
-stdout LF,'<div class="span-10 prepend-1 last">'
+stdout LF,'<div class="span-12 prepend-1 append-3 last">' NB. Append to use the width
 stdout LT1,'<table>'
 stdout LT1,'<thead>',LT2,'<tr>'
 stdout LT3,'<th>Nett</th><th>Player</th><th>Score</th>'
@@ -143,7 +138,7 @@ NB. Loop round the prize times
 last=. _1
 for_ll. i. 6 <. #glPlID do. NB. Start of person loop
 	stdout LT2,'<tr>'
-	nt=. ( +/(7<. ll{glPlGross)) - ll{glPlHCP
+	nt=. ( +/(glMax <. ll{glPlGross)) - ll{glPlHCP
 	if. nt = last do.
 		stdout LT3,'<td>=</td>'
 	else.
@@ -165,12 +160,13 @@ for_ll. i. 6 <. #glPlID do. NB. Start of person loop
 end. NB. End of person loop
 stdout LT1,'</tbody></table></div>'
 
+stdout LF,'<hr>'
 
 for_p. i. #glPuttDesc do.
 	NB. Order by prize time and get unique entries
 	ww=.  /: >glPlFirstName
 	ww=. ww /: >ww{glPlLastName
-	ww=. ww /: (+/"1 (7 <. ww{glPlGross))  NB. Gross
+	ww=. ww /: (+/"1 (glMax <. ww{glPlGross))  NB. Gross
 	if. p< _1+#glPuttDesc do. NB. High to Low
 		ww=. ww \: p{"1 (ww{glPlPutt)
 	else. NB. Low to High
@@ -179,9 +175,9 @@ for_p. i. #glPuttDesc do.
 	(ww{glPlID) utKeyRead glFilepath,'_player'
 
 	if. 0=p do.
-		stdout LF,'<div class="span-7">'
+		stdout LF,'<div class="span-8">'
 	else.
-		stdout LF,'<div class="span-7 prepend-1">'
+		stdout LF,'<div class="span-8 prepend-1">'
 	end.
 	stdout LT1,'<table>'
 	stdout LT1,'<thead>',LT2,'<tr>'

@@ -1,4 +1,3 @@
-
 NB. =========================================================
 NB. jweb_u11_player_v
 NB. View scores for participant
@@ -31,13 +30,7 @@ NB. Retrieve the details
 glFilename=: dltb > 0{ y
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
-if. fexist glFilepath,'.ijf' do.
-	xx=. utFileGet glFilepath
-	xx=. utKeyRead glFilepath,'_player'
-	err=. ''
-else.
-	err=. 'No such course'
-end.
+err=. ReadAll glFilepath
 
 stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
@@ -55,26 +48,25 @@ end.
 NB. Print tees and yardages
 user=. getenv 'REMOTE_USER'
 if. 0 -: user do. user=.'' end.
-stdout LF,'<h2>BB&O Nike U11 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>All players</h3>'
+stdout LF,'<h2>BB&O U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>All players</h3>'
 
 NB. Order by player
 ww=:  /: >glPlFirstName
 ww=: ww /: >ww{glPlLastName
 (ww{glPlID) utKeyRead glFilepath,'_player'
 
-
 NB. Loop round in two halves
 for_hh. 0 1 do.
     
     if. hh=0 do.
-	stdout LF,'<div class="span-9">'
+	stdout LF,'<div class="span-11">'
     else.
-	stdout LF,'<div class="span-9 prepend-1">'
+	stdout LF,'<div class="span-11 prepend-1">'
     end.
 
     stdout LT1,'<table>'
     stdout LT1,'<thead>',LT2,'<tr>'
-    stdout LT3,'<th>Name</th><th>Age</th><th>HCP</th><th>Start</th><th>Gross</th></tr></thead><tbody>'
+    stdout LT3,'<th>Name</th><th>Age</th><th>Full</th><th>HCP</th><th>Start</th><th>Gross</th></tr></thead><tbody>'
     NB. Loop round the players
     chunk=. >. 0.5 * #glPlID
     for_cc. (hh *chunk ) + i. chunk do.
@@ -82,9 +74,10 @@ for_hh. 0 1 do.
 	stdout LF,'<tr><td><a href="http://',(":getenv 'SERVER_NAME'),'/jw/u11/player/v/',(,glFilename),'/',(>cc{glPlID),'">',(>cc{glPlFirstName),' ',(>cc{glPlLastName),'</td>'
 	NB. stdout LT3,'<td>',(":>cc{glPlClub),'</td>'
 	stdout LT3,'<td>',(;'6.3' 8!:0 glCompDate CalcAge cc{glPlDoB),'</td>'
+	stdout LF,'<td>',(":>cc{glPlHCPFull),'</td>'
 	stdout LF,'<td>',(":>cc{glPlHCP),'</td>'
 	stdout LF,'<td>',(":>cc{glPlStartTime),'</td>'
-	gr=. ": +/7<. cc{glPlGross
+	gr=. ": +/glMax <. cc{glPlGross
 	if. *. / _ = cc{ glPlGross do. gr=.'-' end.
 	stdout LF,'<td>',gr,'</td>'
 	stdout LT2,'</tr>'
@@ -92,12 +85,12 @@ for_hh. 0 1 do.
     stdout LF,'</tbody></table></div>'
 end. NB. End of half
 NB. Add the Edit Option
-stdout LF,'<div class="span-4 last">'
+stdout LF,'<div class="span-14 last">'
 stdout LF,'<a href="https://',(":,getenv 'SERVER_NAME'),'/jw/u11/player/a/',glFilename,'">Add new player</a>'
-stdout LF,'<br><br><a href="http://',(":,getenv 'SERVER_NAME'),'/jw/u11/start/v/',glFilename,'">Start sheet</a>'
-stdout LF,'<br><br><a href="http://',(":,getenv 'SERVER_NAME'),'/jw/u11/leader/v/',glFilename,'">Leaderboard</a>'
-stdout LF,'<br><br><a href="http://',(":,getenv 'SERVER_NAME'),'/jw/u11/prize/v/',glFilename,'">Prize Leaders</a><div>'
-stdout LF,'</div>' NB. main span
+stdout LF,EM,EM,' <a href="http://',(":,getenv 'SERVER_NAME'),'/jw/u11/start/v/',glFilename,'">Start sheet</a>'
+stdout LF,EM,EM,' <a href="http://',(":,getenv 'SERVER_NAME'),'/jw/u11/leader/v/',glFilename,'">Leaderboard</a>'
+stdout LF,EM,EM,' <a href="http://',(":,getenv 'SERVER_NAME'),'/jw/u11/prize/v/',glFilename,'">Prize Leaders</a><div>'
+stdout LF,'</div>' NB. Edit buttons span
 stdout LF,'<div class="span-24">'
 stdout LF,'<hr>'
 stdout LF,'</div>' NB. main span
@@ -116,13 +109,7 @@ NB. Retrieve the details
 glFilename=: dltb > 0{ y
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
-if. fexist glFilepath,'.ijf' do.
-	xx=. utFileGet glFilepath
-	xx=. utKeyRead glFilepath,'_player'
-	err=. ''
-else.
-	err=. 'No such course'
-end.
+err=. ReadAll glFilepath
 
 stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
@@ -149,20 +136,22 @@ end.
 NB. Print tees and yardages
 user=.  getenv 'REMOTE_USER'
 if. 0 -: user do. user=.'' end.
-stdout LF,'<h2>BB&O Nike U11 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>View details for :',(>glPlFirstName),' ',(>glPlLastName),'</h3>'
+stdout LF,'<h2>BB&O U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>View details for :',(>glPlFirstName),' ',(>glPlLastName),'</h3>'
 
 NB. Print scorecard and yardage
 stdout LF,'<div class="span-24 last">'
 stdout LT1,'Club = ',(>glPlClub),'<br>'
+stdout LT1,'Full Handicap = ',(": glPlHCPFull),'<br>'
 stdout LT1,'Handicap = ',(": glPlHCP),'<br>'
 stdout LT1,'Start time = ',(>glPlStartTime),'<br>'
 stdout LT1,'Date of Birth = ',(11{. , timestamp 1 tsrep glPlDoB),'<br>'
 
 NB. Flag for not started
-notstarted=. _ * *. / _ = ,glPlGross
+drop=. _9 * gl9Hole
+notstarted=. _ * *. / _ = drop }. ,glPlGross
 
 NB. Front 9
-for_half. i. 2 do.
+for_half. i. (2 - gl9Hole) do.
     if. 0=half do.
 	stdout LF,'<div class="span-5">'
     else.
@@ -182,21 +171,21 @@ stdout LF,'<table>'
 	stdout LF,'</tbody><tfoot><tr><td>OUT</td>'
 	stdout LF,'<td>',(": +/9 {. glYards),'</td>'
 	stdout LF,'<td>',(": +/9 {. glPar ),'</td>'
-	stdout LF,'<td>',(": notstarted + +/ 7 <. 9 {. ,glPlGross ),'</td>'
+	stdout LF,'<td>',(": notstarted + +/ glMax <. 9 {. ,glPlGross ),'</td>'
 	stdout LF,'</tr></tfoot></table></div>'
     else.
 	stdout LF,'</tbody><tfoot><tr><td>IN</td>'
 	stdout LF,'<td>',(": +/(9+i.9)  { glYards),'</td>'
 	stdout LF,'<td>',(": +/(9+i.9) {glPar),'</td>'
-	stdout LF,'<td>',(": notstarted + +/ 7 <. (9+i.9) {,glPlGross),'</td>'
+	stdout LF,'<td>',(": notstarted + +/ glMax <. (9+i.9) {,glPlGross),'</td>'
 	stdout LF,'</tr><tr><td>OUT</td>'
 	stdout LF,'<td>',(": +/9 {. glYards),'</td>'
 	stdout LF,'<td>',(": +/9{. glPar),'</td>'
-	stdout LF,'<td>',(": notstarted + +/ 7 <. 9{. ,glPlGross),'</td>'
+	stdout LF,'<td>',(": notstarted + +/ glMax <. 9{. ,glPlGross),'</td>'
 	stdout LF,'</tr><tr><td><b>TOTAL</b></td>'
 	stdout LF,'<td><b>',(": +/glYards),'</b></td>'
 	stdout LF,'<td><b>',(": +/glPar),'</b></td>'
-	stdout LF,'<td><b>',(": notstarted + +/ 7 <. ,glPlGross),'</b></td>'
+	stdout LF,'<td><b>',(": notstarted + +/ glMax <. ,glPlGross),'</b></td>'
 	stdout LF,'</tr></tfoot></table></div>'
     end.
 
@@ -210,10 +199,11 @@ stdout LF,'<br><br><a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/u11/leader/
 stdout LF,'<hr></div>' NB. main span
 
 NB. Print the putting scores
+stdout LF,'<div class="span-7 last">'
 for_rr. glPuttDesc do.
     stdout '<br>',(>rr),' = ',":rr_index{,glPlPutt
 end.
-
+stdout LF,'</div>' NB. Putting scores
 stdout LF,'</div>' NB. container
 stdout '</body></html>'
 exit ''
@@ -239,13 +229,7 @@ u11_player_edit=: 3 : 0
 glFilename=: dltb > 0{ y
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
-if. fexist glFilepath,'.ijf' do.
-	xx=. utFileGet glFilepath
-	xx=. utKeyRead glFilepath,'_player'
-	err=. ''
-else.
-	err=. 'No such course'
-end.
+err=. ReadAll glFilepath
 
 stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
@@ -271,7 +255,7 @@ end.
 NB. Print tees and yardages
 user=.  getenv 'REMOTE_USER'
 if. 0 -: user do. user=.'' end.
-stdout LF,'<h2>BB&O Nike U11 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2><h3>Edit details for :',(>glPlFirstName),' ',(>glPlLastName),'</h3>','<i>',user,'</i>'
+stdout LF,'<h2>BB&O U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2><h3>Edit details for :',(>glPlFirstName),' ',(>glPlLastName),EM,EM,'<span class="small"><i>',user,'</i></span></h3>'
 
 NB. Print scorecard and yardage
 stdout LF,'<div class="span-24 last">'
@@ -280,16 +264,18 @@ stdout LF, TAB,'<input type="hidden" name="filename" value="',glFilename,'">' NB
 stdout LF, TAB,'<input type="hidden" name="key" value="',(;key),'">'
 stdout LF, TAB,'<input type="hidden" name="prevtime" value="',(,>glPlUpdateTime),'">'
 stdout LF, TAB,'<input type="hidden" name="prevname" value="',(,>glPlUpdateName),'">'
-stdout LF,'<span class="span-3">Name</span><input name="firstname" value="',(,>glPlFirstName),'" tabindex="1" ',(InputField 20),'>'
-stdout LF,EM,'<input name="lastname" value="',(,>glPlLastName),'" tabindex="2" ',(InputField 20),'>'
+stdout LF,'<span class="span-3">First name</span><input name="firstname" value="',(,>glPlFirstName),'" tabindex="1" ',(InputField 20),'><br>'
+stdout LF,'<span class="span-3">Last name</span><input name="lastname" value="',(,>glPlLastName),'" tabindex="2" ',(InputField 20),'>'
 stdout LF,'<br><span class="span-3">Club</span><input name="club" value="',(,>glPlClub),'" tabindex="3" ',(InputField 25),'>'
-stdout LF,'<br><span class="span-3">Handicap</span><input value="',(": ,glPlHCP),'" tabindex="4" ',(InputFieldnum 'hcp'; 3),'>'
+stdout LF,'<br><span class="span-3">Full Handicap</span><input value="',(": ,glPlHCPFull),'" tabindex="4" ',(InputFieldnum 'hcpfull'; 3),'>'
+stdout LF,'<br><span class="span-3">Handicap</span>',(": ,glPlHCP)
 stdout LF,'<br><span class="span-3">Start time</span><input name="starttime" value="',(,>glPlStartTime),'" tabindex="5" ',(InputField 6),'>'
 stdout LF,'<br><span class="span-3">Date of birth</span><input name="dob" value="',(11{. , timestamp 1 tsrep glPlDoB),'" tabindex="6" ',(InputField 12),'>'
 stdout '</div>'
 
 NB. Flag for not started
-notstarted=. _ * *. / _ = ,glPlGross
+drop=. _9 * gl9Hole
+notstarted=. _ * *. / _ = drop }. ,glPlGross
 
 NB. Front 9
 for_half. i. 2 do.
@@ -298,7 +284,7 @@ for_half. i. 2 do.
     else.
 	stdout LF,'<div class="span-5 prepend-2" last>'
     end.
-stdout LF,'<table>'
+    stdout LF,'<table>'
     stdout LF,'<thead><tr>'
     stdout LF,'<th>Hole</th><th>Yards</th><th>Par</th><th>Gross</th></tr></thead><tbody>'
     for_x. (9*half) + i. 9 do.
@@ -307,28 +293,29 @@ stdout LF,'<table>'
 	stdout LF,'<td>',(": x{glYards),'</td>'
 	stdout LF,'<td>',(": x{glPar),'</td>'
 	val=.; 'd<>0.0' 8!:0 x{,glPlGross NB. Can't display infinity
-	stdout LF,'<td><input value="',val,'" tabindex="',(":7+x),'" ',(InputFieldnum ('gross',hole);3),'"></td></tr>'
+	hidden=. (half *. gl9Hole) # 'type = hidden'
+	stdout LF,'<td><input ',hidden,' value="',val,'" tabindex="',(":7+x),'" ',(InputFieldnum ('gross',hole);3),'"></td></tr>'
     end.
 
     if. half=0 do.
 	stdout LF,'</tbody><tfoot><tr><td>OUT</td>'
 	stdout LF,'<td>',(": +/9 {. glYards),'</td>'
 	stdout LF,'<td>',(": +/9 {. glPar ),'</td>'
-	stdout LF,'<td>',(": notstarted + +/ 7 <. 9 {. ,glPlGross ),'</td>'
+	stdout LF,'<td>',(": notstarted + +/ glMax <. 9 {. ,glPlGross ),'</td>'
 	stdout LF,'</tr></tfoot></table></div>'
-    else.
+    elseif. -. gl9Hole do.
 	stdout LF,'</tbody><tfoot><tr><td>IN</td>'
 	stdout LF,'<td>',(": +/(9+i.9)  { glYards),'</td>'
 	stdout LF,'<td>',(": +/(9+i.9) {glPar),'</td>'
-	stdout LF,'<td>',(": notstarted + +/ 7 <. (9+i.9) {,glPlGross),'</td>'
+	stdout LF,'<td>',(": notstarted + +/ glMax <. (9+i.9) {,glPlGross),'</td>'
 	stdout LF,'</tr><tr><td>OUT</td>'
 	stdout LF,'<td>',(": +/9 {. glYards),'</td>'
 	stdout LF,'<td>',(": +/9{. glPar),'</td>'
-	stdout LF,'<td>',(": notstarted + +/ 7 <. 9{. ,glPlGross),'</td>'
+	stdout LF,'<td>',(": notstarted + +/ glMax <. 9{. ,glPlGross),'</td>'
 	stdout LF,'</tr><tr><td><b>TOTAL</b></td>'
 	stdout LF,'<td><b>',(": +/glYards),'</b></td>'
 	stdout LF,'<td><b>',(": +/glPar),'</b></td>'
-	stdout LF,'<td><b>',(": notstarted + +/ 7 <. ,glPlGross),'</b></td>'
+	stdout LF,'<td><b>',(": notstarted + +/ glMax <. ,glPlGross),'</b></td>'
 	stdout LF,'</tr></tfoot></table></div>'
     end.
 
@@ -339,7 +326,11 @@ stdout '<table><thead><tr><th>Putting</th><th></th></tr></thead><tbody>'
 NB. Print the putting scores
 for_rr. glPuttDesc do.
     hole=. ; 'r<0>2.0' 8!:0 rr_index 
-    val=. ; 'd<>b<>0.0' 8!:0 rr_index{,glPlPutt NB. suppress zero and infinity
+    if. rr_index < (#glPuttDesc) -1 do.
+	val=. ; 'd<>b<>0.0' 8!:0 rr_index{,glPlPutt NB. suppress zero and infinity
+    else.
+	val=. ; '0.1' 8!:0 rr_index{,glPlPutt NB. suppress zero and infinity
+    end.
     stdout '<tr><td>',(>rr),'</td><td><input value="',val,'" tabindex="',(":25+rr_index),'" ',(InputFieldnum ('putt',hole) ; 3),'"></td></tr>'
 end.
 stdout LT2,'</tbody></table></div>'
@@ -377,16 +368,16 @@ servername=. getenv 'SERVER_NAME'
 httphost=. getenv 'HTTP_HOST'
 if. -. glSimulate do.
     if. (-. +. / 'u11/player/e/' E. httpreferer) +. (-. 'on'-: https) +. (-.  servername -: httphost) +. (-. +. / servername E. httpreferer) do.
-	pagenotvalid ''
     end.
 end.
 NB. Assign to variables
-xx=. djwCGIPost y ; 'hcp' ; 'gross' ; 'putt'
+xx=. djwCGIPost y ; 'hcpfull' ; 'hcp' ; 'gross' ; 'putt'
 djwBuildArray 'gross'
 djwBuildArray 'putt'
 glFilename=: dltb >filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
+utFileGet glFilepath
 (key) utKeyRead glFilepath,'_player'
 
 NB. Check the time stamp
@@ -415,13 +406,17 @@ glPlUpdateName=: ,<getenv 'REMOTE_USER'
 glPlUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 glPlFirstName=: ,firstname
 glPlLastName=: ,lastname
+glPlHCPFull=: ,hcpfull
+hcp=: glHCPMax <. hcpfull
+hcp=: glHCPAllow * hcp
+if. glHCPRound do. hcp=: <. 0.5 + hcp end.
 glPlHCP=: ,hcp 
 glPlClub=: club
 glPlDoB=: ,tsrep 6 {. getdate >dob
 glPlStartTime=: ,starttime
 glPlGross=: 1 18$,gross
 glPlGross=: <. 0.5 + glPlGross + _ * 0=glPlGross
-glPlPutt=: <. 0.5 + 1 3$,putt
+glPlPutt=:  (1,#glPuttDesc) $,putt
 NB. glPlPutt=: glPlPutt + _ * 25<glPlPutt
 
 (key) utKeyPut glFilepath,'_player'
@@ -467,14 +462,7 @@ NB. Retrieve the details
 glFilename=: dltb > 0{ y
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
-if. fexist glFilepath,'.ijf' do.
-	xx=. utFileGet glFilepath
-	xx=. utKeyRead glFilepath,'_player'
-	err=. ''
-else.
-	err=. 'No such course'
-end.
-
+err=. ReadAll glFilepath
 
 NB. Error page - No such course
 if. 0<#err do.
@@ -507,14 +495,17 @@ ww=. (i. 3+ >. / ww,0) -. ww
 ww=. ; 'r<0>4.0' 8!:0 {.ww
 utKeyClear glFilepath,'_player'
 glPlID=: ,< ww
-glPlFirstName=: ,<''
-glPlLastName=: ,<' New Player'
+glPlFirstName=: ,<'First Name'
+glPlLastName=: ,<'Last Name'
 glPlClub=: ,a:
 glPlGross=: 1 18$_
-glPlPutt=: 1 3$0 0 _
+glPlPutt=: 1 3$0 0 50
 glPlUpdateName=: ,<": getenv 'REMOTE_USER'
 glPlUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 glPlDoB=: ,glCompDate
+glPlHCPFull=: ,36
+glPlHCP=: ,glHCPAllow * (36 <. glHCPMax) 
+if. glHCPRound do. glPlHCP=: <. 0.5 + glPlHCP end.
 utKeyPut glFilepath,'_player'
 
 NB.stdout 'Content-type: text/html',LF,LF

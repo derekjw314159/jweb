@@ -45,16 +45,18 @@ end.
 NB. Read the single record
 keyy utKeyRead glFilepath,'_tee'
 hole=. ''$glTeHole
+stdout LT1,'<form action="/jw/rating/tee/editpost/',(;glFilename),'" method="post">'
 
 stdout LF,'<h2>Course : ', glCourseName,EM,EM,'Tee Measurements</h2>'
-stdout LF,'<div class="span-12 last">'
+stdout LF,'<div class="span-6 append-1">'
 stdout LF,'<table><thead><tr><th></th><th>Value</th></tr></thead><tbody>'
 stdout LF,'<tr><td>Hole:</td><td>',(":1+ ; glTeHole),'</td></tr>'
 stdout LF,'<tr><td>Tee:</td><td>',(": ; (glTees i. glTeTee){glTeesName),'</td></tr>'
-stdout LF,'<tr><td>Yards:</td><td>',(": ; (<(glTees i. glTeTee),glTeHole){glTeesYards),'</td></tr>'
+stdout LF,'<tr><td>Yards:</td><td><input value="',(": ; (<(glTees i. glTeTee),glTeHole){glTeesYards),'" tabindex="1" ',(InputFieldnum 'yyds'; 3),'></td></tr>'
+stdout LF,'<tr><td>Par Men:</td><td><input value="',(": 0{ ; {glTePar),'" tabindex="2" ',(InputFieldnum 'p0' ; 2),'></td></tr>'
+stdout LF,'<tr><td>Par Women:</td><td><input value="',(": 1{ ; {glTePar),'" tabindex="3" ',(InputFieldnum 'p1' ; 2),'></td></tr>'
 stdout LT2,'</tbody></table></div>'
 
-stdout LT1,'<form action="/jw/rating/tee/editpost/',(;glFilename),'" method="post">'
 
 NB. Hidden variables
 stdout LT1,'<div class="span-15 last">'
@@ -68,13 +70,13 @@ stdout LT1,'<h4>Tee Measurements</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
 stdout LT4,'<th>Alt</th><th>Men Measured</th><th>Women Measured</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
-stdout LT4,'<td><input value="',(":;glTeAlt),'" tabindex="1" ',(InputFieldnum 'alt'; 3),'>',LT4,'</td>'
+stdout LT4,'<td><input value="',(":;glTeAlt),'" tabindex="4" ',(InputFieldnum 'alt'; 3),'>',LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" name="m0" value="1" '
 stdout (0{,glTeMeasured)#'checked '
-stdout ' tabindex="2"></td>'
+stdout ' tabindex="5"></td>'
 stdout LT4,'<td><input type="checkbox" name="m1" value="1" '
 stdout (1{,glTeMeasured)#'checked '
-stdout ' tabindex="3"></td>'
+stdout ' tabindex="6"></td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table></div>'
 
@@ -84,17 +86,17 @@ stdout LT1,'<h4>General</h4>'
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
 stdout LT4,'<th>RoughLength</th><th>Apply to all Holes?</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
-stdout LT4,'<td><input value="',(":;(hole=glGrHole)#glGrRRRoughLength),'" tabindex="4" ',(InputFieldnum 'rrlength'; 3),'>',LT4,'</td>'
+stdout LT4,'<td><input value="',(":;(hole=glGrHole)#glGrRRRoughLength),'" tabindex="7" ',(InputFieldnum 'rrlength'; 3),'>',LT4,'</td>'
 stdout LT4,'<td><input type="checkbox" name="all" value="1" '
-stdout ' tabindex="5"></td>'
+stdout ' tabindex="8"></td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table></div>'
 
 NB. Submit buttons
 stdout LT1,'<div class="span-15 last">'
 
-stdout LF,'<input type="submit" name="control_calc" value="Calc" tabindex="',(":2),'">'
-stdout LF,'     <input type="submit" name="control_done" value="Done" tabindex="',(,":3),'">'
+stdout LF,'<input type="submit" name="control_calc" value="Calc" tabindex="',(":100),'">'
+stdout LF,'     <input type="submit" name="control_done" value="Done" tabindex="',(,":101),'">'
 stdout LF,'</div>' NB. end main container
 stdout '</body></html>'
 res=. 1
@@ -102,7 +104,7 @@ exit ''
 )
 
 NB. =========================================================
-NB. jweb_rating_landing_editpost
+NB. jweb_rating_tee_editpost
 NB. =========================================================
 NB. Process entries after edits to landing 
 NB. based on the contents after the "post"
@@ -126,7 +128,7 @@ NB. Assign default values first
 m0=: 0
 m1=: 0
 all=: 0
-xx=. djwCGIPost y ; ' ' cut 'alt m0 m1 rrlength all'
+xx=. djwCGIPost y ; ' ' cut 'all yyds p0 p1 alt m0 m1 rrlength all'
 glFilename=: dltb ;filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
@@ -164,12 +166,20 @@ glTeUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 glTeAlt=: ,alt
 glTeMeasured=: 1 2 $,m0,m1
 glGrRRRoughLength=: ,rrlength
+glTePar=: 1 2 $ p0, p1
 if. all do.
     utKeyRead glFilepath,'_green'
     glGrRRRoughLength=: 18$rrlength
 end.
+oldyards=.  (<(glTees i. glTeTee),glTeHole) { glTeesYards
+if. oldyards ~: yyds do.
+    glTeesYards=: yyds (<(glTees i. glTeTee),glTeHole) } glTeesYards
+    AugmentGPS ,glTeHole
+    (,<'glTeesYards') utFilePut glFilepath
+end.
 
 NB. Write to files
+NB. (,<'glTeesYards') utFilePut glFilepath
 keytee utKeyPut glFilepath,'_tee'
 utKeyPut glFilepath,'_green'
 BuildPlan glTeHole ; glTeTee ; '' ; '' ; ''

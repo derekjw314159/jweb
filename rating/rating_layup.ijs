@@ -60,7 +60,6 @@ if. 0=#ix do.
     djwErrorPage err ; ('No such hole combination : ',}. ; (<'/'),each y) ; ('/jw/rating/plan/v/',filename,'/',":1+hole) ; 'Back to rating plan'
 end.
 
-glPlanMeasDist=: ,yards
 ww=. ix utKeyRead glFilepath,'_plan' NB. Read one record only
 
 NB. New item check
@@ -71,7 +70,7 @@ if. ( -. glPlanLayupType e. 'LR' ) do.  NB. Not found, or transition
 	glPlanLayupCategory=: ,<'forced'
 	glPlanLayupReason=: ,<'Water'
 	glPlanRollLevel=: ,<''
-	glPlanRollFirmness=: ,<''
+	glPlanRollSlope=: ,<''
 	ww=. utKeyPut glFilepath,'_plan'
 end. 
 
@@ -80,9 +79,12 @@ defaulthit=. (< gender, ability, 1<. shot){glPlayerDistances
 remain=. glPlanHitYards + glPlanRemGroundYards
 defaulthit=. defaulthit <. remain
 transition=. 0
-NB. Transitional distance check if within 10 yards
-if. (defaulthit < remain) *. (defaulthit + 10) >: remain do.
-	defaulthit=. remain
+trans_dist=. shot { 10 20 20 20 20 20 
+NB. Transitional distance check if within 10 yards of par 3 or 20 yards of par 4/5
+NB. Logic changed to only count if within 20 yards, i.e. don't extend previous shot
+NB. if. (defaulthit < remain) *. (defaulthit + trans_dist) >: remain do.
+if. (defaulthit <:  trans_dist) do.
+	NB. defaulthit=. remain
 	transition=. 1
 end.
 
@@ -93,7 +95,7 @@ sequence=. (glPlanLayupType='R') |. 'LR'
 extraline=. 0
 
 NB. Print the table of parameters
-stdout LF,'<div class="span-12 last">'
+stdout LF,'<div class="span-12 append-1">'
 stdout LF,'<table><thead><tr><th></th><th>Value</th></tr></thead><tbody>'
 
 stdout LF,'<tr><td>Hole:</td><td>',(":1+ ; hole),'</td></tr><tr><td>Tee:</td><td>',>(glTees i. tee){glTeesName
@@ -189,11 +191,14 @@ NB. Second table is simple roll logic
 	t_index=. glTees i. tee
 	stdout LT4,'<tr>',LT4,'<td><b>From ',>t_index { glTeesName
 	stdout ' tee</b></td>'
-	stdout LT4,'<td>',": ((<t_index,hole){glTeesYards) - glPlanRemGroundYards + glPlanHitYards
-	prevroll=. glPlanHitYards 
-	stdout '</td><td>',(,": defaulthit-20),'</td>',LT4,'<td>', (;'p<+>m<->' 8!:0 prevroll-defaulthit-20),'</td>'
-	stdout LT4,'<td><input  value="',(":,prevroll),'" tabindex="',(":3+extraline),'" ',(InputFieldnum 'roll'; 4),'>'
+	stdout LT4,'<td>',": ((<t_index,hole){glTeesYards) - glPlanRemGroundYards + glPlanHitYards NB. Previous yards covered
+	prevroll=. glPlanHitYards
+	prevrollroll=. glPlanRollDist
+	stdout '</td><td>',(,": prevroll - prevrollroll),'</td>' NB. Carry
+	stdout LT4,'<td><input value="',(": prevrollroll),'" tabindex="',(":3+extraline),'" ',(InputFieldnum 'rollroll';4),'></td>'
+	stdout LT4,'<td><input value="',(":,prevroll),'" tabindex="',(":3+extraline),'" ',(InputFieldnum 'roll'; 4),'>'
 	stdout '<input type="hidden" name="prevroll" value="',(":,prevroll),'">'
+	stdout '<input type="hidden" name="prevrollroll" value="',(":,prevrollroll),'">'
 	stdout '</td><td>',(,":glPlanRemGroundYards),'</td>',LT3,'</tr>'
 	NB. Backtee different from tee in question
 	stdout LT2,'</tbody></table></div>'
@@ -236,7 +241,7 @@ NB. Assign to variables
 NB. cumbackyards may not exist
 cumbackyards=: 0
 prevcumbackyards=: 0
-xx=. djwCGIPost y ; ' ' cut 'defaulthit cumbackyards prevcumbackyards hityards prevhityards cumyards prevcumyards remyards prevremyards roll prevroll'
+xx=. djwCGIPost y ; ' ' cut 'defaulthit cumbackyards prevcumbackyards hityards prevhityards cumyards prevcumyards remyards prevremyards roll prevroll rollroll prevrollroll'
 keyplan=: ; keyplan
 glFilename=: dltb ;filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
@@ -293,15 +298,23 @@ elseif. remyards ~: prevremyards do.
  	glPlanLayupType=: ,'L'
  	glPlanHitYards=: glPlanHitYards + prevremyards - remyards
  	NB. All the others will be recalculated
-elseif. roll ~: prevroll do.
+elseif. (roll ~: prevroll) +. (rollroll ~: prevrollroll) do.
  	changed=. 1
  	glPlanLayupType=: ,'R'
  	glPlanHitYards=: ,roll 
+	glPlanRollDist=: ,rollroll
  	NB. All the others will be recalculated
 end.
 
 NB. Write to two files
 if. 1 +. changed do.
+	NB. Transition logic
+	if. glPlanLayupType e. 'T ' do.
+	    transition=. glPlanLayupType='T'
+	    transition=. transition + (glTransitionOverrideVal i. glPlanTransitionOverride) { glTransitionOverrideNum
+	    transition=. 0 >. 1 <. transition
+	    glPlanLayupType=: ,transition { ' T'
+	end.
 	(,<keyplan) utKeyPut glFilepath,'_plan'
 	NB. Calculate Everything
 	BuildPlan glPlanHole ; glPlanTee ; glPlanGender ; glPlanAbility
@@ -309,7 +322,7 @@ if. 1 +. changed do.
 end.
 
 if. defaulthit = glPlanHitYards do.
-	deletelayup=. 1
+	NB. 	deletelayup=. 1 NB. Remove this logic if roll without transition
 end.
 
 stdout 'Content-type: text/html',LF,LF
@@ -319,6 +332,7 @@ NB. Choose page based on what was pressed
 	if. (0= 4!:0 <'control_delete') +. deletelayup do.
 		NB. Delete the layup record
 		glPlanHitYards=: ,defaulthit
+		NB. glPlanRollDist=: ,20
 		glPlanRecType=: ,'P'
 		glPlanLayupType=: ,' '
 		(<keyplan) utKeyPut glFilepath,'_plan'

@@ -27,8 +27,6 @@ elseif. 1 do.
 end.
 )
 
-
-
 NB. =========================================================
 NB. rating_carry_e
 NB. =========================================================
@@ -86,8 +84,9 @@ if. 'a' = x do.
     glPlanID=: keyy
     glPlanHole=: hole
     t_index=. _1 + #glTees
-    dist=. (<t_index,hole){glTeesYards
-    glPlanTee=: ,t_index{glTees
+	NB. Adding carry - assume back tee and level will shortest tee
+    dist=. (<t_index,hole){glTeesYards NB. i.e. "Red" distance
+    glPlanTee=: ,0{glTees NB. i.e. "White" tee
     glPlanGender=: ,_1
     glPlanAbility=: ,_1
     glPlanShot=: ,_1
@@ -95,6 +94,7 @@ if. 'a' = x do.
     glPlanMeasDist=: ,dist
     glPlanRecType=: ,'C'
     glPlanCarryType=: ,'F'
+	glPlanCarryAffectsTee=: ,' '
     utKeyPut glFilepath,'_plan'
 end.
 
@@ -141,16 +141,19 @@ stdout LT2,'<input type="hidden" name="filename" value="',(;glFilename),'">'
 
 NB. Table of values - Fairway
 stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
-stdout LT4,'<th>From tee</th><th>Distance</th><th>Carry type</th></tr>',LT2,'</thead>',LT2,'<tbody>'
+stdout LT4,'<th>From tee</th><th>Distance</th><th>Carry type</th><th>Affects Tee</th></tr>',LT2,'</thead>',LT2,'<tbody>'
 stdout LT3,'<tr>'
 stdout LT4,'<td>'
 djwSelect 'fromtee' ; 1 ; glTeesName ; (<"0 glTees) ; <<''$glPlanTee
+stdout LT4,'</td>'
 t_index=. glTees i. glPlanTee
 dist=. (<t_index, glPlanHole){glTeesYards
-stdout LT4,'</td>'
 stdout LT4,'<td><input value="',(":;dist - glPlanMeasDist),'" tabindex="2" ',(InputFieldnum 'yards'; 3),'>',LT4,'</td>'
 stdout LT4,'<td>'
 djwSelect 'type' ; 3 ; ('/' cut 'Fairway/Water/Bunkers/Extreme Rough'); (<"0 'FWBR') ; <<''$glPlanCarryType
+stdout LT4,'</td>'
+stdout LT4,'<td>'
+djwSelect 'affectstee' ; 4 ; ((<'All'),glTeesName) ; (<"0 ' ',glTees) ; <<''$glPlanCarryAffectsTee
 stdout LT4,'</td>'
 stdout LT3,'</tr>'
 stdout '</tbody></table></div>'
@@ -158,9 +161,9 @@ stdout '</tbody></table></div>'
 NB. Submit buttons
 stdout LT1,'<div class="span-15 last">'
 
-stdout LF,'<input type="submit" name="control_calc" value="Calc" tabindex="',(":2),'">'
-stdout LF,'     <input type="submit" name="control_done" value="Done" tabindex="',(,":3),'">'
-stdout LF,'     <input type="submit" name="control_delete" value="Delete this Carry" tabindex="',(,":4),'"></form>'
+stdout LF,'<input type="submit" name="control_calc" value="Calc" tabindex="',(":4),'">'
+stdout LF,'     <input type="submit" name="control_done" value="Done" tabindex="',(,":5),'">'
+stdout LF,'     <input type="submit" name="control_delete" value="Delete this Carry" tabindex="',(,":6),'"></form>'
 stdout LF,'</div>' NB. end main container
 stdout '</body></html>'
 exit ''
@@ -225,6 +228,7 @@ dist=. (<t_index, glPlanHole){glTeesYards
 glPlanRemGroundYards=: , dist - yards
 glPlanMeasDist=: glPlanRemGroundYards
 glPlanCarryType=: ,>type
+glPlanCarryAffectsTee=: ,>affectstee
 NB. Write to files
 keyplan utKeyPut glFilepath,'_plan'
 

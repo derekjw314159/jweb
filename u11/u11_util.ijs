@@ -57,3 +57,52 @@ days=. (tsrep x) - tsrep y NB. miliseconds
 days=. <. 0.5 + days % (24 * 60 * 60 * 1000)
 res=. res + 0.001 * days
 )
+
+NB. ================================================
+NB. ReadAll
+NB. ------------------------------------------------
+NB. Read the file and check for missing variables
+NB. Usage: err=. ReadAll filename
+ReadAll=: 3 : 0
+if. fexist y,'.ijf' do.
+	xx=. utFileGet y
+	xx=. utKeyRead y,'_player'
+	if. 0 ~: 4!:0 <'gl9Hole' do.
+	    gl9Hole=: 0
+	    ww=. (<'gl9Hole') utFilePut y
+	end.
+	if. 0 ~: 4!:0 <'glPageDelay' do.
+		glPageDelay=: 7 15 7 NB. Start -> Leader -> Prize
+		ww=.(<'glPageDelay') utFilePut y
+	end.
+	if. 0 ~: 4!:0 <'glScrollParam' do.
+		glScrollParam=: 5 1 0.05 NB. Initial : ScrollPixels : ScrollTime
+		ww=.(<'glScrollParam') utFilePut y
+	end.
+	if. 0 ~: 4!:0 <'glPlHCPFull' do.
+		glHCPAllow=: 0.75
+		glHCPRound=: 1
+		glPlHCPFull=: <. 0.5 + glPlHCP % glHCPAllow
+		ww=.(' ' cut 'glHCPAllow glHCPRound') utFilePut y
+		(,<'glPlHCPFull') utKeyAddColumn y,'_player'
+		utKeyPut y,'_player'
+	end.
+	if. 1 ~: $$glPlHCP do. NB. Should be rank 1
+	    glPlHCPFull=: ;glPlHCPFull
+	    utKeyPut y,'_player'
+	end.
+	if. 1 ~: $$glPlHCP do. NB. Should be rank 1
+	    glPlHCP=: ;glPlHCP
+	    utKeyPut y,'_player'
+	end.
+
+	if. 0 ~: 4!:0 <'glMax' do.
+		glMax=: 7
+		ww=.(<'glMax') utFilePut y
+	end.
+	err=. ''
+else.
+	err=. 'No such course'
+end.
+NB. ================================================
+)

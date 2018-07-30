@@ -83,24 +83,18 @@ end.
 glFilename=: dltb > 0{ y
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
-if. fexist glFilepath,'.ijf' do.
-	xx=. utFileGet glFilepath
-	xx=. utKeyRead glFilepath,'_player'
-	err=. ''
-else.
-	err=. 'No such course'
-end.
+err=. ReadAll glFilepath
 
 stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 if. stay do.
 	NB. one quarter of a second per player, minimum of 30 seconds
-	tm=. ": <. 0.5+ (30000 >. (250 * # glPlID))
+	tm=. ": <. 0.5+ 1000 * 0{glPageDelay
 	stdout LF,'<script>setTimeout(function(){window.location.href=''/jw/u11/startsheet/v/',glFilename,'''},',tm,');</script>'
 elseif. scroll do.
 	NB. one quarter of a second per player, minimum of 10 seconds
-	tm=. ": <. 0.5+ (10000 >. (250 * # glPlID))
+	tm=. ": <. 0.5+ 1000 * 0{glPageDelay
 	stdout LF,'<script>setTimeout(function(){window.location.href=''/jw/u11/leaderscroll/v/',glFilename,'''},',tm,');</script>'
 end.
 
@@ -122,7 +116,7 @@ end.
 NB. Print tees and yardages
 user=. getenv 'REMOTE_USER'
 if. 0 -: user do. user=.'' end.
-stdout LF,'<h2>BB&O Nike U11 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>Start Sheet</h3>'
+stdout LF,'<h2>BB&O U12 Boys'' Competition : ', glCourseName,' : ',(11{.,timestamp 1 tsrep glCompDate),'</h2>','<i>',user,'</i><h3>Start Sheet</h3>'
 
 NB. Order by start time and get unique entries
 ww=:  /: >glPlFirstName
@@ -132,7 +126,7 @@ ww=: ww /: >ww{glPlStartTime
 
     
 stdout LF,'<div class="span-24 large">'
-stdout LT1,'<table>'
+stdout LT1,'<table style="line-height: 1.4em">'
 stdout LT1,'<thead>',LT2,'<tr>'
 stdout LT3,'<th style="border-right: 2px solid lightgrey">Start</th><th colspan="2" style="text-align:center;border-right: 2px solid lightgrey">Player 1</th><th colspan="2" style="text-align:center;border-right: 2px solid lightgrey">Player 2</th><th colspan="2" style="text-align:center;border-right: 2px solid lightgrey">Player 3</th></tr></thead><tbody>'
 NB. Loop round the start times
@@ -152,9 +146,10 @@ for_u. uniq do.
 	else.
 	    stdout LT3,'<td><a href="http://',(":getenv 'SERVER_NAME'),'/jw/u11/player/v/',(,glFilename),'/',(>ll{glPlID),'">',(>ll{glPlFirstName),' ',(>ll{glPlLastName),'</a>  ['
 	end.
+	stdout (":>ll{glPlHCPFull),'/'
 	stdout (":>ll{glPlHCP),'] '
 		stdout '<i>',(":>ll{glPlClub),'</i></td>'
-		gr=. ": +/7<. ll{glPlGross
+		gr=. ": +/glMax <. ll{glPlGross
 		if. *. / _ = ll{ glPlGross do. gr=.'-' end.
 		stdout LT3,'<td style="border-right: 2px solid lightgrey">',gr,'</td>'
 	end. NB. End of person loop
