@@ -389,7 +389,7 @@ NB. Calculate wind factor
 wind=. y
 wind=. , wind
 ab=. x
-res=. (+/wind { 180 144 120 96 72 54) % ($Holes '') * ab{220 160 
+res=. (+/wind { 180 144 120 96 72 54) % (18) * ab{220 160 
 )
 
 round=: 4 : 0
