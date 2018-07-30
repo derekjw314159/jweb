@@ -128,26 +128,26 @@ stdout LT2,'</tr>'
 NB. Elevation
 stdout ,LT2,'<tr>'
 stdout LT3,'<td style="text-align: left;">Elevation</td>'
-for_hole. i. 18 do.
+for_hole. holes do.
     stdout LT3,'<td>',(;'b<>0.0' 8!:0(glSSHole i. hole){glSSElevation),'</td>'
 end.
-stdout LT3,'<td>',(;'b<>0.0' 8!:0 +/ (glSSHole e. i. 9) # glSSElevation),'</td>'
-stdout LT3,'<td>',(;'b<>0.0' 8!:0 +/ (glSSHole e. 9 + i. 9) # glSSElevation),'</td>'
+stdout LT3,'<td>',(;'b<>0.0' 8!:0 +/ (glSSHole e. f9) # glSSElevation),'</td>'
+stdout LT3,'<td>',(;'b<>0.0' 8!:0 +/ (glSSHole e. b9) # glSSElevation),'</td>'
 stdout LT3,'<td>',(;'b<>0.0' 8!:0 +/ glSSElevation),'</td>'
 stdout LT2,'</tr>'
 NB. Dogleg
 stdout ,LT2,'<tr>'
 stdout LT3,'<td style="text-align: left;">Layup</td>'
-for_hole. i. 18 do.
+for_hole. holes do.
     ww=. ;'b<>0.0' 8!:0 (<(glSSHole i. hole),0){glSSDogleg
     ww=. ww,' / ',;'b<>0.0' 8!:0 (<(glSSHole i. hole),1){glSSDogleg
     stdout LT3,'<td>',ww,'</td>'
 end.
-ww=. ;'0.0' 8!:0 +/(<(I. glSSHole e. i. 9) ; 0){glSSDogleg
-ww=. ww,' / ',;'0.0' 8!:0 +/(<(I. glSSHole e. i. 9) ; 1){glSSDogleg
+ww=. ;'0.0' 8!:0 +/(<(I. glSSHole e. f9) ; 0){glSSDogleg
+ww=. ww,' / ',;'0.0' 8!:0 +/(<(I. glSSHole e. f9) ; 1){glSSDogleg
 stdout LT3,'<td>',ww,'</td>'
-ww=. ;'0.0' 8!:0 +/(<(I. glSSHole e. 9 + i. 9) ; 0){glSSDogleg
-ww=. ww,' / ',;'0.0' 8!:0 +/(<(I. glSSHole e. 9 + i. 9) ; 1){glSSDogleg
+ww=. ;'0.0' 8!:0 +/(<(I. glSSHole e. b9) ; 0){glSSDogleg
+ww=. ww,' / ',;'0.0' 8!:0 +/(<(I. glSSHole e. b9) ; 1){glSSDogleg
 stdout LT3,'<td>',ww,'</td>'
 ww=. ;'0.0' 8!:0 +/0{"1 glSSDogleg
 ww=. ww,' / ',;'0.0' 8!:0 +/1{"1 glSSDogleg
@@ -156,17 +156,17 @@ stdout LT2,'</tr>'
 NB. Wind
 stdout ,LT2,'<tr>'
 stdout LT3,'<td style="text-align: left;">Wind</td>'
-for_hole. i. 18 do.
+for_hole. holes do.
     stdout LT3,'<td>',(":(glSSHole i. hole){glSSWind),'</td>'
 end.
-stdout LT3,'<td>',(;'b<>0.0' 8!:0 +/ (glSSHole e. i. 9) # glSSWind),'</td>'
-stdout LT3,'<td>',(;'b<>0.0' 8!:0 +/ (glSSHole e. 9 + i. 9) # glSSWind),'</td>'
+stdout LT3,'<td>',(;'b<>0.0' 8!:0 +/ (glSSHole e. f9) # glSSWind),'</td>'
+stdout LT3,'<td>',(;'b<>0.0' 8!:0 +/ (glSSHole e. b9) # glSSWind),'</td>'
 stdout LT3,'<td>',(;'b<>0.0' 8!:0 +/ glSSWind),'</td>'
 stdout LT2,'</tr></tbody><thead>'
 NB. Obstacle value ----------------
 stdout LT2,'<tr>'
 stdout LT3,'<th style="text-align: left;">Obstacles</th>'
-for_hole. i. 18 do.
+for_hole. holes do.
     stdout LT3,'<th>',(":1+hole),'</th>'
 end.
 stdout LT3,'<th>Front9</th><th>Back9</th><th>Total</th>'
@@ -177,16 +177,16 @@ NB. Obstacle <ob>
     stdout ,LT2,'<tr>'
     ww=. ' ' cut 'Topog F/way Gr/Targ R&R Bunk OOB/ER Water Trees Gr/Surf Pysch'
     stdout LT3,'<td style="text-align: left;">',(>ob{ww),'</td>'
-    for_hole. i. 18 do.
-	ww=. ;'b<>0.0' 8!:0 (<(glSSHole i. hole),ob,0){glSSObstacle
-	ww=. ww,' / ',;'b<>0.0' 8!:0 (<(glSSHole i. hole),ob,1){glSSObstacle
-	stdout LT3,'<td>',ww,'</td>'
+    for_hole. holes do.
+		ww=. ;'b<>0.0' 8!:0 (<(glSSHole i. hole),ob,0){glSSObstacle
+		ww=. ww,' / ',;'b<>0.0' 8!:0 (<(glSSHole i. hole),ob,1){glSSObstacle
+		stdout LT3,'<td>',ww,'</td>'
     end.
-    ww=. ;'0.0' 8!:0 +/(<(I. glSSHole e. i. 9) ; ob ; 0){glSSObstacle
-    ww=. ww,' / ',;'0.0' 8!:0 +/(<(I. glSSHole e. i. 9) ; ob ; 1){glSSObstacle
+    ww=. ;'0.0' 8!:0 +/(<(I. glSSHole e. f9) ; ob ; 0){glSSObstacle
+    ww=. ww,' / ',;'0.0' 8!:0 +/(<(I. glSSHole e. f9) ; ob ; 1){glSSObstacle
     stdout LT3,'<td>',ww,'</td>'
-    ww=. ;'0.0' 8!:0 +/(<(I. glSSHole e. 9 + i. 9) ; ob ; 0){glSSObstacle
-    ww=. ww,' / ',;'0.0' 8!:0 +/(<(I. glSSHole e. 9 + i. 9) ; ob ; 1){glSSObstacle
+    ww=. ;'0.0' 8!:0 +/(<(I. glSSHole e. b9) ; ob ; 0){glSSObstacle
+    ww=. ww,' / ',;'0.0' 8!:0 +/(<(I. glSSHole e. b9) ; ob ; 1){glSSObstacle
     stdout LT3,'<td>',ww,'</td>'
     ww=. ;'0.0' 8!:0 +/ ob {"1 (0{"1 glSSObstacle)
     ww=. ww,' / ',;'0.0' 8!:0 +/ ob{"1 (1{"1 glSSObstacle)
@@ -203,8 +203,8 @@ for_ab. 0 1 do.
     stdout LF,'<h3>',(>ab{' ' cut 'Scratch Bogey'),'</h3>'
     stdout LF,'<table>',LT2,'<thead><tr>'
     stdout LT3,'<th style="text-align: left;">Distances</th>'
-    for_hole. i. 18 do.
-	stdout LT3,'<th>',(":1+hole),'</th>'
+    for_hole. holes do.
+		stdout LT3,'<th>',(":1+hole),'</th>'
     end.
     stdout LT3,'<th>Front9</th><th>Back9</th><th>Total</th>'
     stdout LT2,'</tr></thead><tbody>'
@@ -212,23 +212,23 @@ for_ab. 0 1 do.
     stdout ,LT2,'<tr>'
     stdout LT3,'<td style="text-align: left;">Yards</td>'
 
-    for_hole. i. 18 do.
-	stdout LT3,'<td>',(5j3 ": ab ss_calc_yards (glSSHole i. hole){glSSYards),'</td>'
+    for_hole. holes do.
+		stdout LT3,'<td>',(5j3 ": ab ss_calc_yards (glSSHole i. hole){glSSYards),'</td>'
     end.
-    stdout LT3,'<td>',(6j3 ": ab ss_calc_yards (glSSHole e. i. 9) # glSSYards),'</td>'
-    stdout LT3,'<td>',(6j3 ": ab ss_calc_yards (glSSHole e. 9 + i. 9) # glSSYards),'</td>'
+    stdout LT3,'<td>',(6j3 ": ab ss_calc_yards (glSSHole e. f9) # glSSYards),'</td>'
+    stdout LT3,'<td>',(6j3 ": ab ss_calc_yards (glSSHole e. b9) # glSSYards),'</td>'
     stdout LT3,'<td>',(6j3 ": ab ss_calc_yards glSSYards),'</td>'
     stdout LT2,'</tr>'
     NB. Roll
     stdout ,LT2,'<tr>'
     stdout LT3,'<td style="text-align: left;">Roll</td>'
-    for_hole. i. 18 do.
-	ww=. ;'b<>0.3' 8!:0 (3.5%ab{220 160)*(<(glSSHole i. hole),ab){glSSRoll
-	stdout LT3,'<td>',ww,'</td>'
+    for_hole. holes do.
+		ww=. ;'b<>0.3' 8!:0 (3.5%ab{220 160)*(<(glSSHole i. hole),ab){glSSRoll
+		stdout LT3,'<td>',ww,'</td>'
     end.
-    ww=. ;'0.3' 8!:0 (3.5%ab{220 160)*+/(<(I. glSSHole e. i. 9) ; ab){glSSRoll
+    ww=. ;'0.3' 8!:0 (3.5%ab{220 160)*+/(<(I. glSSHole e. f9) ; ab){glSSRoll
     stdout LT3,'<td>',ww,'</td>'
-    ww=. ;'0.3' 8!:0 (3.5%ab{220 160)*+/(<(I. glSSHole e. 9 + i. 9) ; ab){glSSRoll
+    ww=. ;'0.3' 8!:0 (3.5%ab{220 160)*+/(<(I. glSSHole e. b9) ; ab){glSSRoll
     stdout LT3,'<td>',ww,'</td>'
     ww=. ;'0.3' 8!:0 (3.5%ab{220 160)*+/ab{"1 glSSRoll
     stdout LT3,'<td>',ww,'</td>'
@@ -236,13 +236,13 @@ for_ab. 0 1 do.
     NB. Elevation
     stdout ,LT2,'<tr>'
     stdout LT3,'<td style="text-align: left;">Elevation</td>'
-    for_hole. i. 18 do.
-	ww=. ;'b<>0.3' 8!:0 (0.23%ab{220 160)*(glSSHole i. hole){glSSElevation
-	stdout LT3,'<td>',ww,'</td>'
+    for_hole. holes do.
+		ww=. ;'b<>0.3' 8!:0 (0.23%ab{220 160)*(glSSHole i. hole){glSSElevation
+		stdout LT3,'<td>',ww,'</td>'
     end.
-    ww=. ;'0.3' 8!:0 (0.23%ab{220 160)*+/(I. glSSHole e. i. 9){glSSElevation
+    ww=. ;'0.3' 8!:0 (0.23%ab{220 160)*+/(I. glSSHole e. f9){glSSElevation
     stdout LT3,'<td>',ww,'</td>'
-    ww=. ;'0.3' 8!:0 (0.23%ab{220 160)*+/(I. glSSHole e. 9 + i. 9){glSSElevation
+    ww=. ;'0.3' 8!:0 (0.23%ab{220 160)*+/(I. glSSHole e. b9){glSSElevation
     stdout LT3,'<td>',ww,'</td>'
     ww=. ;'0.3' 8!:0 (0.23%ab{220 160)*+/glSSElevation
     stdout LT3,'<td>',ww,'</td>'
@@ -250,13 +250,13 @@ for_ab. 0 1 do.
     NB. Dogleg
     stdout ,LT2,'<tr>'
     stdout LT3,'<td style="text-align: left;">Layup</td>'
-    for_hole. i. 18 do.
-	ww=. ;'b<>0.3' 8!:0 (%ab{220 160)*(<(glSSHole i. hole),ab){glSSDogleg
-	stdout LT3,'<td>',ww,'</td>'
+    for_hole. holes do.
+		ww=. ;'b<>0.3' 8!:0 (%ab{220 160)*(<(glSSHole i. hole),ab){glSSDogleg
+		stdout LT3,'<td>',ww,'</td>'
     end.
-    ww=. ;'0.3' 8!:0 (%ab{220 160)*+/(<(I. glSSHole e. i. 9) ; ab){glSSDogleg
+    ww=. ;'0.3' 8!:0 (%ab{220 160)*+/(<(I. glSSHole e. f9) ; ab){glSSDogleg
     stdout LT3,'<td>',ww,'</td>'
-    ww=. ;'0.3' 8!:0 (%ab{220 160)*+/(<(I. glSSHole e. 9 + i. 9) ; ab){glSSDogleg
+    ww=. ;'0.3' 8!:0 (%ab{220 160)*+/(<(I. glSSHole e. b9) ; ab){glSSDogleg
     stdout LT3,'<td>',ww,'</td>'
     ww=. ;'0.3' 8!:0 (%ab{220 160)*+/ab{"1 glSSDogleg
     stdout LT3,'<td>',ww,'</td>'
@@ -264,23 +264,23 @@ for_ab. 0 1 do.
     NB. Wind
     stdout ,LT2,'<tr>'
     stdout LT3,'<td style="text-align: left;">Wind</td>'
-    for_hole. i. 18 do.
-	stdout LT3,'<td>',(5j3 ": ab ss_calc_wind (glSSHole i. hole){glSSWind),'</td>'
+    for_hole. holes do.
+		stdout LT3,'<td>',(5j3 ": ab ss_calc_wind (glSSHole i. hole){glSSWind),'</td>'
     end.
-    stdout LT3,'<td>',(6j3 ": ab ss_calc_wind (glSSHole e. i. 9) # glSSWind),'</td>'
-    stdout LT3,'<td>',(6j3 ": ab ss_calc_wind (glSSHole e. 9 + i. 9) # glSSWind),'</td>'
+    stdout LT3,'<td>',(6j3 ": ab ss_calc_wind (glSSHole e. f9) # glSSWind),'</td>'
+    stdout LT3,'<td>',(6j3 ": ab ss_calc_wind (glSSHole e. b9) # glSSWind),'</td>'
     stdout LT3,'<td>',(6j3 ": ab ss_calc_wind glSSWind),'</td>'
     stdout LT2,'</tr>'
     NB. Total
-    mat=. ;ab ss_calc_yards each (glSSHole i. i. 18){glSSYards
-    mat=. mat,: (3.5%ab{220 160) * (<(glSSHole i. i. 18) ; ab){glSSRoll
-    mat=. mat, (0.23%ab{220 160) * (glSSHole i. i. 18) {glSSElevation
-    mat=. mat, (%ab{220 160) * (<(glSSHole i. i. 18) ; ab){glSSDogleg
-    mat=. mat, ;ab ss_calc_wind each (glSSHole i. i. 18){glSSWind
+    mat=. ;ab ss_calc_yards each (glSSHole i. holes){glSSYards
+    mat=. mat,: (3.5%ab{220 160) * (<(glSSHole i. holes) ; ab){glSSRoll
+    mat=. mat, (0.23%ab{220 160) * (glSSHole i. holes) {glSSElevation
+    mat=. mat, (%ab{220 160) * (<(glSSHole i. holes) ; ab){glSSDogleg
+    mat=. mat, ;ab ss_calc_wind each (glSSHole i. holes){glSSWind
     stdout ,LT2,'<tr>'
     stdout LT3,'<td class="total" style="text-align: left; width: 7%;">Dist SS</td>'
-    for_hole. i. 18 do.
-	stdout LT3,'<td><b>',(5j3 ": hole{ +/mat),'</td>'
+    for_hole. holes do.
+		stdout LT3,'<td><b>',(5j3 ": hole{ +/mat),'</td>'
     end.
     adj=. ab{40.9 50.7
     total=. 1 round 0.5 * adj+(2 round ((-adj)+2* +/9{.+/mat))
@@ -291,8 +291,8 @@ for_ab. 0 1 do.
     stdout LT2,'</tr></tbody><thead>'
     NB. Obstacle Factors
     stdout LT3,'<th style="text-align: left;">Obstacles</th>'
-    for_hole. i. 18 do.
-	stdout LT3,'<th>',(":1+hole),'</th>'
+    for_hole. holes do.
+		stdout LT3,'<th>',(":1+hole),'</th>'
     end.
     stdout LT3,'<th>Front9</th><th>Back9</th><th>Total</th>'
     stdout LT2,'</tr></thead><tbody>'
@@ -301,25 +301,25 @@ for_ab. 0 1 do.
 	stdout ,LT2,'<tr>'
 	ww=. ' ' cut 'Topog F/way Gr/Targ R&R Bunk OOB/ER Water Trees Gr/Surf Pysch'
 	stdout LT3,'<td style="text-align: left;">',(>ob{ww),'</td>'
-	    for_hole. i. 18 do.
-		ww=. ;'b<>0.3' 8!:0 (<(glSSHole i. hole);ob;ab){glSSObstacle * glSSObsFactor * (ab{0.11 0.26)
-		stdout LT3,'<td>',ww,'</td>'
+	    for_hole. holes do.
+			ww=. ;'b<>0.3' 8!:0 (<(glSSHole i. hole);ob;ab){glSSObstacle * glSSObsFactor * (ab{0.11 0.26)
+			stdout LT3,'<td>',ww,'</td>'
 	    end.
-	ww=. ;'b<>0.3' 8!:0 +/(<(glSSHole i. i.9);ob; ab) {glSSObstacle * glSSObsFactor * ab{0.11 0.26
+	ww=. ;'b<>0.3' 8!:0 +/(<(glSSHole i. holes);ob; ab) {glSSObstacle * glSSObsFactor * ab{0.11 0.26
 	stdout LT3,'<td>',ww,'</td>'
-	ww=. ;'b<>0.3' 8!:0 +/(<(glSSHole i. 9+i.9);ob; ab) {glSSObstacle * glSSObsFactor * ab{0.11 0.26
+	ww=. ;'b<>0.3' 8!:0 +/(<(glSSHole i. holes);ob; ab) {glSSObstacle * glSSObsFactor * ab{0.11 0.26
 	stdout LT3,'<td>',ww,'</td>'
 	ww=. ;'b<>0.3' 8!:0 +/(<((<'') ;ob; ab)) {glSSObstacle * glSSObsFactor * ab{0.11 0.26
 	stdout LT3,'<td>',ww,'</td>'
 	stdout LT2,'</tr>'
     end. NB. End of obstacle loop
-    mat2=.|: (<(glSSHole i. i. 18) ; (<'') ; ab) { glSSObstacle * glSSObsFactor * ab{ 0.11 0.26
-    mat2=. mat2, 18$,(-ab{4.9 11.5)%18
+    mat2=.|: (<(glSSHole i. holes) ; (<'') ; ab) { glSSObstacle * glSSObsFactor * ab{ 0.11 0.26
+    mat2=. mat2, ($holes)$,(-ab{4.9 11.5)%($holes)
     stdout LT2,'<tr>'
     stdout LT3,'<td style="text-align: left">Fixed</td>'
-    for_hole. i. 18 do.
-	ww=. ;'b<>0.3' 8!:0 (<_1 ; hole ){mat2 
-	stdout LT3,'<td>',ww,'</td>'
+    for_hole. holes do.
+		ww=. ;'b<>0.3' 8!:0 (<_1 ; hole ){mat2 
+		stdout LT3,'<td>',ww,'</td>'
     end.
     ww=. ;'b<>0.3' 8!:0 +/9{._1{mat2
     stdout LT3,'<td>',ww,'</td>'
@@ -331,8 +331,8 @@ for_ab. 0 1 do.
     NB. Total obstacle
     stdout ,LT2,'<tr>'
     stdout LT3,'<td class="total" style="text-align: left; width: 7%">Obst SS</td>'
-    for_hole. i. 18 do.
-	stdout LT3,'<td><b>',(;'b<>0.3' 8!:0 hole{ +/mat2),'</td>'
+    for_hole. holes do.
+		stdout LT3,'<td><b>',(;'b<>0.3' 8!:0 hole{ +/mat2),'</td>'
     end.
     total2=. 1 round +/9{.+/mat2
     total2=. total2,1 round +/9}.+/mat2
@@ -343,8 +343,8 @@ for_ab. 0 1 do.
     NB. Grand total
     stdout LT2,'<tr>'
     stdout LT3,'<td class="total" style="text-align: left; width: 7%">Total ',(>ab{' ' cut 'Scr Bgy'),'</td>'
-    for_hole. i. 18 do.
-	stdout LT3,'<td><b>',(;'b<>0.3' 8!:0 hole{ +/mat,mat2),'</td>'
+    for_hole. holes do.
+		stdout LT3,'<td><b>',(;'b<>0.3' 8!:0 hole{ +/mat,mat2),'</td>'
     end.
     
     stdout LT3,'<td class="grandtotal">',(4j1 ": 0{total+total2) ,'</td>'
@@ -389,7 +389,7 @@ NB. Calculate wind factor
 wind=. y
 wind=. , wind
 ab=. x
-res=. (+/wind { 180 144 120 96 72 54) % 18 * ab{220 160 
+res=. (+/wind { 180 144 120 96 72 54) % ($Holes '') * ab{220 160 
 )
 
 round=: 4 : 0
