@@ -126,6 +126,9 @@ NB. ============================================
 NB. ReadGPS 
 NB. --------------------------------------------
 NB. Read GPS file
+NB. Usage:
+NB.		ReadGPS ''
+NB.	File context is automatic.  Converts .txt file to global variables.
 NB. ============================================
 ReadGPS=: 3 : 0
 require 'tables/csv'
@@ -313,7 +316,7 @@ NB. =============================================
 NB. Usage: AugmentGPS holes
 AugmentGPS=: 3 : 0
 y=. ,y
-y=. (y e. i.18 ) # y NB. Limit to valid holes
+y=. (y e. Holes '' ) # y NB. Limit to valid holes
 for_h. y do. NB. Start of hole loop <h>
     NB. Green centres
     xx=. ('r<0>2.0' 8!:0 (1+h)),each(' ' cut 'GC GF GB')
@@ -347,7 +350,7 @@ for_h. y do. NB. Start of hole loop <h>
 
 end. NB. End of hole loop <h>	
 
-NB. Finally, adjust tee position to be the same as the card
+NB. Finally, adjust tee position to be the same as the card yardage
 for_h. y do. NB. Start of hole loop <h>
 
     NB. Other tees
@@ -370,6 +373,7 @@ utFilePut glFilepath
 
 NB. =====================================================
 NB. Check_dogleg
+NB. No longer used.  Was originally for crow-flight distance calculations.
 NB. =====================================================
 Check_dogleg=: 3 : 0
 'hole tee gender ability'=. y
@@ -422,7 +426,7 @@ if. 0=L. y do. y=. 4{. <y end.
 y=. 4{. y
 (' ' cut 'holes tees genders abilities')=. y
 holes=. , holes
-if. 0=#holes do. holes=. i. 18 end.
+if. 0=#holes do. holes=. (Holes '') end.
 genders=. ,genders
 if. 0=#genders do. genders=. 0 1 end.
 abilities=. , abilities
@@ -756,7 +760,7 @@ NB. -------------------------------------------------------------
 CleanupPlan=: 3 : 0
 'holes tees genders abilities'=. y
 holes=. ,<. 0.5 + holes
-holes=. (holes e. i. 18) # holes
+holes=. (holes e. Holes '') # holes	NB. Augmented to cover >18 holes
 
 NB. Delete if a measurement record and no recordings
 utKeyRead glFilepath,'_plan'
@@ -930,20 +934,24 @@ utKeyRead glFilepath,'_plan'
 NB. Clear tee altitudes
 utKeyRead glFilepath,'_tee'
 glTeID utKeyDrop glFilepath,'_tee'
-glTeUpdateName=: (18*$glTees)$<''
+holes=. $Holes ''
+glTeUpdateName=: (holes*$glTees)$<''
 glTeUpdateTime=: glTeUpdateName
 glTeAlt=: ($glTeUpdateName)$0
-glTePar=: ((18*$glTees),2)$,1 0 2 |:(($glTees),18 2)$,18 2 $ par
+glTePar=: ((holes*$glTees),2)$,1 0 2 |:(($glTees),holes, 2)$,(holes, 2) $ par
 ww=.(3 4 5 i. glTePar){('' ; '.' ; '.')
 glTeTree=: (($ww),2)$,ww,"1 ww NB. Have to add extra dimension for the ability
 glTeTee=: ($glTeUpdateName)$ ; {. each glTeesName
 glTePlayer=: (($glTeUpdateName),2)$1 0
 glTeMeasured=: glTePlayer
-glTeHole=: , |: (($glTees),18)$i. 18
-glTeID=: (,|: (($glTees),18)$'r<0>2.0' 8!:0 i. 18),each ($glTeUpdateName)${. each glTeesName
+glTeHole=: , |: (($glTees),holes)$glHoleOffset + i. holes
+glTeID=: (,|: (($glTees),holes)$'r<0>2.0' 8!:0 glHoleOffset + i. holes),each ($glTeUpdateName)${. each glTeesName
 utKeyPut glFilepath,'_tee'
 NB. Clear green 
 utKeyRead glFilepath,'_green'
+glGrID utKeyDrop glFilepath,'_green'
+glGrHole=: glHoleOffset + i. holes
+glGrID=: 'r<0>2.0' 8!:0 glHoleOffset + i. holes
 glGrAlt=: 0 * glGrAlt
 glGrLength=: ($glGrID)$0
 glGrWidth=: ($glGrWidth)$0
@@ -981,9 +989,22 @@ glGrWaterFraction=: ($glGrID)$<''
 glGrWaterSurrDist=: ($glGrID)$<''
 glGrNotes=: ($glGrID)$<''
 utKeyPut glFilepath,'_green'
-AugmentGPS i. 18
-BuildPlan i. 18
+AugmentGPS glHoleOffset + i. holes
+BuildPlan glHoleOffset + i. holes
 )
+
+NB. =======================================================
+NB. CheckMainFile
+NB. =======================================================
+NB. Check if extra variables exist
+CheckMainFile=: 3 : 0
+if. 0 ~: 4!:0 <'gl9Hole' do.
+	gl9Hole=: 0
+	glHoleOffset=: 0
+	(cut 'gl9Hole glHoleOffset') utFilePut glFilepath
+end.
+)
+
 
 NB. ========================================================
 NB. CheckPlanFile
@@ -1156,6 +1177,80 @@ if. -. fexist y,'.ijf' do.
     glSSObstacle=: 1 10 2$0
     glSSObsFactor=: 1 10 2$0
 end.
+
+)
+
+Holes=: 3 : 0
+NB. =========================================================
+NB. Holes
+NB. Usage:
+NB.    Holes ''
+NB. ---------------------------------------------------------
+NB. Generates an array of holes based on <<gl9Hole>> and <glHoleOffset
+NB. =========================================================
+res=. glHoleOffset + i. gl9Hole { 18 9 
+)
+
+jweb_rating_getholes=: 3 : 0
+NB. =========================================================
+NB. getholes
+NB. Usage:
+NB.    Holes ''
+NB. ---------------------------------------------------------
+NB. Returns <<gl9Hole>> and <glHoleOffse
+NB. ONLY RUN in batch modet
+NB. =========================================================
+glFilename=: dltb > 0{ y
+glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
+utFileGet glFilepath
+stdout dltb ": glHoleOffset,gl9Hole{18 9
+)
+
+ChopFiles=: 3 : 0
+NB. =====================================================================
+NB. ChopFiles
+NB. =====================================================================
+NB. Usage:
+NB.    InitiateCourse pi ; 4 4 , 5 5 , ..  (pars)
+NB.
+NB. 1. Copy seven files from the latest one
+NB. 2. Alter glCourseName, glCourseLead, glCourseDate and write to glFilepath
+NB. 3. Alter glTeesYards and write to glFilepath
+NB. 4. Alter glTees and glTeesName and write to glFilepath
+NB. 5. Create kml file in GoogleEarth
+NB. 6. Use gpsbabel to convert to unicsv, saving as ".txt" file
+NB. 7. Run ReadGPS and save to glFilepath
+NB. 8. Run this function InitiateCourse pi (for safety)
+NB. 4. Execute:  glTePar=: ((18*$glTees),2)$,1 0 2 |:(($glTees),18 2)$,18 2 $ 4 4, 5 5 , 3 3 5 3 4 ... and write to '.._tee'
+'pi holes'=. y
+if. pi ~: 3.14159 do. return. end.
+utFileGet glFilepath
+currholes=. Holes ''
+glTeesYards=: (currholes i. holes){"1 glTeesYards
+glHoleOffset=: 0{holes
+gl9Hole=: 9=$holes
+utFilePut glFilepath
+NB. Clear out the plan records
+utKeyRead glFilepath,'_plan'
+ww=. (glPlanHole>:0) *. -. glPlanHole e. holes
+(ww#glPlanID) utKeyDrop glFilepath,'_plan' NB. Ignore '_default' and drop the other holes
+NB. Clear tee altitudes
+utKeyRead glFilepath,'_tee'
+ww=. (glTeHole>:0) *. -. glTeHole e. holes
+(ww#glTeID) utKeyDrop glFilepath,'_tee' NB. Ignore '_default' and drop the other holes
+NB. Clear green 
+utKeyRead glFilepath,'_green'
+ww=. (glGrHole>:0) *. -. glGrHole e. holes
+(ww#glGrID) utKeyDrop glFilepath,'_green' NB. Ignore '_default' and drop the other holes
+NB. SS green 
+utKeyRead glFilepath,'_ss'
+ww=. (glSSHole>:0) *. -. glSSHole e. holes
+(ww#glSSID) utKeyDrop glFilepath,'_ss' NB. Ignore '_default' and drop the other holes
+NB. XL green 
+utKeyRead glFilepath,'_xl'
+ww=. (glXLHole>:0) *. -. glXLHole e. holes
+(ww#glXLID) utKeyDrop glFilepath,'_xl' NB. Ignore '_default' and drop the other holes
+
 
 )
 

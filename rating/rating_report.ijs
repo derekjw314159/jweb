@@ -628,12 +628,12 @@ lay=. ((<glFWWidthAdjVal) i. each lay) { each <glFWWidthAdjNum
 msk=. _1 1 i. sz
 fname fappend~ 'C' write_input 3 27 ; sz ; msk #inv (+./ msk) # (0>. ; lay) NB. Need to cater for the case where is it a Par 4 changed to Par 3
 fwtot=. fwtot +each lay NB. Only need to add once
-write_xl hole ; tee ; gender ; (hole+1) ; 83 ; 5 6 7 8 9 ; 0 ; 'Fairway W+' ; <msk #inv (+/. msk) # 0 >. ;lay NB. Expand with zeros
-2 write_xl hole ; tee ; gender ; (hole+1) ; 28 ; 5 6 7 8 9 ; 0 ; 'Fairway W+' ; <msk #inv (+/. msk) # <"0  (0 >. ;lay) NB. Expand with null boxes
+write_xl hole ; tee ; gender ; (hole+1) ; 83 ; 5 6 7 8 9 ; 0 ; 'Fairway W+' ; <msk #inv (+./ msk) # 0 >. ;lay NB. Expand with zeros
+2 write_xl hole ; tee ; gender ; (hole+1) ; 28 ; 5 6 7 8 9 ; 0 ; 'Fairway W+' ; <msk #inv (+./ msk) # <"0  (0 >. ;lay) NB. Expand with null boxes
 NB. Fairwidth negative adjustment
 fname fappend~ write_row_head 0 28 ; 2.1 0.9; '<i>Width</i>'; '<b>-W</b>'
-fname fappend~ 'C' write_input 3 28 ; sz ; msk #inv (+/. msk) # (0<.;lay)
-write_xl hole ; tee ; gender ; (hole+1) ; 84 ; 5 6 7 8 9 ; 0 ; 'Fairway W-' ; <msk #inv (+/. msk) # (0 <. ;lay) NB. Expand with zeros
+fname fappend~ 'C' write_input 3 28 ; sz ; msk #inv (+./ msk) # (0<.;lay)
+write_xl hole ; tee ; gender ; (hole+1) ; 84 ; 5 6 7 8 9 ; 0 ; 'Fairway W-' ; <msk #inv (+./ msk) # (0 <. ;lay) NB. Expand with zeros
 2 write_xl hole ; tee ; gender ; (hole+1) ; 29 ; 5 6 7 8 9 ; 0 ; 'Fairway W-' ; <msk #inv <"0  (+./ msk) # (0 <. ;lay) NB. Expand with null boxes
 NB. Fairway Obstructed
 fname fappend~ write_row_head 0 29 ; 2.5 0.5; '<i>Obtructed</i>'; '<b>O</b>'

@@ -34,7 +34,9 @@ function rating_report_summary($params, $url, $post) {
 			$gender = 'W';
 			break;
 		}
-			
+	// Retrieve the range of holes from ijf file
+	exec(($GLOBALS['ijconsole'] . ' ' . $GLOBALS['document_root'] . '/jweb/cgi/simulate.ijs r=rating/getholes/' . (implode('/', $params)) . ' PHP'), $res);
+	$holes=explode(" ", $res[0]);
 	echo '<h2>Course : ' . $course . '  Gender : ' . $gender . '  Tee : ' . $tee . '</h2><h3>All holes</h3>' ;
 // ---
 ?>
@@ -53,7 +55,9 @@ function rating_report_summary($params, $url, $post) {
 // ---
 	// Loop round holes
 	date_default_timezone_set('Europe/London');
-	for($h=0; $h<18; $h++){
+	$firsthole=intval($holes[0]);
+	$lasthole=$firsthole + intval($holes[1]);
+	for($h=$firsthole; $h<$lasthole; $h++){
 		echo "\t\t<tr>" . PHP_EOL;
 		echo "\t\t\t<td>" . (sprintf('%02d', 1+$h)) . '</td>' . PHP_EOL;
 		$webname = '/tcpdf/rating/' . $course . '_' . (sprintf('%02d' , 1+$h)) . $gender . $tee . '.pdf';
@@ -148,6 +152,9 @@ function rating_report_regen($params, $url, $post) {
 			$gender = 'W';
 			break;
 		}
+	// Retrieve the range of holes from ijf file
+	exec(($GLOBALS['ijconsole'] . ' ' . $GLOBALS['document_root'] . '/jweb/cgi/simulate.ijs r=rating/getholes/' . (implode('/', $params)) . ' PHP'), $res);
+	$holes=explode(" ", $res);
 	header('Content-Type: text/html' . PHP_EOL . PHP_EOL); 
 // ---
 ?>
@@ -167,7 +174,9 @@ function rating_report_regen($params, $url, $post) {
 <?php
 // ---
 
-	for($h=0; $h<18 ; $h++){
+	$firsthole=intval($holes[0]);
+	$lasthole=$firsthole + intval($holes[1]);
+	for($h=$firsthole; $h<$lasthole; $h++){
 		echo 'About to build PHP file for hole ' . (1+$h) . '<br>' . PHP_EOL;
 		ob_flush();
 		flush();

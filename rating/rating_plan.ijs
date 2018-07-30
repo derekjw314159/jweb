@@ -69,7 +69,7 @@ djwBlueprintCSS ''
 
 NB. Add the header stuff for the map
 if. showmap do.
-    BuildMap i. 18
+    BuildMap (Holes '')
 end.
 
 stdout LF,'</head>',LF,'<body>'
@@ -103,7 +103,7 @@ stdout LT3,'<th>RoughLength</th>'
 stdout LT2,'</tr>'
 
 stdout LT1,'</thead><tbody>'
-for_hole. i. 18 do.
+for_hole. (Holes '') do.
     stdout LT2,'<tr>',LT3,'<td><a href="/jw/rating/plan',((-. showmap)#'nomap'),'/v/',glFilename,'/',(": 1+hole),'">',(":1+hole),'</a></td>'
     for_t.  i. #glTees do.
 	    stdout LT3,'<td><a href="/jw/rating/tee/e/',glFilename,'/',(1 1 0 0 1#5{.>EnKey hole ; '' ; (t{glTees) ; 0 ; 0 ; 0),'">',(": <. 0.5 + (<t,hole){glTeesYards),'</td>'
@@ -126,7 +126,7 @@ stdout LT1,'</tbody></table>'
 
 stdout LF,'</div>' NB. main span
 stdout LF,'        '
-for_h. i. 18 do.
+for_h. (Holes '') do.
 		stdout '    <a href="/jw/rating/plan',((-. showmap)#'nomap'),'/v/',glFilename,'/',(": 1+h),'">',(":1+h),'</a>'
 end.
 stdout LF,'<br><a href="/jw/rating/xl/',glFilename,'">XL Macro</a>'
@@ -159,6 +159,7 @@ if. fexist glFilepath,'.ijf' do.
 	xx=. utKeyRead glFilepath,'_plan'
 	xx=. utKeyRead glFilepath,'_tee'
 	xx=. utKeyRead glFilepath,'_green'
+	CheckMainFile glFilepath
 	CheckPlanFile glFilepath,'_plan'  NB. Check for added variables
 	err=. ''
 else.
@@ -543,17 +544,17 @@ NB. Notes field
 stdout LT2,'Notes:',EM,;ww{glGrNotes
 stdout LF,'</div>' NB. main span
 
-if. hole>0 do.
+if. hole>0{Holes '' do.
 	stdout ' <a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/rating/plan',((-. showmap)#'nomap'),'/v/',glFilename,'/',(": hole),'">&lt;&lt;</a>'
 end.
-for_h. i. 18 do.
+for_h. (Holes '') do.
 	if. h=hole do.
 		stdout ' ',(": 1+h)
 	else.
 		stdout ' <a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/rating/plan',((-. showmap)#'nomap'),'/v/',glFilename,'/',(": 1+h),'">',(":1+h),'</a>'
 	end.
 end.
-if. hole<17 do.
+if. hole<_1{Holes '' do.
 	stdout ' <a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/rating/plan',((-. showmap)#'nomap'),'/v/',glFilename,'/',(": 2+hole),'">&gt;&gt;</a>'
 end.
 stdout ' <a href="/jw/rating/plan',((-. showmap)#'nomap'),'/v/',glFilename,'">All</a>'

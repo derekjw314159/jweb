@@ -18,7 +18,7 @@ glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
 if. fexist glFilepath,'.ijf' do.
 	ww=.utFileGet glFilepath
-	CheckXLFile glFilepath,'_ss'
+	CheckSSFile glFilepath,'_ss'
 	utKeyRead glFilepath,'_ss'
 	err=. ''
 else.
@@ -69,7 +69,10 @@ ww=. ww /: ww{glSSHole
 (ww{glSSID) utKeyRead glFilepath,'_ss'
 
 NB. Error page - No such course
-ww=.  (-. (i.18) e. glSSHole ) # 1+i. 18
+holes=. Holes ''
+f9=. 9{. holes
+b9=. 9}. holes
+ww=.  (-. holes e. glSSHole ) # 1+holes
 if. 0<#ww do.
     djwErrorPage err ; ('Missing analysis for holes : ',glFilename,' Holes : ', ":ww) ; ('/jw/rating/plan/v/',glFilename) ; 'Back to rating plan'
 	exit 2
@@ -79,7 +82,7 @@ NB. Values
 stdout LF,'<h3>Rating Values</h3>'
 stdout LF,'<table>',LT2,'<thead><tr>'
 stdout LT3,'<th style="text-align: left; width: 7%;">Dist Factors</th>'
-for_hole. i. 18 do.
+for_hole. holes do.
     stdout LT3,'<th>',(":1+hole),'</th>'
 end.
 stdout LT3,'<th>Front9</th><th>Back9</th><th>Total</th>'
@@ -87,36 +90,36 @@ stdout LT2,'</tr></thead><tbody>'
 NB. Yards
 stdout ,LT2,'<tr>'
 stdout LT3,'<td style="text-align: left;">Yards</td>'
-for_hole. i. 18 do.
+for_hole. holes do.
     stdout LT3,'<td>',(":(glSSHole i. hole){glSSYards),'</td>'
 end.
-stdout LT3,'<td>',(": +/ (glSSHole e. i. 9) # glSSYards),'</td>'
-stdout LT3,'<td>',(": +/ (glSSHole e. 9 + i. 9) # glSSYards),'</td>'
+stdout LT3,'<td>',(": +/ (glSSHole e. f9) # glSSYards),'</td>'
+stdout LT3,'<td>',(": +/ (glSSHole e. b9) # glSSYards),'</td>'
 stdout LT3,'<td>',(": +/ glSSYards),'</td>'
 stdout LT2,'</tr>'
 NB. Par
 stdout ,LT2,'<tr>'
 stdout LT3,'<td style="text-align: left;">Par</td>'
-for_hole. i. 18 do.
+for_hole. holes do.
     stdout LT3,'<td>',(":(glSSHole i. hole){glSSPar),'</td>'
 end.
-stdout LT3,'<td>',(": +/ (glSSHole e. i. 9) # glSSPar),'</td>'
-stdout LT3,'<td>',(": +/ (glSSHole e. 9 + i. 9) # glSSPar),'</td>'
+stdout LT3,'<td>',(": +/ (glSSHole e. f9) # glSSPar),'</td>'
+stdout LT3,'<td>',(": +/ (glSSHole e. b9) # glSSPar),'</td>'
 stdout LT3,'<td>',(": +/ glSSPar),'</td>'
 stdout LT2,'</tr>'
 NB. Roll
 stdout ,LT2,'<tr>'
 stdout LT3,'<td style="text-align: left;">Roll</td>'
-for_hole. i. 18 do.
+for_hole. holes do.
     ww=. ;'b<>0.0' 8!:0 (<(glSSHole i. hole),0){glSSRoll
     ww=. ww,' / ',;'b<>0.0' 8!:0 (<(glSSHole i. hole),1){glSSRoll
     stdout LT3,'<td>',ww,'</td>'
 end.
-ww=. ;'0.0' 8!:0 +/(<(I. glSSHole e. i. 9) ; 0){glSSRoll
-ww=. ww,' / ',;'0.0' 8!:0 +/(<(I. glSSHole e. i. 9) ; 1){glSSRoll
+ww=. ;'0.0' 8!:0 +/(<(I. glSSHole e. f9) ; 0){glSSRoll
+ww=. ww,' / ',;'0.0' 8!:0 +/(<(I. glSSHole e. f9) ; 1){glSSRoll
 stdout LT3,'<td>',ww,'</td>'
-ww=. ;'0.0' 8!:0 +/(<(I. glSSHole e. 9 + i. 9) ; 0){glSSRoll
-ww=. ww,' / ',;'0.0' 8!:0 +/(<(I. glSSHole e. 9 + i. 9) ; 1){glSSRoll
+ww=. ;'0.0' 8!:0 +/(<(I. glSSHole e. b9) ; 0){glSSRoll
+ww=. ww,' / ',;'0.0' 8!:0 +/(<(I. glSSHole e. b9) ; 1){glSSRoll
 stdout LT3,'<td>',ww,'</td>'
 ww=. ;'0.0' 8!:0 +/0{"1 glSSRoll
 ww=. ww,' / ',;'0.0' 8!:0 +/1{"1 glSSRoll
