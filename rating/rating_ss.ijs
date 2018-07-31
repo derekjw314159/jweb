@@ -314,7 +314,7 @@ for_ab. 0 1 do.
 	stdout LT2,'</tr>'
     end. NB. End of obstacle loop
     mat2=.|: (<(glSSHole i. holes) ; (<'') ; ab) { glSSObstacle * glSSObsFactor * ab{ 0.11 0.26
-    mat2=. mat2, ($holes)$,(-ab{4.9 11.5)%($holes)
+    mat2=. mat2, ($holes)$,(-ab{4.9 11.5)%(18)
     stdout LT2,'<tr>'
     stdout LT3,'<td style="text-align: left">Fixed</td>'
     for_hole. holes do.

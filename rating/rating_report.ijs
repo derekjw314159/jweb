@@ -438,6 +438,7 @@ fname fappend~ LF,'$pdf->AddPage(''L'');'
 
 NB. Build the data
 hityards=. 'glPlanHitYards' matrix_pull hole ; tee ; gender
+dccyards=. 'glPlanDoglegNeg' matrix_pull hole ; tee ; gender
 transition=. 'glPlanLayupType' matrix_pull hole ; tee ; gender
 transition=.  +. /"1'T' = >transition
 targvisible=. ((<glTargVisibleVal) i. each 'glPlanFWTargVisible' matrix_pull hole ; tee ; gender) { each <glTargVisibleNum
@@ -486,13 +487,14 @@ for_ab. i. 2 do.
     if. -. +. / (ww2{glPlanLayupType) e. 'LR' do.
 	ww=. (#ww2)$<''
     else.
-	ww=. boxnonzero ww2{glPlanHitYards
+	ww=. boxnonzero ww2{glPlanHitYards-glPlanDoglegNeg NB. Need to adjust for DCC
     end.
     2 write_xl hole ; tee ; gender ; (hole+1) ; (ab{7 9) ; 5 ; 0 ; 'Shot distance input' ; <(ab{3 4){.ww
-    write_xl hole ; tee ; gender ; (hole+1) ; (53+ab) ; 5 ; 0 ; 'Shot distance' ; (ab{3 4){.ww2{glPlanHitYards 
+    write_xl hole ; tee ; gender ; (hole+1) ; (53+ab) ; 5 ; 0 ; 'Shot distance' ; (ab{3 4){.ww2{glPlanHitYards-glPlanDoglegNeg NB. Need to adjust for DCC 
     2 write_xl hole ; tee ; gender ; (hole+1) ; 10 ; (ab{6 9) ; 0 ; 'Transition input' ; (+. / 'T'=ww2 {glPlanLayupType)#'Y' NB. Transition y/n
     write_xl hole ; tee ; gender ; (hole+1) ; 55 ; (ab{6 8) ; 0 ; 'Transition' ; (+. / 'T'=ww2 {glPlanLayupType){'NY' NB. Transition y/n
-    ww2=. ('' (8!:0) ww2{glPlanHitYards),each <"0 ww2{glPlanLayupType
+	NB. Need to adjust for DCC
+    ww2=. ('' (8!:0) ww2{glPlanHitYards-glPlanDoglegNeg),each <"0 ww2{glPlanLayupType
     fname fappend~ ('C' ; 1) write_input (3, 2+ab) ; (4{.((#ww2)$1.25), 4$_1.25) ; <ww2
 end.
 fname fappend~ ('R' ; 1) write_cell 0 4 ; 3 ; 'Transition Hole?'
