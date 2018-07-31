@@ -39,7 +39,7 @@ stdout LF,'<h2>''Macros for ', glCourseName,'</h2>'
 tab=. ;4$<'&nbsp;'
 NB. file exists if we have got this far
 NB. Work out the unique values and loop round by hole, tee and gender
-tees=. ~. ( (glXLHole e. i. 18 ) *. glXLOverwrite e. 0 1) # glXLTee
+tees=. ~. ( (glXLHole e. Holes'' ) *. glXLOverwrite e. 0 1) # glXLTee
 tees=. tees /: glTees i. tees
 for_tee. tees do.
     genders=. ~. ((tee = glXLTee) *. glXLOverwrite e. 0 1)# glXLGender

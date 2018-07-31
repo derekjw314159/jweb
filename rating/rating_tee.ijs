@@ -169,7 +169,7 @@ glGrRRRoughLength=: ,rrlength
 glTePar=: 1 2 $ p0, p1
 if. all do.
     utKeyRead glFilepath,'_green'
-    glGrRRRoughLength=: 18$rrlength
+    glGrRRRoughLength=: ($glGrID)$rrlength
 end.
 oldyards=.  (<(glTees i. glTeTee),glTeHole) { glTeesYards
 if. oldyards ~: yyds do.

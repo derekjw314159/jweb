@@ -344,7 +344,7 @@ keyplan utKeyPut glFilepath,'_green'
 utKeyPut glFilepath,'_tee'
 if. all do.
     utKeyRead glFilepath,'_green'
-    glGrStimp=: 18$ stimp
+    glGrStimp=: ($glGrID)$ stimp
     utKeyPut glFilepath,'_green'
 end.
 

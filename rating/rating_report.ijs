@@ -1588,7 +1588,7 @@ NB.
 NB. Returns a LF delimited string of distances
 distance_report=: 3 : 0
 res=. ''
-for_h. i. 18 do.
+for_h. (Holes '') do.
     for_t. glTees do.
 		utKeyRead glFilepath,'_plan'
 		ww=. glPlanHole = h
@@ -1687,7 +1687,7 @@ NB.
 NB. Returns a LF delimited string of distances
 merge_sheets=: 3 : 0
 res=. 'pdftk '
-for_hole. i. 18 do.
+for_hole. (Holes '') do.
 		shortname=. glFilename,'_',(;'r<0>2.0' 8!:0 (1+hole))
 		fname=. '/home/user/Downloads/',shortname,'.pdf'
 		res=. res,' ',fname
