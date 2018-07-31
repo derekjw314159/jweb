@@ -616,6 +616,7 @@ write_xl hole ; tee ; gender ; (hole+1) ; 79 ; 5 6 7 8 9 ; 0 ; 'Fairway width' ;
 NB. Fairway Layup
 fname fappend~ write_row_head 0 25 ; 2.5 0.5; '<i>Lay-up</i>'; '<b>L</b>'
 lay=. - each 'L' =each }: each 'glPlanLayupType' matrix_pull hole ; tee ; gender NB. -1 if Layup
+lay=. lay * each (<<'dcc') ~: each }: each'glPlanLayupCategory' matrix_pull hole ; tee ; gender NB. Doesn't count if DCC
 fname fappend~ 'C' write_input 3 25 ; sz ; (;lay)
 fwtot=. fwtot +each lay
 NB. Fairway Visibility
@@ -1038,6 +1039,7 @@ fname fappend~ write_calc 11 3 ; 3 4 ; fwtot
 NB. Fairway Layup
 fname fappend~ write_row_head 8 4 ; 2.5 0.5; '<i>Lay-up</i>'; '<b>L</b>'
 lay=. - each 'L' =each 'glPlanLayupType' matrix_pull hole ; tee ; gender NB. -1 if Layup
+lay=. lay * each (<<'dcc') ~: each 'glPlanLayupCategory' matrix_pull hole ; tee ; gender NB. Doesn't count if DCC
 fname fappend~ 'C' write_input 11 4 ; sz ; (;lay)
 fwtot=. fwtot + > +/each lay
 NB. Inconsistent
