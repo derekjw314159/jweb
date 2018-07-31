@@ -154,7 +154,7 @@ function rating_report_regen($params, $url, $post) {
 		}
 	// Retrieve the range of holes from ijf file
 	exec(($GLOBALS['ijconsole'] . ' ' . $GLOBALS['document_root'] . '/jweb/cgi/simulate.ijs r=rating/getholes/' . (implode('/', $params)) . ' PHP'), $res);
-	$holes=explode(" ", $res);
+	$holes=explode(" ", $res[0]);
 	header('Content-Type: text/html' . PHP_EOL . PHP_EOL); 
 // ---
 ?>

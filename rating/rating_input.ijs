@@ -32,7 +32,7 @@ if. 0<#err do.
     djwErrorPage err ; ('No such course name : ',glFilename) ; '/jw/rating/plan/v' ; 'Back to rating plan'
 end.
 
-stdout LF,'<h2>Input macros for ', glCourseName,'</h2>'
+stdout LF,'<h2>''Input macros for ', glCourseName,'</h2>'
 tab=. ;4$<'&nbsp;'
 NB. file exists if we have got this far
 NB. Work out the unique values and loop round by hole, tee and gender
@@ -78,7 +78,7 @@ for_i. ww do.
 end.
 
 stdout LF,'<div class="span-20 last">'
-stdout LF,'<a href="/jw/rating/plannomap/v/',(glFilename),'">Return to plan</a>'
+stdout LF,''' <a href="/jw/rating/plannomap/v/',(glFilename),'">Return to plan</a>'
 stdout LF,'</div>' 
 stdout LF,'</div>' NB. end main container
 stdout '</body></html>'
