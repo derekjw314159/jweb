@@ -345,8 +345,6 @@ if. fexist glFilepath,'.ijf' do.
 	utKeyRead glFilepath,'_plan'
 	utKeyRead glFilepath,'_tee'
 	utKeyRead glFilepath,'_green'
-	CheckXLFile glFilepath,'_xl'  NB. Check existence of XL file
-	utKeyRead glFilepath,'_xl'
 	CheckSSFile glFilepath,'_ss'
 	utKeyRead glFilepath,'_ss'
 	err=. ''
@@ -368,10 +366,12 @@ if. 0<#err do.
 end.
 
 NB. Clear down the XL entries for this page
-ww=. glXLHole = hole
-ww=. ww *. glXLTee = tee
-ww=. ww *. glXLGender = gender
-(ww # glXLID) utKeyDrop glFilepath,'_xl'
+CheckXLFile glFilepath,'_xl'  NB. Check existence of XL file
+keys=. keydir glFilepath,'_xl'
+ww=. I. hole = >_1 ". each (<0 1){ each keys
+ww=. ((>3 {each ww{keys)=tee)#ww
+ww=. ((>5 {each ww{keys)=gender{'MW')#ww
+(ww{keys) utKeyDrop glFilepath,'_xl'
 glXLCount=: _1
 
 NB. Pull / create SS record
@@ -390,10 +390,10 @@ end.
 
 NB. file exists if we have got this far
 NB. Need to check this is a valid shot
-ww=. glPlanRecType e. 'P'
-ww=. ww *. glPlanHole=hole
-ww=. ww *. glPlanTee=tee
-ww=. I. ww *. glPlanGender=gender
+keys=. keydir glFilepath,'_plan'
+ww=. I. hole = >_1 ". each (<0 1){ each keys
+ww=. ((>4 {each ww{keys)=tee)#ww
+ww=. ((>6 {each ww{keys)=gender{'MW')#ww
 
 if.  (0=#ww) do.
     djwErrorPage err ; ('No such sheet : ',}. ; (<'/'),each y) ; ('/jw/rating/plannomap/v/',glFilename) ; 'Back to rating plan'
@@ -410,6 +410,8 @@ NB. Read the Green
 ((hole=glGrHole)#glGrID) utKeyRead glFilepath,'_green'
 
 NB. Order by ability, shot and re-read the plan
+(ww{keys) utKeyRead glFilepath,'_plan'
+ww=. I. glPlanRecType e. 'P'
 ww=. ww /: ww{glPlanShot
 ww=. ww /: ww{glPlanAbility
 (ww{glPlanID) utKeyRead glFilepath,'_plan'
@@ -629,15 +631,15 @@ fname fappend~ write_row_head 0 27 ; 2.1 0.9; '<i>Width</i>'; '<b>+W</b>'
 lay=.  }: each 'glPlanFWWidthAdj' matrix_pull hole ; tee ; gender
 lay=. ((<glFWWidthAdjVal) i. each lay) { each <glFWWidthAdjNum
 msk=. _1 1 i. sz
-fname fappend~ 'C' write_input 3 27 ; sz ; msk #inv (+./ msk) # (0>. ; lay) NB. Need to cater for the case where is it a Par 4 changed to Par 3
+fname fappend~ 'C' write_input 3 27 ; sz ; (+./ msk) # (0>. ; lay) NB. Need to cater for the case where is it a Par 4 changed to Par 3
 fwtot=. fwtot +each lay NB. Only need to add once
 write_xl hole ; tee ; gender ; (hole+1) ; 83 ; 5 6 7 8 9 ; 0 ; 'Fairway W+' ; <msk #inv (+./ msk) # 0 >. ;lay NB. Expand with zeros
-2 write_xl hole ; tee ; gender ; (hole+1) ; 28 ; 5 6 7 8 9 ; 0 ; 'Fairway W+' ; <msk #inv (+./ msk) # <"0  (0 >. ;lay) NB. Expand with null boxes
+2 write_xl hole ; tee ; gender ; (hole+1) ; 28 ; 5 6 7 8 9 ; 0 ; 'Fairway W+' ; < msk #inv (+./ msk) # <"0  (0 >. ;lay) NB. Expand with null boxes
 NB. Fairwidth negative adjustment
 fname fappend~ write_row_head 0 28 ; 2.1 0.9; '<i>Width</i>'; '<b>-W</b>'
-fname fappend~ 'C' write_input 3 28 ; sz ; msk #inv (+./ msk) # (0<.;lay)
-write_xl hole ; tee ; gender ; (hole+1) ; 84 ; 5 6 7 8 9 ; 0 ; 'Fairway W-' ; <msk #inv (+./ msk) # (0 <. ;lay) NB. Expand with zeros
-2 write_xl hole ; tee ; gender ; (hole+1) ; 29 ; 5 6 7 8 9 ; 0 ; 'Fairway W-' ; <msk #inv <"0  (+./ msk) # (0 <. ;lay) NB. Expand with null boxes
+fname fappend~ 'C' write_input 3 28 ; sz ;  (+./ msk) # (0<.;lay)
+write_xl hole ; tee ; gender ; (hole+1) ; 84 ; 5 6 7 8 9 ; 0 ; 'Fairway W-' ; < msk #inv (+./ msk) # (0 <. ;lay) NB. Expand with zeros
+2 write_xl hole ; tee ; gender ; (hole+1) ; 29 ; 5 6 7 8 9 ; 0 ; 'Fairway W-' ; < msk #inv<"0  (+./ msk) # (0 <. ;lay) NB. Expand with null boxes
 NB. Fairway Obstructed
 fname fappend~ write_row_head 0 29 ; 2.5 0.5; '<i>Obtructed</i>'; '<b>O</b>'
 lay=. _2}. each 0, each 'glPlanFWObstructed' matrix_pull hole ; tee ; gender NB. Push to the shot after
