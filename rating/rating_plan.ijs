@@ -170,6 +170,7 @@ stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 djwBlueprintCSS ''
+NB. stdout LF,'<link rel="stylesheet" href="/css/rating_plan.css" type="text/css">'
 
 NB. Add the header stuff for the map
 if. showmap do.
@@ -222,7 +223,7 @@ end.
 stdout '</tbody></table></div>'
 stdout LF,TAB,'<div class="span-24 last">'
 
-stdout LF,'<table>'
+stdout LF,'<table class="tableplan">'
 stdout LF,'<thead><tr>'
 utKeyRead glFilepath,'_tee' NB. Just read for this hole
 ww=. I. glTeHole = hole
@@ -235,6 +236,10 @@ backstart=. 0{backpath
 
 for_t. tees do.
 	stdout '<th>',(>(glTees i. t){glTeesName),'</th>'
+end.
+NB. Pad to five columns for a maximum of five tees
+for. (i. 0 >. 5-#tees) do.
+	stdout '<th class="zz"></th>'
 end.
 stdout '<th>Player Shot</th><th>Hit / Layup</th><th>To Green</th><th>Edit Copy</th><th>Alt</th><th>F/width</th><th>Bunk LZ</th><th>Bunk LoP</th><th>Dist OB</th><th>OOB %age</th><th>OOB LoP</th><th>Dist Tr</th><th>Dist Wat</th><th>Wat LoP</th><th>Roll U/L/D</th><th>Mi/Mo /Sig</th><th>MP/MA SA/EA</th><th>F/w +/-W</th><th colspan="3">Other Variables</th></tr></thead><tbody>'
 NB. Sort the records and re-read
@@ -258,6 +263,10 @@ stdout '">Add chute</a></td></tr>'
 
 for_rr. i. #glPlanID do.
 	if. 'P' = rr{glPlanRecType do.
+		rgb=. (glTees i. rr{glPlanTee){glTeesRGB
+		rgb=. (0{"1 glRGB) i. rgb
+		rgb=. >(<rgb,1) { glRGB
+		rgb=. '#',rgb
 		stdout '<tr>'
 		if. 0 = rr{glPlanRemGroundYards do.
 			for_t. tees do.
@@ -267,9 +276,12 @@ for_rr. i. #glPlanID do.
 				end.
 				stdout '</td>'
 			end.
+			for. (i. 0 >. 5-#tees) do.
+				stdout '<td class="zz"></td>'
+			end.
 		else.
 			for_t. tees do. NB. Write out the distances and crow's flight distance
-				stdout '<td>'
+				stdout '<td style="background-color:',rgb,';">'
 				holelength=. (<(glTees i. t),hole){glTeesYards
 				holelength=. <. 0.5+ holelength - (rr{glPlanMeasDist) 
 				ww=. InterceptPath backpath ; backstart ; holelength
@@ -290,6 +302,9 @@ for_rr. i. #glPlanID do.
 				elseif. 1 do.
 				end.
 				stdout '</td>'
+			end.
+			for. (i. 0 >. 5-#tees) do.
+				stdout '<td class="zz"></td>'
 			end.
 		end.
 		stdout '<td>',((rr{glPlanGender){'MW'),({.>(glTees i. rr{glPlanTee){glTeesName),'-',((rr{glPlanAbility){'SB'),(": 1+rr{glPlanShot),,'</td>'
@@ -371,12 +386,18 @@ NB.stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr
 				stdout 'Hole'
 				stdout '</td>'
 			end.
+			for. (i. 0 >. 5-#tees) do.
+				stdout '<td class="zz"></td>'
+			end.
 		else.
 			for_t. tees do.
 				stdout '<td>'
 				holelength=. (<(glTees i. t),hole){glTeesYards
 				stdout ": <. 0.5+ holelength - (rr{glPlanMeasDist) 
 				stdout '</td>'
+			end.
+			for. (i. 0 >. 5-#tees) do.
+				stdout '<td class="zz"></td>'
 			end.
 		end.
 		stdout '<td colspan="3"><i>Measured Point</i></td>'
@@ -424,6 +445,9 @@ NB.stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr
 			stdout ": <. 0.5+ holelength - (rr{glPlanMeasDist) 
 			stdout '</td>'
 		end.
+		for. (i. 0 >. 5-#tees) do.
+			stdout '<td class="zz"></td>'
+		end.
 		stdout '<td colspan="3"><i>Carry : ',(;('FWBR' i. rr{glPlanCarryType){'/' cut 'Fairway/Water/Bunkers/Extreme Rough')
 		affects=. ''$rr{glPlanCarryAffectsTee
 		if. (' ' ~: affects) do.
@@ -452,6 +476,9 @@ NB.stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr
 			holelength=. (<(glTees i. t),hole){glTeesYards
 			stdout ": <. 0.5+ holelength - (rr{glPlanMeasDist) 
 			stdout '</td>'
+		end.
+		for. (i. 0 >. 5-#tees) do.
+			stdout '<td class="zz"></td>'
 		end.
 		stdout '<td colspan="3"><i>Squeeze/Chute : ',(;('TWBR' i. rr{glPlanSqueezeType){'/' cut 'Trees/Water/Bunkers/Extreme Rough'),' width=',(": rr{glPlanSqueezeWidth),'</i></td>'
 		NB. stdout LT3,'<td>',(": rr{glPlanRemGroundYards),'</td>'

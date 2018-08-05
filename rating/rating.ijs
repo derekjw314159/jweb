@@ -25,6 +25,9 @@ stdout LF,'<link rel="stylesheet" href="/css/blueprint/screen.css" type="text/cs
 stdout LF,'<style>a:link:after, a:visited:after{'
 stdout LF,TAB,'     content: normal;'
 stdout LF,TAB,'}</style>'
+NB. Zero columns
+stdout LF,'<style>td.zz, th.zz { font-size: 0px; width: 0px; padding: 0px; border-collapse: true; }'
+stdout LF,'</style>'
 NB. stdout LF,'<link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print">'
 stdout LF,'<!--[if lt IE 8]>'
 stdout LF,TAB,'<link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection">'

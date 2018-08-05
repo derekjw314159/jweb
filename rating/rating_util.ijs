@@ -919,7 +919,7 @@ NB.
 NB. 1. Copy seven files from the latest one
 NB. 2. Alter glCourseName, glCourseLead, glCourseDate and write to glFilepath
 NB. 3. Alter glTeesYards and write to glFilepath
-NB. 4. Alter glTees and glTeesName and write to glFilepath
+NB. 4. Alter glTees, glTeesName and write to glFilepath
 NB. 5. Create kml file in GoogleEarth
 NB. 6. Use gpsbabel to convert to unicsv, saving as ".txt" file
 NB. 7. Run ReadGPS and save to glFilepath
@@ -958,7 +958,7 @@ glGrWidth=: ($glGrWidth)$0
 glGrDiam=: ($glGrID)$0
 glGrCircleConcept=: ($glGrID)$0
 glGrVisibility=: ($glGrID)$<''
-glGrObstrcted=: ($glGrID)$0 NB. Not used
+glGrObstructed=: ($glGrID)$0 NB. Not used
 glGrTiered=: ($glGrID)$0
 glGrFirmness=: ($glGrID)$<''
 glGrWaterPercent=: ($glGrID)$<''
