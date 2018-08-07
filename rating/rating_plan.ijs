@@ -170,7 +170,7 @@ stdout 'Content-type: text/html',LF,LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 djwBlueprintCSS ''
-NB. stdout LF,'<link rel="stylesheet" href="/css/rating_plan.css" type="text/css">'
+stdout LF,'<link rel="stylesheet" href="/css/rating_plan.css" type="text/css">'
 
 NB. Add the header stuff for the map
 if. showmap do.
