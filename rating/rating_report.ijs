@@ -354,7 +354,7 @@ end.
 
 
 if. x=0 do.
-stdout 'Content-type: text/html',LF,LF,'<html>',LF
+stdout 'Content-type: text/html',LF,LF,'<!DOCTYPE html>',LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 djwBlueprintCSS ''

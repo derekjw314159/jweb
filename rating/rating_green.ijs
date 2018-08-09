@@ -21,7 +21,7 @@ else.
 	err=. 'No such course : ',glFilename
 end.
 
-stdout 'Content-type: text/html',LF,LF,'<html>',LF
+stdout 'Content-type: text/html',LF,LF,'<!DOCTYPE html>',LF,'<!DOCTYPE html>',LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 djwBlueprintCSS ''
@@ -265,7 +265,7 @@ utKeyRead glFilepath,'_tee'
 NB. Throw error page if updated
 if. (-. glSimulate)  do.
 if. (-. (;glGrUpdateTime) -: (;prevtime)) do.
-	stdout 'Content-type: text/html',LF,LF,'<html>',LF
+	stdout 'Content-type: text/html',LF,LF,'<!DOCTYPE html>',LF,'<html>',LF
  	stdout LF,'<head>'
  	stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
  	djwBlueprintCSS ''
@@ -349,7 +349,7 @@ if. all do.
 end.
 
 stdout 'Content-type: text/html',LF,LF
-stdout LF,'<html><head>' 
+stdout LF,'<!DOCTYPE html>',LF,'<html><head>' 
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 NB. Choose page based on what was pressed
 	if. 0= 4!:0 <'control_calc' do.

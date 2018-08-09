@@ -60,7 +60,7 @@ else.
 	err=. 'No such course'
 end.
 
-stdout 'Content-type: text/html',LF,LF,'<html>',LF
+stdout 'Content-type: text/html',LF,LF,'<!DOCTYPE html>',LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
 NB. stdout LF,'<script>setTimeout(function(){window.location.href=''http://www.google.com''},5000);</script>'
@@ -253,7 +253,7 @@ rr=. (rr { glPlanID) \: rr { glPlanMeasDist
 rr utKeyRead glFilepath,'_plan'
 
 NB. Add buttons first
-stdout LT3,'<tr>',LT4,'<td colspan="8">'
+stdout LT3,'<tr>',LT4,'<td data-tee="Carry Points" colspan="8">'
 stdout '<a href="/jw/rating/carry/a/',(glFilename),'/'
 stdout ;": 0{glPlanHole
 stdout '">Add carry point</a>',EM
@@ -270,9 +270,11 @@ for_rr. i. #glPlanID do.
 		stdout '<tr>'
 		if. 0 = rr{glPlanRemGroundYards do.
 			for_t. tees do.
-				stdout '<td>'
+				tdtext=.'<td style="background-color:',rgb,';" data-tee','="',(>(glTees i. t){glTeesName),'">'
 				if. (t=rr{glPlanTee) do.
-					stdout '<b>Hole</b>'
+					stdout tdtext,'<b>Hole</b>'
+				else.
+					stdout '<td style="padding: 0px; border: 0px; border-collapse: collapse;">'
 				end.
 				stdout '</td>'
 			end.
@@ -281,7 +283,7 @@ for_rr. i. #glPlanID do.
 			end.
 		else.
 			for_t. tees do. NB. Write out the distances and crow's flight distance
-				stdout '<td style="background-color:',rgb,';">'
+				tdtext=.'<td style="background-color:',rgb,';" data-tee','="',(>(glTees i. t){glTeesName),'">'
 				holelength=. (<(glTees i. t),hole){glTeesYards
 				holelength=. <. 0.5+ holelength - (rr{glPlanMeasDist) 
 				ww=. InterceptPath backpath ; backstart ; holelength
@@ -294,12 +296,13 @@ for_rr. i. #glPlanID do.
 				holelength=. ":holelength
 				
 				if. (t=rr{glPlanTee) *. (0=t_index) do.
-					stdout '<b>',holelength,ww,'</b>'
+					stdout tdtext,'<b>',holelength,ww,'</b>'
 				elseif. (t=rr{glPlanTee) do.
-					stdout '<b>',holelength,'</b>'
+					stdout tdtext,'<b>',holelength,'</b>'
 				elseif. t_index = 0. do.
-					stdout '<i>',holelength,ww,'</i>'
+					stdout tdtext,'<i>',holelength,ww,'</i>'
 				elseif. 1 do.
+					stdout '<td style="padding: 0px; border: 0px; border-collapse: collapse;">'
 				end.
 				stdout '</td>'
 			end.
@@ -440,9 +443,9 @@ NB.stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr
 	elseif. 'C' = rr{glPlanRecType do.
 		stdout '<tr>'
 		for_t. tees do.
-			stdout '<td>'
+			tdtext=.'<td data-tee','="',(>(glTees i. t){glTeesName),'">'
 			holelength=. (<(glTees i. t),hole){glTeesYards
-			stdout ": <. 0.5+ holelength - (rr{glPlanMeasDist) 
+			stdout tdtext,": <. 0.5+ holelength - (rr{glPlanMeasDist) 
 			stdout '</td>'
 		end.
 		for. (i. 0 >. 5-#tees) do.
