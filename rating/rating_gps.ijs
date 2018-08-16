@@ -269,7 +269,7 @@ NB. Loop round the points for this hold
 	NB. Loop round each tee to draw the "crow's feet"
 	path=. 0$0
 	for_t. }. glTees do. NB. All bar first tee
-		path=. path, 0 1 0{ PathTeeToGreen hh ; t
+		path=. path, 1 0 1{ PathTeeToGreen hh ; t
 	end.
 	path=. path, PathTeeToGreen hh ; 0{glTees
     stdout LF,'   var flightPathCoord',(":hh),' = ['
@@ -393,7 +393,7 @@ NB. Choose page based on what was pressed
 	if. 0= 4!:0 <'control_calc' do.
 		stdout '</head><body onLoad="redirect(''',(":httpreferer),''')"'
 	elseif. 1 do.
-		stdout '</head><body onLoad="redirect(''/jw/rating/plannomap/v/',glFilename,'/',(;":1+hole),''')"'
+		stdout '</head><body onLoad="redirect(''/jw/rating/plan/v/',glFilename,'/',(;":1+hole),''')"'
     end.
 stdout LF,'</body></html>'
 NB. exit ''

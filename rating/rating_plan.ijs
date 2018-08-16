@@ -713,7 +713,7 @@ for_hh. hole do.
 	NB. Loop round each tee to draw the "crow's feet"
 	path=. 0$0
 	for_t. }. glTees do. NB. All bar first tee
-		path=. path, 0 1 0{ PathTeeToGreen hh ; t
+		path=. path, 1 0 1{ PathTeeToGreen hh ; t
 	end.
 	path=. path, PathTeeToGreen hh ; 0{glTees
     stdout LF,'   var flightPathCoord',(":hh),' = ['
