@@ -1386,12 +1386,15 @@ NB. Tree chute (not yet implemented)
 
 fname fappend~ ('cell' ; 'input') write_row_head 18 28 ; 0.55 0.7 ; '<i>W</i>' ; ":0{>0{sqwidth
 fname fappend~ ('cell' ; 'input') write_row_head 19.25 28 ; 0.5 0.75 ; '<i>D</i>'; ":0{>0{sqdist
+fw=. lookup_tree_chute (0{>0{sqwidth) ; (0{>0{sqdist) NB. Only tee shot
 fname fappend~ 'R' write_cell 20.5 28 ; 0.5 ; '<b>Q</b>'
-fname fappend~ 'C' write_calc 21 28 ;  sz ;  0*;sqdist NB. Haven't impleented the lookup yet
+fname fappend~ 'C' write_calc 21 28 ;  sz ;  1 0 1 0 #inv fw NB. Only tee shot, doesn't affect total
 NB. Tree Rating
 fname fappend~ 'R' write_footer 18 29 ; 3 ; 'Tree Rating'
 fname fappend~ 'C' write_footer 21 29 ;  3 4 ; fwtot
 psych=. psych, fwtot
+1 write_xl hole ; tee ; gender ; (hole+1) ; 30 ; 30 36 ; 0 ; 'Chute calc'  ; fw,fw  
+write_xl hole ; tee ; gender ; (hole+1) ; 89 ; 30 36 ; 0 ; 'Trees' ; fw,fw
 1 write_xl hole ; tee ; gender ; (hole+1) ; 33 ; 30 36 ; 0 ; 'Trees input'  ; fwtot  
 write_xl hole ; tee ; gender ; (hole+1) ; 92 ; 30 36 ; 0 ; 'Trees' ; fwtot
  
@@ -1434,6 +1437,7 @@ fname fappend~ write_row_head 18 38 ; 2.9 0.1 ;  ':' cut 'Sum of Obstacles: '
 fname fappend~ write_calc 21 38 ; 3 4 ; <+ / psych * psych >: 5
 fname fappend~ 'R' write_cell 18 39 ; 3 ; 'Table Value'
 wid=. lookup_psychological psych
+
 fname fappend~ 'C' write_calc  21 39 ; 3 4 ; (;wid) 
 NB. Extraordinary rating if any rated 10
 fname fappend~ write_row_head 18 40 ; 2.5 0.5 ; 'Extraordinary' ; '<b>X</b>'
@@ -2217,6 +2221,18 @@ for_ab. 0 1 do.
 	end.
 	res=. res, ( <(+/ (''$stimp) >: row), contour){mat
 end.
+)
+
+NB. =========================================================
+NB. lookup_tree_chute
+NB. =========================================================
+NB. Usage
+NB.   lookup_green_surface stimp ; contour
+lookup_tree_chute=: 3 : 0
+'width distance'=. y
+ww=. +/width > 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34
+ubound=. 9 13 17 21 ; 19 27 35 43; 29 41 53 65; 39 55 71 87;49 69 89 109; 59 83 107 131; 69 97 125 153; 79 111 143 175 ; 89 125 161 197 ; 99 139 179 219 ; 109 153 197 _ ; 119 167 215 _ ; 129 181 _ _ ; 139 195 _ _ ; 149 209 _ _ ; 159 223 _ _ ; 169 _ _ _ 
+res=.  +/ distance > ;ww { ubound
 )
 
 NB. =========================================================

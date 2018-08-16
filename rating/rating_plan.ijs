@@ -182,7 +182,7 @@ stdout LF,'<div class="container" width="100%">'
 NB. Control map display
 if. showmap do.
 	stdout LT1,'  <div id="map-canvas"></div>'
-end.e
+end.
 NB. stdout LF,'<div class="container" width="100%">'
 
 NB. Error page - No such course
@@ -310,15 +310,17 @@ for_rr. i. #glPlanID do.
 				stdout '<td class="zz"></td>'
 			end.
 		end.
-		stdout '<td>',((rr{glPlanGender){'MW'),({.>(glTees i. rr{glPlanTee){glTeesName),'-',((rr{glPlanAbility){'SB'),(": 1+rr{glPlanShot),,'</td>'
+		stdout 'Player Shot' djwTDClass ((rr{glPlanGender){'MW'),({.>(glTees i. rr{glPlanTee){glTeesName),'-',((rr{glPlanAbility){'SB'),(": 1+rr{glPlanShot)
 NB.stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr{glPlanShot),({.>(glTees i. rr{glPlanTee){glTeesName),'</td>'
-		stdout '<td><a href="/jw/rating/layup/e/',(glFilename),'/'
-		stdout ;": 1+rr{glPlanHole
-		stdout (;rr{glPlanTee),'/'
-		stdout ((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),(": 1+rr{glPlanShot),'">'
-		stdout (": rr{glPlanHitYards),( rr{glPlanHitYards ~: glPlanCrowDist)#' <span style="color: gray">[',(": rr{glPlanCrowDist),']</span>'
-		stdout (rr{glPlanLayupType)
-		stdout (('L'=rr{glPlanLayupType)#(3{.": >rr{glPlanLayupCategory)),'</a></td><td>', (": <. 0.5 + rr{glPlanRemGroundYards),'</td>' 
+		str=. '<a href="/jw/rating/layup/e/',(glFilename),'/'
+		str=. str, ;": 1+rr{glPlanHole
+		str=. str, (;rr{glPlanTee),'/'
+		str=. str, ((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),(": 1+rr{glPlanShot),'">'
+		str=. str, (": rr{glPlanHitYards),( rr{glPlanHitYards ~: glPlanCrowDist)#' <span style="color: gray">[',(": rr{glPlanCrowDist),']</span>'
+		str=. str, (rr{glPlanLayupType)
+		str=. str, (('L'=rr{glPlanLayupType)#(3{.": >rr{glPlanLayupCategory)),'</a>'
+		stdout LT4, 'Hit' djwTDClass str
+		stdout LT4, 'To Green' djwTDClass  (": <. 0.5 + rr{glPlanRemGroundYards)
 		if. 0<rr{glPlanRemGroundYards do.
 		    other=. ''
 		    other=. other, (0<#>rr{glPlanBunkExtreme)#' BuEx:',>rr{glPlanBunkExtreme
@@ -339,26 +341,25 @@ NB.stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr
 		    other=. other, (0<#>rr{glPlanTransitionOverride)#' Tran O/R:',;>rr{glPlanTransitionOverride
 		    other=. other, (0<#>rr{glPlanTransitionAdj)#' Tran Adj:',;>rr{glPlanTransitionAdj
 		    NB. Edit / Copy links
-		    stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">E</a>'
-		    stdout LT4,' <a href="/jw/rating/landingcopy/e/',(glFilename),'/',(;rr{glPlanID),'">C</a>'
-		    stdout LT4,' <a href="/jw/rating/landingcopyshot/e/',(glFilename),'/',(;rr{glPlanID),'">X</a>'
-		    stdout '</td>'
-		    stdout '<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanAlt),'</td>'
-		    stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanFWWidth),'</td>'
-		    stdout LT3,'<td style="border-right: 1px solid lightgray">',((rr{glPlanBunkLZ){'-y'),'</td>'
-		    stdout LT3,'<td style="border-right: 1px solid lightgray">',((rr{glPlanBunkLine){'-y'),'</td>'
-		    stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanOOBDist),'</td>'
-		    stdout LT3,'<td style="border-right: 1px solid lightgray">',(>rr{glPlanOOBPercent),'</td>'
-		    stdout LT3,'<td style="border-right: 1px solid lightgray">',((rr{glPlanOOBLine){'-y'),'</td>'
-		    stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanTreeDist),'</td>'
-		    NB.	stdout LT3,'<td>',(;(glTreeRecovVal i. rr{glPlanTreeRecov){glTreeRecovDesc),'</td>'
-		    stdout LT3, '<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanLatWaterDist),'</td>'
-		    stdout LT3, '<td style="border-right: 1px solid lightgray">',((rr{glPlanWaterLine){'-y'),'</td>'
-		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanRollLevel),'</td>'
-		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (3{. ":  ,>rr{glPlanRollSlope),'</td>'
-		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (,>rr{glPlanTopogStance),'</td>'
-		    stdout LT3, '<td style="border-right: 1px solid lightgray">', (6{. ":  ,>rr{glPlanFWWidthAdj),'</td>'
-		    stdout LT3,'<td colspan="3">',(}.other),'</td>'
+		    str=. '<a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">E</a>'
+		    str=. str,' <a href="/jw/rating/landingcopy/e/',(glFilename),'/',(;rr{glPlanID),'">C</a>'
+		    str=. str,' <a href="/jw/rating/landingcopyshot/e/',(glFilename),'/',(;rr{glPlanID),'">X</a>'
+		    stdout LT4,'Edit / Copy / Xcopy' djwTDClass str 
+		    stdout LT4, 'Altitude' djwTDClass ;'b<.>' 8!:0 rr{glPlanAlt
+		    stdout LT4, 'FW Width' djwTDClass ;'b<.>' 8!:0 rr{glPlanFWWidth
+		    stdout LT4, 'Bunker in LZ' djwTDClass (rr{glPlanBunkLZ){'-y'
+		    stdout LT4, 'Bunker in LoP' djwTDClass (rr{glPlanBunkLine){'-y'
+		    stdout LT4, 'OOB Distance' djwTDClass ;'b<.>' 8!:0 rr{glPlanOOBDist
+		    stdout LT4, 'OOB %age red' djwTDClass >rr{glPlanOOBPercent
+		    stdout LT4, 'OOB on LoP' djwTDClass (rr{glPlanOOBLine){'-y'
+		    stdout LT4, 'Tree Distance' djwTDClass ;'b<.>' 8!:0 rr{glPlanTreeDist
+		    stdout LT4, '<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanLatWaterDist),'</td>'
+		    stdout LT4, '<td style="border-right: 1px solid lightgray">',((rr{glPlanWaterLine){'-y'),'</td>'
+		    stdout LT4, '<td style="border-right: 1px solid lightgray">', (2{. ":  ,>rr{glPlanRollLevel),'</td>'
+		    stdout LT4, '<td style="border-right: 1px solid lightgray">', (3{. ":  ,>rr{glPlanRollSlope),'</td>'
+		    stdout LT4, '<td style="border-right: 1px solid lightgray">', (,>rr{glPlanTopogStance),'</td>'
+		    stdout LT4, '<td style="border-right: 1px solid lightgray">', (6{. ":  ,>rr{glPlanFWWidthAdj),'</td>'
+		    stdout LT4,'<td colspan="3">',(}.other),'</td>'
 		    
 		else. NB. Truncated row when at hole
 		    other=. ''
@@ -451,27 +452,19 @@ NB.stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr
 		for. (i. 0 >. 5-#tees) do.
 			stdout '<td class="zz"></td>'
 		end.
-		stdout '<td colspan="3"><i>Carry : ',(;('FWBR' i. rr{glPlanCarryType){'/' cut 'Fairway/Water/Bunkers/Extreme Rough')
+		str=. '<i>Carry : ',(;('FWBR' i. rr{glPlanCarryType){'/' cut 'Fairway/Water/Bunkers/Extreme Rough')
 		affects=. ''$rr{glPlanCarryAffectsTee
 		if. (' ' ~: affects) do.
-			stdout ' [',(>(glTees i. affects){glTeesName),']'
+			str=. str, ' [',(>(glTees i. affects){glTeesName),']'
 		end.
-		stdout '</i></td>'
+		str=. str, '</i>'
+		stdout LT3, ('Carry point'; 'colspan="3"') djwTDClass str
 		NB. stdout LT3,'<td>',(": rr{glPlanRemGroundYards),'</td>'
-		stdout LT4,'<td><a href="/jw/rating/carry/e/',(glFilename),'/',(;rr{glPlanID),'">E</a> <a href="/jw/rating/carry/d/',glFilename,'/',(;rr{glPlanID),'">D</a>'
-		stdout LT3,'<td></td>'
-		stdout LT3,'<td></td>'
-		stdout LT3,'<td></td>'
-		stdout LT3,'<td></td>'
-		stdout LT3,'<td></td>'
-		stdout LT3,'<td></td>'
-		stdout LT3,'<td></td>'
-		stdout LT3,'<td></td>'
-		stdout LT3,'<td></td>'
-		stdout LT3,'<td></td>'
-		stdout LT3,'<td></td>'
-		stdout LT3,'<td></td>'
-		stdout LT3, '<td colspan=3></td></tr>'
+		stdout LT4,'Edit / Delete' djwTDClass '<a href="/jw/rating/carry/e/',(glFilename),'/',(;rr{glPlanID),'">E</a> <a href="/jw/rating/carry/d/',glFilename,'/',(;rr{glPlanID),'">D</a>'
+		for. i. 12 do.
+			stdout LT3,djwTDClass ''
+		end.
+		stdout LT3, '<td class="zzempty" colspan=3></td></tr>'
 	elseif. 'Q' = rr{glPlanRecType do.
 		stdout '<tr>'
 		for_t. tees do.
@@ -716,8 +709,13 @@ for_hh. hole do.
     stdout LF,'      });'
     stdout LF,'   marker',(":hh),'GC.setMap(map);'
 
-    NB. Flightpath
-    path=. PathTeeToGreen hh ; 0{glTees
+	NB. Flightpath
+	NB. Loop round each tee to draw the "crow's feet"
+	path=. 0$0
+	for_t. }. glTees do. NB. All bar first tee
+		path=. path, 0 1 0{ PathTeeToGreen hh ; t
+	end.
+	path=. path, PathTeeToGreen hh ; 0{glTees
     stdout LF,'   var flightPathCoord',(":hh),' = ['
     for_p. path do.
 	    pp=. +. p
@@ -735,6 +733,17 @@ for_hh. hole do.
     stdout LF,'       strokeWeight: 1,'
     stdout LF,'       });'
     stdout LF,'   flightPath',(":hh),'.setMap(map);'
+
+	NB. Actual trail points
+    stdout LF,'   var flightPathTrail',(":hh),' = ',(ReadGPSActual ''),';'
+    stdout LF,'   var flightPathActual',(":hh),' = new google.maps.Polyline({'
+    stdout LF,'       path: flightPathTrail',(":hh),','
+    stdout LF,'       geodesic: true,'
+    stdout LF,'       strokeColor: ''pink'','
+    stdout LF,'       strokeOpacity: 1,'
+    stdout LF,'       strokeWeight: 1,'
+    stdout LF,'       });'
+    stdout LF,'   flightPathActual',(":hh),'.setMap(map);'
 
     NB. Carry Point .. draw perpendicular line
     ww=. glPlanHole = hh
@@ -791,4 +800,30 @@ NB.    stdout LF,'}'
 NB. End of hh loop
     stdout LF,'google.maps.event.addDomListener(window, ''load'', initialize);'
     stdout LF,'</script>'
+)
+
+NB. ==========================================================================
+NB. djwTDclass
+NB. --------------------------------------------------------------------------
+djwTDClass=: 3 : 0
+NB. Output class information with row "::before" format
+'' djwTDClass y
+:
+if. 32 ~: 3!:0 x do. x=. <x end.
+x=. 2{. ,x
+if. 2 ~: 3!:0 y do. y=. ": y end. NB. Numeric
+if. 32 = 3!:0 y do. y=. ; ": each y end. NB. boxed
+y=. ,y
+null=. 0
+select. y
+	case. ,'' do. null=. 1 
+	case. ,'.' do. null=. 1
+	case. ,'.' do. null=. 1
+	case. ,'-' do. null=. 1
+end.
+res=. '<td'
+res=. res,null#' class="zzempty"'
+res=. res,(0<#>0{x)#' data-tee="',(>0{x),'"'
+res=. res,(0<#>1{x)#' ',>1{x
+res=. res,'>',y,'</td>'
 )

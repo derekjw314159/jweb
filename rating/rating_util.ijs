@@ -1,3 +1,46 @@
+NB. =====================================================
+NB. Check_dogleg
+NB. No longer used.  Was originally for crow-flight distance calculations.
+NB. =====================================================
+Check_dogleg=: 3 : 0
+'hole tee gender ability'=. y
+i=. <(>'r<0>2.0' 8!:0 (1+hole)),'P1'
+i=. glGPSName i. i
+if. i >: #glGPSName do. NB. No Pivot point
+	res=. ''
+	return.
+end.
+gps_t=. LatLontoFullOS (glGPSName i. <(>'r<0>2.0' 8!:0 (1+hole)),'T',tee) { glGPSLatLon
+gps_p=. LatLontoFullOS (glGPSName i. <(>'r<0>2.0' 8!:0 (1+hole)),'P1') { glGPSLatLon
+gps_g=. LatLontoFullOS (glGPSName i. <(>'r<0>2.0' 8!:0 (1+hole)),'GC') { glGPSLatLon
+dist=. (<gender,ability){glPlayerDistances
+NB. Convert to metres
+dist=. dist % glMY
+if. (0{dist) >: |gps_p - gps_t do.
+	NB. Hit beyond pivot point
+	res=. 'Tee shot restricted to ',": <. 0.5 + glMY * |gps_p - gps_t
+	return.
+else.
+	NB. Have to calculate complex second shot
+	res=. 'Tee shot normal ',": <. 0.5 + glMY*0{dist
+	NB. Calculate pivot point 
+	gps_lay=. gps_t + ((0{dist) % (|gps_p-gps_t)) * (gps_p - gps_t)
+	NB. Angle between lines on fairway using scalar product
+	theta=. (gps_p - gps_t), (gps_g - gps_p)
+	theta=. ( */(0.5 * theta + +theta) ) - (*/ 0.5 * theta - +theta)
+	theta=. theta % (|gps_p - gps_t) * (|gps_g - gps_p) 
+	theta=. _2 o. theta NB. arccos
+	theta=. (o. 1) - theta
+	NB. Sin rule for next angle
+	bit1=. (|gps_p - gps_t) - 0{dist
+	alpha=. _1 o.  (1 o. theta) * bit1 % 1{dist
+	beta=. (o. 1) - (theta+alpha)
+	NB. Sin rule again
+	bit2=. (1 o. beta) * (1{dist) % 1 o. theta
+	res=. res, LF, 'second shot ', ": <. 0.5 + glMY * bit1 + bit2
+	res=. res, LF, 'extra ',": <. 0.5 + glMY * bit1 + bit2 - 1{dist
+end.
+)
 NB. Utilities for rating programme
 NB. Including GPS calculations
 NB. and offline updates
@@ -134,8 +177,8 @@ ReadGPS=: 3 : 0
 require 'tables/csv'
 ww=. readcsv glDocument_Root,'/yii/',glBasename,'/protected/data/',y,'.txt'
 res=. (0{ww) i. 'Latitude' ; 'Longitude' ; 'Altitude' ; 'Time' ; 'Name' ; 'Icon' ; 'Description'
-res=. res {"1 (ww,"1 a:)
-res=. }. res
+res=. res {"1 (ww,"1 a:) NB. Order the columns
+res=. }. res NB. Drop the row titles
 NB. Convert the first three columns to numbers
 res=. (". each 3{."1 res),"1 (3 }."1 res)
 res=. res /: 'TPG' i. 2{"1 >4{"1 res NB. sort by type
@@ -146,6 +189,24 @@ glGPSName=: 4{"1 res
 glGPSName=: toupper each glGPSName
 glGPSMeasured=: (#glGPSLatLon)$1
 (' ' cut 'glGPSLatLon glGPSAlt glGPSName glGPSMeasured') utFilePut glDocument_Root,'/yii/',glBasename,'/protected/data/',y
+)
+
+NB. ============================================
+NB. ReadGPSActual
+NB. --------------------------------------------
+NB. Read GPS actual file
+NB. Usage:
+NB.		ReadGPSActual ''
+NB.	Returns a javascript format set of coordinates
+NB. ============================================
+ReadGPSActual=: 3 : 0
+require 'tables/csv'
+ww=. readcsv glFilepath,'actual.txt'
+res=. (0{ww) i. 'Latitude' ; 'Longitude' ; 'Altitude' ; 'Time' ; 'Name' ; 'Icon' ; 'Description'
+res=. res {"1 (ww,"1 a:) NB. Order the columns
+res=. }. res NB. Drop the row titles
+latlon=. 2 0 3 1 4{"1 (0 1{"1 res),"1 (LF,'   new google.maps.LatLng(') ; ', ' ; '),'
+latlon=. '   [',(}: ;latlon),LF,'   ]'
 )
 
 NB. =============================================
@@ -167,7 +228,7 @@ NB. =============================================
 PathTeeToGreen=: 3 : 0
 ('h' ; 'tee' ) =. y
 string=. >'r<0>2.0' 8!:0 (1+h)
-res=. I. ((<string,'P') = (3{. each glGPSName) ) NB. Pivot ppints
+res=. I. ((<string,'P') = (3{. each glGPSName) ) NB. Pivot points
 res=. (glGPSName i.  (<string,'T',tee)),res NB. Tee
 res=. res, (glGPSName i. (<string,'GC')) NB. Green
 latlon=. res { glGPSLatLon
@@ -321,21 +382,74 @@ for_h. y do. NB. Start of hole loop <h>
     NB. Green centres
     xx=. ('r<0>2.0' 8!:0 (1+h)),each(' ' cut 'GC GF GB')
     xx=. glGPSName i. xx
-    if. (0{xx) < #glGPSName do. continue. end. NB. already exists
-    latlon=. LatLontoFullOS (1 2{xx)  { glGPSLatLon
-    latlon=. 0.5 * +/ latlon NB. average of two positions
-    latlon=. FullOStoLatLon latlon
-    glGPSLatLon=: glGPSLatLon, latlon
-    glGPSAlt=: glGPSAlt, 0.5 * +/ 1 2 {glGPSAlt
-    glGPSName=: glGPSName, <(>'r<0>2.0' 8!:0 (1+h)),'GC'
-    glGPSMeasured=: glGPSMeasured, 0
+    if. (0{xx) < #glGPSName do. continue. end. NB. already exist
+	NB. Check if GF and GB exists
+	if. *. / (1 2{xx) < #glGPSName do.
+		latlon=. LatLontoFullOS (1 2{xx)  { glGPSLatLon
+		latlon=. 0.5 * +/ latlon NB. average of two positions
+		latlon=. FullOStoLatLon latlon
+		glGPSLatLon=: glGPSLatLon, latlon
+		glGPSAlt=: glGPSAlt, 0.5 * +/ 1 2 {glGPSAlt
+		glGPSName=: glGPSName, <(>'r<0>2.0' 8!:0 (1+h)),'GC'
+		glGPSMeasured=: glGPSMeasured, 0
+	NB. Check if any other points exist for this hole
+	elseif.  (+. / (ww=. (2{. each glGPSName) i. ('r<0>2.0' 8!:0 (1+h))) < #glGPSName) do.
+		ww=. 0{I. ww < #glGPSName NB. First one which meets criterion
+		glGPSLatLon=: glGPSLatLon, ww{glGPSLatLon
+		glGPSAlt=: glGPSAlt, ww{glGPSAlt
+		glGPSName=: glGPSName, <(>'r<0>2.0' 8!:0 (1+h)),'GC'
+		glGPSMeasured=: glGPSMeasured, 0
+	NB. Check if tee reading exists for next hole
+	elseif. ( +. / (ww=. (3{. each glGPSName) i. ('r<0>2.0' 8!:0 (2+h)),each <'T') < #glGPSName) do.
+		ww=. 0{I. ww < #glGPSName NB. First one which meets criterion
+		glGPSLatLon=: glGPSLatLon, ww{glGPSLatLon
+		glGPSAlt=: glGPSAlt, ww{glGPSAlt
+		glGPSName=: glGPSName, <(>'r<0>2.0' 8!:0 (1+h)),'GC'
+		glGPSMeasured=: glGPSMeasured, 0
+	NB. Check if any reading exists on next hole
+	elseif.  (+. / (ww=. (2{. each glGPSName) i. ('r<0>2.0' 8!:0 (2+h))) < #glGPSName) do.
+		ww=. 0{I. ww < #glGPSName NB. First one which meets criterion
+		glGPSLatLon=: glGPSLatLon, ww{glGPSLatLon
+		glGPSAlt=: glGPSAlt, ww{glGPSAlt
+		glGPSName=: glGPSName, <(>'r<0>2.0' 8!:0 (1+h)),'GC'
+		glGPSMeasured=: glGPSMeasured, 0
+	NB. Check if any reading exists anywhere
+	elseif.  (0<#glGPSName)  do.
+		latlon=. LatLontoFullOS glGPSLatLon
+		latlon=. FullOStoLatLon (+/latlon) % #latlon NB. Take average
+		glGPSLatLon=: glGPSLatLon, latlon
+		glGPSAlt=: glGPSAlt, (+/glGPSAlt)% (#glGPSAlt)
+		glGPSName=: glGPSName, <(>'r<0>2.0' 8!:0 (1+h)),'GC'
+		glGPSMeasured=: glGPSMeasured, 0
+	NB. If all else fails, do a radius around the BBO office
+	elseif. 1 do.
+		glGPSLatLon=: glGPSLatLon, 51.72926843499641j_1.0429796775924842
+		glGPSAlt=: glGPSAlt, 0
+		glGPSName=: glGPSName, <(>'r<0>2.0' 8!:0 (1+h)),'GC'
+		glGPSMeasured=: glGPSMeasured, 0
+	end.
 end.  NB. end of first hole loop
+
 
 for_h. y do. NB. Start of hole loop <h>
 
+	NB. See if back tee exists first
+	t=. 0{glTees
+    xx=. <(>'r<0>2.0' 8!:0 (1+h)),'T',t
+    xx=. glGPSName i. xx
+    if. (xx = #glGPSName) do.
+	    xx=. <(>'r<0>2.0' 8!:0 (1+h)),'GC'
+		xx=. glGPSName i. xx
+		latlon=. FullOStoLatLon (LatLontoFullOS xx{glGPSLatLon) - 150j0 NB. Adjust by 150m
+	    glGPSLatLon=: glGPSLatLon, latlon
+	    glGPSAlt=: glGPSAlt, xx{glGPSAlt
+	    glGPSName=: glGPSName, <(>'r<0>2.0' 8!:0 (1+h)),'T',t
+	    glGPSMeasured=: glGPSMeasured, 0
+	end.
+
     NB. Other tees
     for_t. }. glTees do. NB. start of tee loop
-	    xx=. (>'r<0>2.0' 8!:0 (1+h)),'T',t
+	    xx=. <(>'r<0>2.0' 8!:0 (1+h)),'T',t
 	    xx=. glGPSName i. xx
 	    if. xx < #glGPSName do. continue. end. NB. already exists
 	    path=. PathTeeToGreen h ; 0{glTees
@@ -371,49 +485,6 @@ end. NB. End of hole loop <h>
 utFilePut glFilepath
 )
 
-NB. =====================================================
-NB. Check_dogleg
-NB. No longer used.  Was originally for crow-flight distance calculations.
-NB. =====================================================
-Check_dogleg=: 3 : 0
-'hole tee gender ability'=. y
-i=. <(>'r<0>2.0' 8!:0 (1+hole)),'P1'
-i=. glGPSName i. i
-if. i >: #glGPSName do. NB. No Pivot point
-	res=. ''
-	return.
-end.
-gps_t=. LatLontoFullOS (glGPSName i. <(>'r<0>2.0' 8!:0 (1+hole)),'T',tee) { glGPSLatLon
-gps_p=. LatLontoFullOS (glGPSName i. <(>'r<0>2.0' 8!:0 (1+hole)),'P1') { glGPSLatLon
-gps_g=. LatLontoFullOS (glGPSName i. <(>'r<0>2.0' 8!:0 (1+hole)),'GC') { glGPSLatLon
-dist=. (<gender,ability){glPlayerDistances
-NB. Convert to metres
-dist=. dist % glMY
-if. (0{dist) >: |gps_p - gps_t do.
-	NB. Hit beyond pivot point
-	res=. 'Tee shot restricted to ',": <. 0.5 + glMY * |gps_p - gps_t
-	return.
-else.
-	NB. Have to calculate complex second shot
-	res=. 'Tee shot normal ',": <. 0.5 + glMY*0{dist
-	NB. Calculate pivot point 
-	gps_lay=. gps_t + ((0{dist) % (|gps_p-gps_t)) * (gps_p - gps_t)
-	NB. Angle between lines on fairway using scalar product
-	theta=. (gps_p - gps_t), (gps_g - gps_p)
-	theta=. ( */(0.5 * theta + +theta) ) - (*/ 0.5 * theta - +theta)
-	theta=. theta % (|gps_p - gps_t) * (|gps_g - gps_p) 
-	theta=. _2 o. theta NB. arccos
-	theta=. (o. 1) - theta
-	NB. Sin rule for next angle
-	bit1=. (|gps_p - gps_t) - 0{dist
-	alpha=. _1 o.  (1 o. theta) * bit1 % 1{dist
-	beta=. (o. 1) - (theta+alpha)
-	NB. Sin rule again
-	bit2=. (1 o. beta) * (1{dist) % 1 o. theta
-	res=. res, LF, 'second shot ', ": <. 0.5 + glMY * bit1 + bit2
-	res=. res, LF, 'extra ',": <. 0.5 + glMY * bit1 + bit2 - 1{dist
-end.
-)
 
 NB. =====================================================
 NB. BuildPlan

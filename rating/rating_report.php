@@ -9,7 +9,7 @@ function rating_report_summary($params, $url, $post) {
 	header('Content-Type: text/html' . PHP_EOL . PHP_EOL); 
 // ---
 ?>
-<html>
+<!DOCTYPE html>
 <head>
 <script src="/javascript/pagescroll.js"></script>
 
@@ -158,6 +158,7 @@ function rating_report_regen($params, $url, $post) {
 	header('Content-Type: text/html' . PHP_EOL . PHP_EOL); 
 // ---
 ?>
+<!DOCTYPE html>
 <html>
 <head>
 <script src="/javascript/pagescroll.js"></script>
