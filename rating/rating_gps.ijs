@@ -280,6 +280,9 @@ NB. Loop round the points for this hold
 		    stdout ','
 	    end.
     end.
+	NB. Reset path
+	path=. PathTeeToGreen hh ; 0{glTees
+
     stdout LF,'      ];'
     stdout LF,'   var flightPath',(":hh),' = new google.maps.Polyline({'
     stdout LF,'       path: flightPathCoord',(":hh),','
