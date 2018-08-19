@@ -1027,6 +1027,8 @@ NB. Recoverability and Rough
 NB. ------------------------
 fname fappend~ LF,'// -------- Recoverability and Rough -------------'
 carryyards=. 'F' carry_yards hole; tee ; gender 
+NB. Have to fix bogey first carry in case it is >=200 yards
+carryyards=. (0{carryyards), <(0{>0{carryyards),}.>1{carryyards
 fname fappend~ write_title 8 1 ; 3 1 ; '<b>RECOV & ROUGH</b>' 
 fname fappend~ ('cell' ; 'input') write_row_head 11 1 ; 5 2 ; '<i>Average Hole Rough Height:</i>' ; (":glGrRRRoughLength),'&quot;'
 NB. XL has a range
