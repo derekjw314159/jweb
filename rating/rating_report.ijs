@@ -831,7 +831,7 @@ fname fappend~ write_row_head 0 36 ; 2.5 0.5 ; ' ' cut '<i>Adjust</i> <b></b>'
 fname fappend~ write_input 3 36 ; 2.5 2.5 ; adj
 greenval=. greenval + adj
 write_xl hole ; tee ; gender ; (hole+1) ; 93 ; 5 7 ; 0 ; 'Transition adjustment' ; adj
-2 write_xl hole ; tee ; gender ; (hole+1) ; 37 ; 5 7 ; 0 ; 'Transition adjustment' ; adj
+2 write_xl hole ; tee ; gender ; (hole+1) ; 37 ; 5 7 ; 0 ; 'Transition adjustment' ; <boxnonzero adj
 NB. Visibility
 fname fappend~ write_row_head 0 37 ; 2.5 0.5 ; ' ' cut '<i>Visibility</i> <b>V</b>'
 fname fappend~ write_input 3 37 ; 2.5 2.5 ; > _1 { each targvisible
