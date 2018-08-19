@@ -8,7 +8,7 @@ NB. View scores for participant
 jweb_rating_xl=: 3 : 0
 NB. Retrieve the details
 
-NB. y has two elements only
+NB. y has one element only
 
 filename=. ;1{.y
 glFilename=: dltb filename
@@ -16,8 +16,6 @@ glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 
 if. fexist glFilepath,'.ijf' do.
 	ww=.utFileGet glFilepath
-	CheckXLFile glFilepath,'_xl'
-	utKeyRead glFilepath,'_xl'
 	err=. ''
 else.
 	err=. 'No such course : ',glFilename
@@ -39,42 +37,33 @@ stdout LF,'<h2>''Macros for ', glCourseName,'</h2>'
 tab=. ;4$<'&nbsp;'
 NB. file exists if we have got this far
 NB. Work out the unique values and loop round by hole, tee and gender
-tees=. ~. ( (glXLHole e. Holes'' ) *. glXLOverwrite e. 0 1) # glXLTee
-tees=. tees /: glTees i. tees
-for_tee. tees do.
-    genders=. ~. ((tee = glXLTee) *. glXLOverwrite e. 0 1)# glXLGender
-    genders=. genders /: genders
-    for_gender. genders do.
-	holes=. ~. ((tee=glXLTee) *. (gender=glXLGender) *. glXLOverwrite e. 0 1) # glXLHole
-	holes=. holes /: holes
-	NB. Write the umbrella macro
-	stdout LF,'Sub Check_',(>(glTees i. tee){glTeesName),'_',(>gender{' ' cut 'Men Women'),'()<br>'
-	for_hole. holes do.
-		    stdout LT1,tab,'Call Check_',(>(glTees i. tee){glTeesName),'_',(>gender{' ' cut 'Men Women'),'_',(;'r<0>2.0' 8!:0 hole+1),'()<br>'
-	end.
-	stdout LF,'End Sub<br>'
-	for_hole. holes do.
-	    stdout LF,'Sub Check_',(>(glTees i. tee){glTeesName),'_',(>gender{' ' cut 'Men Women'),'_',(;'r<0>2.0' 8!:0 hole+1),'()<br>'
-	    ix=. I. ((hole = glXLHole) *. (tee = glXLTee) *. (gender=glXLGender) *. glXLOverwrite e. 0 1)
-	    for_i. ix do.
-		ww=. LT1,tab,'If 2 = CheckVal("',(>i{glXLSheet),'", '
-		ww=. ww, (": >i{glXLRow),', '
-		ww=. ww, (": >i{glXLColumn),', '
-		ww=. ww, '"',(i{glXLType),'", '
-		ww=. ww, (>(i{glXLNull){' ' cut 'False True'),', '
-		ww=. ww, '"',(>i{glXLNote),'", '
-		if. 'N' = i{glXLType do.
-		    ww=. ww,('_' ; '-') stringreplace (": i{glXLNum)
-		else.
-		    ww=. ww, '"',(>i{glXLString),'"'
+for_tee. glTees do.
+    for_gender. 0 1 do.
+		holes=. Holes ''
+		NB. Write the umbrella macro
+		stdout LF,'Sub Check_',(>(glTees i. tee){glTeesName),'_',(>gender{' ' cut 'Men Women'),'()<br>'
+		for_hole. holes do.
+			stdout LT1,tab,'Call Check_',(>(glTees i. tee){glTeesName),'_',(>gender{' ' cut 'Men Women'),'_',(;'r<0>2.0' 8!:0 hole+1),'()<br>'
 		end.
-		ww=. ww, ') Then Exit Sub<br>'
-		stdout ww
-	    end.
-	    stdout LF,'End Sub<br>'
-	end.
-    end.
-end.
+		stdout LF,'End Sub<br>'
+		NB. Write out the individual macros, assuming the file exists
+		for_hole. holes do.
+			shortname=. glFilename,'_',(;'r<0>2.0' 8!:0 (1+hole)),(gender{'MW'),tee
+			xlfname=. glDocument_Root,'/tcpdf/',glBasename,'/',shortname,'.txt'
+			stdout LF,'Sub Check_',(>(glTees i. tee){glTeesName),'_',(>gender{' ' cut 'Men Women'),'_',(;'r<0>2.0' 8!:0 hole+1),'()<br>'
+			if. fexist xlfname do.
+				NB. Read the file and write out the relevant rows
+				ww=. 'b' fread xlfname
+				ww=. (>+./ each(<'CheckVal') E. each ww)#ww
+				ww=. (<LF,'&nbsp;&nbsp;'), each ww,each <'<br>',LF
+				stdout ;ww
+			end.
+			stdout LF,'End Sub<br>'
+		end.
+    end. NB. End of Gender
+end. NB. End of Tee
+
+
 ww=. LF cut glMacroCheck
 for_i. ww do.
     stdout LF,(((' '); '&nbsp' ; TAB ; EM) stringreplace >i),'<br>'

@@ -339,6 +339,8 @@ glFilename=: dltb filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 shortname=. glFilename,'_',(;'r<0>2.0' 8!:0 (1+hole)),(gender{'MW'),tee
 fname=. glDocument_Root,'/tcpdf/',glBasename,'/',shortname,'.php'
+xlfname=. (_3}.fname),'txt' NB. Text file for XL macros
+glXLStr=: ''
 
 if. fexist glFilepath,'.ijf' do.
 	ww=.utFileGet glFilepath
@@ -1511,6 +1513,10 @@ NB. fname fappend~ LF,'$pdf->Write(10,''Return to plan'',''http://jw/rating/plan
 NB. fname fappend~ LF,'$pdf->Output(''/var/www/tcpdf/rating/',shortname,'.pdf'', ''FI'');'
 fname fappend~ LF,'$pdf->Output(''',glDocument_Root,'/tcpdf/rating/',shortname,'.pdf'', ''F',((-. x)#'I'),''');'
 fname fappend~ LF,'?>'
+
+NB. Write out the macro file
+xlfname fwrite~ glXLStr
+
 if. x=0 do.
     stdout '</head><body onLoad="redirect(''/tcpdf/rating/',shortname,'.php'')"'
     stdout LF,'</body></html>'
@@ -2259,9 +2265,9 @@ for_ab. 0 1 do.
 end.
 )
 
-write_xl=: 3 : 0
-NB. =========================================================
-NB. write_xl
+write_xlold=: 3 : 0
+NB. ============================={OLD VERSION]===============
+NB. write_xlold
 NB. =========================================================
 NB. Usage:
 NB.    write_xl hole ; tee ; gender ; sheet ; row ; column ; null ; note ; value
@@ -2269,7 +2275,7 @@ NB.    x is whether to overwrite
 NB.    x=0 is check only
 NB.    x=1 is check and input
 NB.    x=2 is input only
-0 write_xl y
+0 write_xlold y
 :
 'hole tee gender sheet row column null note value'=. y
 NB. Check if boxed or literal
@@ -2328,3 +2334,87 @@ for_vv. value do.
     utKeyPut glFilepath,'_xl'
 end.
 )
+
+write_xl=: 3 : 0
+NB. =========================================================
+NB. write_xl
+NB. =========================================================
+NB. Usage:
+NB.    write_xl hole ; tee ; gender ; sheet ; row ; column ; null ; note ; value
+NB.    x is whether to overwrite
+NB.    x=0 is check only
+NB.    x=1 is check and input
+NB.    x=2 is input only
+NB. Writes output to global variable <<glXLStr>>
+0 write_xl y
+:
+'hole tee gender sheet row column null note value'=. y
+NB. Check if boxed or literal
+select. 3!:0 value
+    case. 32 do.
+	value=. ,value NB. Already boxed, just ravel
+    case. 2 do.
+	value=. ,<value NB. If text/literal box and ravel
+end.
+value=. ,value NB. All other cases are numeric
+
+for_vv. value do.
+	str=. '('
+    if. 2 = 3!:0 sheet do.
+		str=. str, '"',(;sheet),'"' NB. Text sheet name 
+    else. 
+		str=. str, '"H',(":sheet),'"' NB. Hole number
+    end.
+	str=. str, ', ', (": row),', '
+
+	NB. Column can be scalar or vector of columns
+    if. 1=#,column do.
+		col=: ,column+vv_index
+    else.
+		col=: ,vv_index{column
+    end.
+	str=. str, (":col),', '
+    
+	NB. Each element can be different string/value
+    select. 3!:0 vv
+		case. 32 do. NB. boxed
+			if. 2=3!:0 >vv do. NB. literal
+				string=: ;vv
+				num=: 0
+				type=: 'S'
+			elseif. 0=#>vv do.
+				string=: ''
+				num=: 0
+				type=: ,'S'
+			elseif. 1 do.
+				string=: ''
+				num=: ;vv
+				type=: 'N'
+			end.
+		case. do. NB. Numbers
+			string=: ''
+			num=: vv
+			type=: 'N'
+    end.
+	str=. str, '"', type, '", '
+    str=. str, (;null{' ' cut'False True'),', ' NB. Null allowed?
+	str=. str, '"', note, '", ' NB. Note
+	if. ('N' = type) do.
+		str=. str, ('_'; '-') stringreplace ":num
+	else.
+		str=. str, '"',string,'"'
+	end.
+
+	str=. str, ') Then Exit Sub',LF
+	NB. Write to one or both files
+	if. x e. 0 1 do.
+		NB. Check compare value
+		glXLStr=: glXLStr, '    If 2 = CheckVal',str
+	end.
+	if. x e. 1 2 do.
+		NB. Input value
+		glXLStr=: glXLStr, '    If 2 = InputVal',str
+	end.
+end.
+)
+
