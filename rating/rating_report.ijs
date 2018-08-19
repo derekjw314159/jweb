@@ -1392,7 +1392,7 @@ fname fappend~ ('cell' ; 'input') write_row_head 18 28 ; 0.55 0.7 ; '<i>W</i>' ;
 fname fappend~ ('cell' ; 'input') write_row_head 19.25 28 ; 0.5 0.75 ; '<i>D</i>'; ":0{>0{sqdist
 fw=. lookup_tree_chute (0{>0{sqwidth) ; (0{>0{sqdist) NB. Only tee shot
 fname fappend~ 'R' write_cell 20.5 28 ; 0.5 ; '<b>Q</b>'
-fname fappend~ 'C' write_calc 21 28 ;  sz ;  ((#>0{sqwidth){. fw),((#>0{sqwidth){. fw) NB. Only tee shot, doesn't affect total
+fname fappend~ 'C' write_calc 21 28 ;  sz ;  ((#>0{sqwidth){. fw),((#>1{sqwidth){. fw) NB. Only tee shot, doesn't affect total
 NB. Tree Rating
 fname fappend~ 'R' write_footer 18 29 ; 3 ; 'Tree Rating'
 fname fappend~ 'C' write_footer 21 29 ;  3 4 ; fwtot
