@@ -581,6 +581,7 @@ if. hole<_1{Holes '' do.
 	stdout ' <a href="http://',(": ,getenv 'SERVER_NAME'),'/jw/rating/plan',((-. showmap)#'nomap'),'/v/',glFilename,'/',(": 2+hole),'">&gt;&gt;</a>'
 end.
 stdout ' <a href="/jw/rating/plan',((-. showmap)#'nomap'),'/v/',glFilename,'">All</a>'
+stdout ' <a href="/jw/rating/gps/e/',glFilename,'/',(":1+hole),'">GPS points</a>'
 	
 stdout LF,'</div>' NB. container
 stdout '</body></html>'
@@ -608,6 +609,7 @@ stdout LF,'</style>'
 stdout LF,'<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAenjNEmfxxMDt3XnAXyY6jXwVgYmC5wjc&v=3.exp"></script>'
 stdout LF,'<script src="/javascript/myLatLon.js"></script>'
 stdout LF,'<script>',LF,'var map;'
+stdout LF,'glTees="',glTees,'";'
 NB. Work out map centre from tees and greens
 path=. glGPSName i. ('r<0>2.0' 8!:0 (1+hole)),each <'TW'
 path=. path, glGPSName i. ('r<0>2.0' 8!:0 (1+hole)),each <'GC'
