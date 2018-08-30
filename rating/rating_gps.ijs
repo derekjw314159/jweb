@@ -72,14 +72,14 @@ stdout LT4,'<th>Name</th><th>Latitude</th><th>Longitude</th><th>Meas</th><th>Add
 	for_t. glTees  do.
 		stdout LT3,'<tr>'
 		stdout LT4,'<td>',(>(glTees i. t){glTeesName),'</td>'
-		markername=. 'marker',(":hole),'T',>t
+		markername=. 'markerT',>t
 		path=. glGPSName i. <(>'r<0>2.0' 8!:0 (1+hole)),'T',t
 		meas=. path { glGPSMeasured, 0
 		path=. +. path { glGPSLatLon
 		ww=. 9!:11 (9)  NB. Print precision
-		stdout LT4,'<td><input value="',(;'m<->9' 8!:0 (0{path)),'" ',(InputFieldnum (markername,'lat'); 12),'></td>'
-		stdout LT4,'<td><input value="',(;'m<->9' 8!:0 (1{path)),'" ',(InputFieldnum (markername,'lng'); 12),'></td>'
-		stdout LT4,'<td><input name="',(markername,'meas'),'" id="',(markername,'meas'),'" value="',(meas{'-y'),'" ',(InputField 2),'></td>'
+		stdout LT4,'<td><input value="',(;'m<->9' 8!:0 (0{path)),'" ',(InputFieldnum (markername,'lat'); 12),' readonly></td>'
+		stdout LT4,'<td><input value="',(;'m<->9' 8!:0 (1{path)),'" ',(InputFieldnum (markername,'lng'); 12),' readonly></td>'
+		stdout LT4,'<td><input name="',(markername,'meas'),'" id="',(markername,'meas'),'" value="',(meas{'-y'),'" ',(InputField 2),' readonly></td>'
 		stdout LT4,'<td></td>'
 		stdout LT4,'<td></td>'
 		stdout LT3,'</tr>'
@@ -87,38 +87,35 @@ stdout LT4,'<th>Name</th><th>Latitude</th><th>Longitude</th><th>Meas</th><th>Add
 
 	for_p. 1+i. 5  do.
 		stdout LT3,'<tr>'
-		stdout LT4,'<td>Pivot point',(":p),'</td>'
-		markername=. 'marker',(":hole),'P',":p
+		stdout LT4,'<td>Pivot point ',(":p),'</td>'
+		markername=. 'markerP',":p
 		path=. glGPSName i. <(>'r<0>2.0' 8!:0 (1+hole)),'P',":p
 		meas=. path { glGPSMeasured, 0
 		path=. +. path { glGPSLatLon,91j181
 		ww=. 9!:11 (9)  NB. Print precision
-		stdout LT4,'<td><input value="',(;'m<->9' 8!:0 (0{path)),'" ',(InputFieldnum (markername,'lat'); 12),'></td>'
-		stdout LT4,'<td><input value="',(;'m<->9' 8!:0 (1{path)),'" ',(InputFieldnum (markername,'lng'); 12),'></td>'
-		stdout LT4,'<td><input name="',(markername,'meas'),'" id="',(markername,'meas'),'" value="',(meas{'-y'),'" ',(InputField 2),'></td>'
-		stdout LT4,'<td><button type="button" onclick="addPivot(''',markername,''')">Add</button></td>'
-		stdout LT4,'<td><button type="button">Del</button></td>'
+		stdout LT4,'<td><input value="',(;'m<->9' 8!:0 (0{path)),'" ',(InputFieldnum (markername,'lat'); 12),' readonly></td>'
+		stdout LT4,'<td><input value="',(;'m<->9' 8!:0 (1{path)),'" ',(InputFieldnum (markername,'lng'); 12),' readonly></td>'
+		stdout LT4,'<td><input name="',(markername,'meas'),'" id="',(markername,'meas'),'" value="',(meas{'-y'),'" ',(InputField 2),' readonly></td>'
+		stdout LT4,'<td><button type="button" onclick="addPivot(''',markername,''',', (":p),')">Add</button></td>'
+		stdout LT4,'<td><button type="button" onclick="deletePivot(''',markername,''',', (":p),')">Delete</button></td>'
 		stdout LT3,'</tr>'
 	end.
 
 	stdout LT3,'<tr>'
 	stdout LT4,'<td>Green centre</td>'
-	markername=. 'marker',(":hole),'GC'
+	markername=. 'markerGC'
 	path=. glGPSName i. <(>'r<0>2.0' 8!:0 (1+hole)),'GC'
 	meas=. path { glGPSMeasured, 0
 	path=. +. path { glGPSLatLon,91j181
 	ww=. 9!:11 (9)  NB. Print precision
-	stdout LT4,'<td><input value="',(;'m<->9' 8!:0 (0{path)),'" ',(InputFieldnum (markername,'lat'); 12),'></td>'
-	stdout LT4,'<td><input value="',(;'m<->9' 8!:0 (1{path)),'" ',(InputFieldnum (markername,'lng'); 12),'></td>'
-	stdout LT4,'<td><input name="',(markername,'meas'),'" id="',(markername,'meas'),'" value="',(meas{'-y'),'" ',(InputField 2),'></td>'
+	stdout LT4,'<td><input value="',(;'m<->9' 8!:0 (0{path)),'" ',(InputFieldnum (markername,'lat'); 12),' readonly></td>'
+	stdout LT4,'<td><input value="',(;'m<->9' 8!:0 (1{path)),'" ',(InputFieldnum (markername,'lng'); 12),' readonly></td>'
+	stdout LT4,'<td><input name="',(markername,'meas'),'" id="',(markername,'meas'),'" value="',(meas{'-y'),'" ',(InputField 2),' readonly></td>'
 	stdout LT4,'<td></td>'
 	stdout LT4,'<td></td>'
 	stdout LT3,'</tr>'
 
 stdout LT2,'</tbody></table>'
-stdout LF,'<input type="submit" name="control_calc" value="Calc">'
-stdout LF,'     <input type="submit" name="control_done" value="Done">'
-stdout LT1,'</form>'
 
 stdout LF,'</div>' NB. main span
 
@@ -135,6 +132,9 @@ end.
 if. hole<_1{Holes '' do.
 	stdout ' <a href="https://',(": ,getenv 'SERVER_NAME'),'/jw/rating/gps/e/',glFilename,'/',(": 2+hole),'">&gt;&gt;</a>'
 end.
+stdout LF,'<input type="submit" name="control_calc" value="Calc">'
+stdout LF,'     <input type="submit" name="control_done" value="Done">'
+stdout LT1,'</form>'
 	
 stdout LF,'</div>' NB. container
 stdout '</body></html>'
@@ -162,6 +162,8 @@ stdout LF,'</style>'
 stdout LF,'<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAenjNEmfxxMDt3XnAXyY6jXwVgYmC5wjc&v=3.exp"></script>'
 stdout LF,'<script src="/javascript/myLatLon.js"></script>'
 stdout LF,'<script>',LF,'var map;'
+stdout LF,'glTees = "',glTees,'"; // glTees as javascript global variable'
+stdout LF,'hole = "',(":hole),'";'
 NB. Work out map centre from tees and greens
 path=. glGPSName i. ('r<0>2.0' 8!:0 (1+hole)),each <'TW'
 path=. path, glGPSName i. ('r<0>2.0' 8!:0 (1+hole)),each <'GC'
@@ -171,6 +173,7 @@ path=. ( +/path ) % #path
 path=.;  +. FullOStoLatLon path
 centre=. path
 ww=. 9!:11 (9)  NB. Print precision
+stdout LF,'markers = []; //Global array of pivot markers'
 stdout LF,'var myCenter=new google.maps.LatLng(',(>'' 8!:0  (0{path)),',',(>'' 8!:0 (1{path)),');'
 stdout LF,'function dyncircle(inner, outer) {'
 stdout LF,'   var circ={'
@@ -201,7 +204,7 @@ NB. Loop round the points for this hold
     NB. Add the various points here, starting with tees
 	hh=. 0{, hole
 	for_t. i.#glTees  do.
-		stdout LF,'   var marker',(":hh),'T',(t{glTees),'=new google.maps.Marker({'
+		stdout LF,'   var marker','T',(t{glTees),'=new google.maps.Marker({'
 		path=. glGPSName i. <(>'r<0>2.0' 8!:0 (1+hh)),'T',t{glTees
 		path=. +. path { glGPSLatLon
 		stdout LF,'      position: new google.maps.LatLng(',(>'' 8!:0  (0{path)),',',(>'' 8!:0 (1{path)),'),'
@@ -209,7 +212,7 @@ NB. Loop round the points for this hold
 		rgb=. (0{"1 glRGB) i. rgb
 		rgb=. >(<rgb,1) { glRGB
 		rgb=. '#',rgb
-		markername=. 'marker',(":hh),'T',>t{glTees
+		markername=. 'markerT',>t{glTees
 		NB.	stdout LF,'      icon: dyncircle( ''white'', ''white''),'
 		stdout LF,'       icon: dyncircle( ''',rgb,''', ''',rgb,'''),'
 		stdout LF,'       title: ''Hole ',(":hh+1),' Tee ',(>t{glTeesName),''','
@@ -222,97 +225,78 @@ NB. Loop round the points for this hold
 		stdout LF,'        document.getElementById("',markername,'lat','").value = event.latLng.lat();'
 		stdout LF,'        document.getElementById("',markername,'lng','").value = event.latLng.lng();'
 		stdout LF,'        document.getElementById("',markername,'meas").value = "y";'
+		stdout LF,'        redrawpolyline(glTees);'
 		stdout LF,'        });'
 	end. 
 
 	NB. Write out pivot points
 
 	for_p. 1+i.5  do.
-		stdout LF,'   var marker',(":hh),'P',(":p),'=new google.maps.Marker({'
+		stdout LF,'   var markerP',(":p),'=new google.maps.Marker({'
 		path=. glGPSName i. <(>'r<0>2.0' 8!:0 (1+hh)),'P',": p
 		path=. +. path { glGPSLatLon, 91j181
 		stdout LF,'      position: new google.maps.LatLng(',(>'' 8!:0  (0{path)),',',(>'' 8!:0 (1{path)),'),'
-		markername=. 'marker',(":hh),'P',": p
+		markername=. 'markerP',": p
 		stdout LF,'       icon: dyncircle( ''black'', ''white''),'
 		stdout LF,'       title: ''Pivot point ',(":hh+1),' P',(":p),''','
 		stdout LF,'       draggable: true'
 		stdout LF,'       });'
 		stdout LF,'    ',markername,'.setMap(map);'
+		stdout LF,'markers.push(',markername,'); //push to array of objects'
 		NB. Add event handler
 		stdout LF,'    /* Event handler */'
 		stdout LF,'    google.maps.event.addListener(',markername,', ''dragend'', function (event) {'
 		stdout LF,'        document.getElementById("',markername,'lat','").value = event.latLng.lat();'
 		stdout LF,'        document.getElementById("',markername,'lng','").value = event.latLng.lng();'
 		stdout LF,'        document.getElementById("',markername,'meas").value = "y";'
+		stdout LF,'        redrawpolyline(glTees);'
 		stdout LF,'        });'
 	end. 
 	
     NB. Green marker 
-    stdout LF,'   var marker',(":hh),'GC=new google.maps.Marker({'
+    stdout LF,'   var markerGC=new google.maps.Marker({'
     rr=. glGPSName i. <(>'r<0>2.0' 8!:0 (1+hh)),'GC'
     rr=. +. rr { glGPSLatLon, 91j181
     stdout LF,'      position: new google.maps.LatLng(',(>'' 8!:0  (0{rr)),',',(>'' 8!:0 (1{rr)),'),'
-	markername=. 'marker',(":hh),'GC'
+	markername=. 'markerGC'
     stdout LF,'      icon: "https://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|FF99CC|8|_|',(":1+hh),'",'
 	stdout LF,'      draggable: true'
     stdout LF,'      });'
-    stdout LF,'   marker',(":hh),'GC.setMap(map);'
+    stdout LF,'   markerGC.setMap(map);'
 	NB. Add event handler
 	stdout LF,'    /* Event handler */'
 	stdout LF,'    google.maps.event.addListener(',markername,', ''dragend'', function (event) {'
 	stdout LF,'        document.getElementById("',markername,'lat','").value = event.latLng.lat();'
 	stdout LF,'        document.getElementById("',markername,'lng','").value = event.latLng.lng();'
 	stdout LF,'        document.getElementById("',markername,'meas").value = "y";'
+	stdout LF,'        redrawpolyline(glTees);'
 	stdout LF,'        });'
 
 	NB. Flightpath
-	NB. Loop round each tee to draw the "crow's feet"
-	path=. 0$0
-	for_t. }. glTees do. NB. All bar first tee
-		path=. path, 1 0 1{ PathTeeToGreen hh ; t
-	end.
-	path=. path, PathTeeToGreen hh ; 0{glTees
-    stdout LF,'   var flightPathCoord',(":hh),' = ['
-    for_p. path do.
-	    pp=. +. p
-	    stdout LF,'      new google.maps.LatLng(', (>'' 8!:0  (0{pp)),', ',(>'' 8!:0 (1{pp)),')'
-	    if. p_index < _1 + #path do.
-		    stdout ','
-	    end.
-    end.
-	NB. Reset path
-	path=. PathTeeToGreen hh ; 0{glTees
-
-    stdout LF,'      ];'
-    stdout LF,'   var flightPath',(":hh),' = new google.maps.Polyline({'
-    stdout LF,'       path: flightPathCoord',(":hh),','
+    stdout LF,'   var flightPathCoord = [];'
+	stdout LF,'    /* Make global so it can be changed later */'
+    stdout LF,'   flightPath = new google.maps.Polyline({'
+    stdout LF,'       path: flightPathCoord,'
     stdout LF,'       geodesic: true,'
     stdout LF,'       strokeColor: ''#FFFFFF'','
     stdout LF,'       strokeOpacity: 1,'
     stdout LF,'       strokeWeight: 1,'
     stdout LF,'       });'
-    stdout LF,'   flightPath',(":hh),'.setMap(map);'
-
+    stdout LF,'   flightPath.setMap(map);'
+	stdout LF,'    redrawpolyline(glTees);'
 	NB. Actual trail points
-    stdout LF,'   var flightPathTrail',(":hh),' = ',(ReadGPSActual ''),';'
-    stdout LF,'   var flightPathActual',(":hh),' = new google.maps.Polyline({'
-    stdout LF,'       path: flightPathTrail',(":hh),','
+    stdout LF,'   var flightPathTrail = ',(ReadGPSActual ''),';'
+    stdout LF,'   var flightPathActual = new google.maps.Polyline({'
+    stdout LF,'       path: flightPathTrail,'
     stdout LF,'       geodesic: true,'
     stdout LF,'       strokeColor: ''pink'','
     stdout LF,'       strokeOpacity: 1,'
     stdout LF,'       strokeWeight: 1,'
     stdout LF,'       });'
-    stdout LF,'   flightPathActual',(":hh),'.setMap(map);'
+    stdout LF,'   flightPathActual.setMap(map);'
 
 	stdout LF,'    }'
 
-	stdout LF,'    function addPivot(name){'
-	stdout LF,'        document.getElementById(name + "lat").value = "', (;'' 8!:0 (0{centre)),'";'
-	stdout LF,'        document.getElementById(name + "lng").value = "', (;'' 8!:0 (1{centre)),'";'
-	stdout LF,'        document.getElementById(name + "meas").value = "";'
-	stdout LF,'        var latlng = new google.maps.LatLng(',(;'' 8!:0 (0{centre)),', ',(;'' 8!:0 (1{centre)),');'
-    stdout LF,'        name.setPosition(latlng);'
-	stdout LF,'        }'
 NB. End of hh loop
     stdout LF,'google.maps.event.addDomListener(window, ''load'', initialize);'
     stdout LF,'</script>'
@@ -355,7 +339,7 @@ glGPSAlt=: ix # glGPSAlt
 glGPSMeasured=: ix # glGPSMeasured
 
 	for_t. glTees  do.
-		markername=. 'marker',(":hole),'T',>t
+		markername=. 'markerT',>t
 		glGPSName=: glGPSName,  <(>'r<0>2.0' 8!:0 (1+hole)),'T',t
 		glGPSAlt=: glGPSAlt, 0
 		glGPSLatLon=: glGPSLatLon, (91". ;". markername,'lat') j. 181". ;". markername,'lng'
@@ -363,14 +347,14 @@ glGPSMeasured=: ix # glGPSMeasured
 	end.
 
 	for_p. 1+i. 5  do.
-		markername=. 'marker',(":hole),'P',":p
+		markername=. 'markerP',":p
 		glGPSName=: glGPSName, <(>'r<0>2.0' 8!:0 (1+hole)),'P',":p
 		glGPSAlt=: glGPSAlt, 0
 		glGPSLatLon=: glGPSLatLon, (91". ;". markername,'lat') j. 181". ;". markername,'lng'
 		glGPSMeasured=: glGPSMeasured, 'y' e. ;".markername,'meas'
 	end.
 
-		markername=. 'marker',(":hole),'GC'
+		markername=. 'markerGC'
 		glGPSName=: glGPSName, <(>'r<0>2.0' 8!:0 (1+hole)),'GC'
 		glGPSAlt=: glGPSAlt, 0
 		glGPSLatLon=: glGPSLatLon, (91". ;". markername,'lat') j. 181". ;". markername,'lng'
