@@ -1321,7 +1321,90 @@ NB. XL green
 utKeyRead glFilepath,'_xl'
 ww=. (glXLHole>:0) *. -. glXLHole e. holes
 (ww#glXLID) utKeyDrop glFilepath,'_xl' NB. Ignore '_default' and drop the other holes
+)
 
+NB. ============================================
+NB. prompt
+NB. ============================================
 
+prompt=: 3 : 0
+'' prompt y
+:
+  y 1!:2 (IFWIN+.IFJHS+.IFIOS) { 4 2
+  1!:1 ] 1
+)
+
+NB. ============================================
+NB. prompt_v
+NB. --------------------------------------------
+NB. Prompt for numeric vector input
+NB. Return Q, * or null followed by result in boxed vector
+NB. ============================================
+prompt_v=: 4 : 0
+originaly=. y
+label_again.
+res=. dltb(' ' cut '_ -') stringreplace ": y
+res=. dltb prompt x,': (',res,') : '
+if. (({.res) e. 'qQ') do.
+	res=. 'Q' ; originaly
+	return.
+elseif. ('*' = {.res) do.
+	NB. One value to be repeated
+	res=. (' ' cut '- _') stringreplace }. res
+	res=. 0". res
+	y=. ($y)$0{res
+	goto_again.
+elseif. (({.res) e. 'eE') do.
+	NB. Loop through each individual value
+	for_i. i. #y do.
+		res=. (x,'[',(":i),']') prompt_v ,i{y
+		if. ('Q'={.>0{res) do.
+			res=. 'Q' ; originaly
+			return.
+		else.
+			y=. (''$>1{res) i } y
+		end.
+	end.
+	goto_again.
+elseif. (0=$res) do.
+	NB. Just pressed Return
+	res=. '' ; y
+	return.
+elseif. 1 do.
+	NB. Vector of values
+	res=. (' ' cut '- _') stringreplace res
+	res=. 0". res
+	y=. ($y){.res
+	goto_again.
+end.
+)
+
+NB. ============================================
+NB. prompt_s
+NB. --------------------------------------------
+NB. Prompt for a string input
+NB. Return Q, * or null followed by result in boxed vector
+NB. ============================================
+prompt_s=: 4 : 0
+originaly=. y
+label_again.
+res=. dltb y
+res=. dltb prompt x,': (',res,') : '
+if. ((tolower 4{.res) -: 'quit') do.
+	res=. 'Q' ; originaly
+	return.
+elseif. ('*' = {.res) do.
+	NB. One value to be repeated
+	y=.  ($y)$}. res
+	goto_again.
+elseif. (0=$res) do.
+	NB. Just pressed Return
+	res=. '' ; y
+	return.
+elseif. 1 do.
+	y=. res
+	NB. Vector of values
+	goto_again.
+end.
 )
 
