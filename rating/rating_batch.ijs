@@ -152,7 +152,7 @@ res=. ('Hole ',(":1+hole),' OOB/ER %age reduction {0/25/50/75/100}') prompt_v (g
 if. ('Q'={.>0{res) do.
 	return.
 else.
-	glPlanOOBPercent=: (0 25 50 75 100 i. >1{res}{glOOBPercentVal
+	glPlanOOBPercent=: (0 25 50 75 100 i. >1{res){glOOBPercentVal
 	utKeyPut glFilepath,'_plan'
 end.
 
