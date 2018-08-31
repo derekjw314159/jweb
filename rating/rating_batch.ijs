@@ -388,4 +388,61 @@ end.
 
 )
 
+NB. ============================================
+NB. FixAltitude  
+NB. --------------------------------------------
+FixAltitude=: 3 : 0
+require 'tables/csv'
+ww=. readcsv glFilepath,'actual.txt'
+res=. (0{ww) i. 'Latitude' ; 'Longitude' ; 'Altitude' ; 'Time' ; 'Name' ; 'Icon' ; 'Description'
+res=. res {"1 (ww,"1 a:) NB. Order the columns
+res=. }. res NB. Drop the row titles
+latlon=. j. /"1 >(". each 0 1{"1 res)
+latlon=. LatLontoFullOS latlon
+alt=. 3 * glMY * >". each 2{"1 res
+
+NB. Tee
+utKeyRead glFilepath,'_tee'
+msk=. glTeAlt=0
+(msk#glTeID) utKeyRead glFilepath,'_tee'
+NB. We don't store the Tee LatLon separately
+ll=. LatLontoFullOS  (glGPSName i. (<1 2 0 3) {each 'T', each glTeID){glGPSLatLon
+res=. 0$0
+for_i. i. #ll do.
+	idx=. 4{. /: |(i{ll)-latlon
+	reg=. (idx{alt) %. 1,"1 +. idx{latlon
+	res=. res, <. 0.5 + +/reg * 1,+. i{ll
+end.
+glTeAlt=: res
+utKeyPut glFilepath,'_tee'
+
+NB. Plan
+utKeyRead glFilepath,'_plan'
+msk=. (glPlanAlt=0) *. (glPlanHole>: 0)
+(msk#glPlanID) utKeyRead glFilepath,'_plan'
+ll=. LatLontoFullOS glPlanLatLon
+res=. 0$0
+for_i. i. #ll do.
+	idx=. 4{. /: |(i{ll)-latlon
+	reg=. (idx{alt) %. 1,"1 +. idx{latlon
+	res=. res, <. 0.5 + +/reg * 1,+. i{ll
+end.
+glPlanAlt=: res
+utKeyPut glFilepath,'_plan'
+
+NB. Green
+utKeyRead glFilepath,'_green'
+msk=. (glGrAlt=0) *. (glGrHole>: 0)
+(msk#glGrID) utKeyRead glFilepath,'_green'
+ll=. LatLontoFullOS  (glGPSName i. (< 2 3 0 1) {each (<'GC'), each glGrID){glGPSLatLon
+res=. 0$0
+for_i. i. #ll do.
+	idx=. 4{. /: |(i{ll)-latlon
+	reg=. (idx{alt) %. 1,"1 +. idx{latlon
+	res=. res, <. 0.5 + +/reg * 1,+. i{ll
+end.
+glGrAlt=: res
+utKeyPut glFilepath,'_green'
+
+)
 
