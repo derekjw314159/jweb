@@ -342,7 +342,7 @@ res=. ('Hole ',(":1+hole),' Green OOB behind {0/-1/-2}') prompt_v (glOOBBehindVa
 if. ('Q'={.>0{res) do.
 	return.
 else.
-	glGrOOBBehind=: ; (0 _1 _2 i. >1{res){glOOBBehindVal
+	glGrOOBBehind=:  (0 _1 _2 i. >1{res){glOOBBehindVal
 	utKeyPut glFilepath,'_green'
 end.
 
