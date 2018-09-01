@@ -406,7 +406,7 @@ utKeyRead glFilepath,'_tee'
 msk=. glTeAlt=0
 (msk#glTeID) utKeyRead glFilepath,'_tee'
 NB. We don't store the Tee LatLon separately
-ll=. LatLontoFullOS  (glGPSName i. (<1 2 0 3) {each 'T', each glTeID){glGPSLatLon
+ll=. LatLontoFullOS  (glGPSName i. ('r<0>2.0' 8!:0 (1+glTeHole)),each 'T', each <"0 glTeTee){glGPSLatLon
 res=. 0$0
 for_i. i. #ll do.
 	idx=. 4{. /: |(i{ll)-latlon
@@ -434,8 +434,8 @@ NB. Green
 utKeyRead glFilepath,'_green'
 msk=. (glGrAlt=0) *. (glGrHole>: 0)
 (msk#glGrID) utKeyRead glFilepath,'_green'
-ll=. LatLontoFullOS  (glGPSName i. (< 2 3 0 1) {each (<'GC'), each glGrID){glGPSLatLon
 res=. 0$0
+ll=. LatLontoFullOS  (glGPSName i. ('r<0>2.0' 8!:0 (1+glGrHole)),each <'GC'){glGPSLatLon
 for_i. i. #ll do.
 	idx=. 4{. /: |(i{ll)-latlon
 	reg=. (idx{alt) %. 1,"1 +. idx{latlon
