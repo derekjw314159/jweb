@@ -35,6 +35,10 @@ else.
 	err=. 'No such course'
 end.
 
+NB. Run AugmentGPS to default the values
+AugmentGPS hole
+
+
 stdout 'Content-type: text/html',LF,LF,'<!DOCTYPE html>',LF,'<html>',LF
 stdout LF,'<head>'
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF

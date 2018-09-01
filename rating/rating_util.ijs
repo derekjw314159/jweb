@@ -378,6 +378,16 @@ NB. Usage: AugmentGPS holes
 AugmentGPS=: 3 : 0
 y=. ,y
 y=. (y e. Holes '' ) # y NB. Limit to valid holes
+
+NB. Delete any infeasible
+msk=. +. glGPSLatLon
+msk=. (90 >: 0{"1 msk) *. (180 >: 1{"1 msk) *. (0 <: 0{"1 msk) *. (_180 <: 1{"1 msk)
+msk=. msk *. glGPSMeasured
+glGPSName=: msk # glGPSName
+glGPSLatLon=: msk # glGPSLatLon
+glGPSAlt=: msk#glGPSAlt
+glGPSMeasured=: msk # glGPSMeasured
+
 for_h. y do. NB. Start of hole loop <h>
     NB. Green centres
     xx=. ('r<0>2.0' 8!:0 (1+h)),each(' ' cut 'GC GF GB')
@@ -394,21 +404,35 @@ for_h. y do. NB. Start of hole loop <h>
 		glGPSMeasured=: glGPSMeasured, 0
 	NB. Check if any other points exist for this hole
 	elseif.  (+. / (ww=. (2{. each glGPSName) i. ('r<0>2.0' 8!:0 (1+h))) < #glGPSName) do.
-		ww=. 0{I. ww < #glGPSName NB. First one which meets criterion
+		ww=. 0{ (ww < #glGPSName)#ww NB. First one which meets criterion
+		glGPSLatLon=: glGPSLatLon, ww{glGPSLatLon
+		glGPSAlt=: glGPSAlt, ww{glGPSAlt
+		glGPSName=: glGPSName, <(>'r<0>2.0' 8!:0 (1+h)),'GC'
+		glGPSMeasured=: glGPSMeasured, 0
+	NB. Check if green reading exists for previous hole
+	elseif. ( +. / (ww=. (3{. each glGPSName) i. ('r<0>2.0' 8!:0 (0+h)),each <'G') < #glGPSName) do.
+		ww=. 0{ (ww < #glGPSName)#ww NB. First one which meets criterion
+		glGPSLatLon=: glGPSLatLon, ww{glGPSLatLon
+		glGPSAlt=: glGPSAlt, ww{glGPSAlt
+		glGPSName=: glGPSName, <(>'r<0>2.0' 8!:0 (1+h)),'GC'
+		glGPSMeasured=: glGPSMeasured, 0
+	NB. Check if any reading exists on previous hole
+	elseif.  (+. / (ww=. (2{. each glGPSName) i. ('r<0>2.0' 8!:0 (0+h))) < #glGPSName) do.
+		ww=. 0{ (ww < #glGPSName)#ww NB. First one which meets criterion
 		glGPSLatLon=: glGPSLatLon, ww{glGPSLatLon
 		glGPSAlt=: glGPSAlt, ww{glGPSAlt
 		glGPSName=: glGPSName, <(>'r<0>2.0' 8!:0 (1+h)),'GC'
 		glGPSMeasured=: glGPSMeasured, 0
 	NB. Check if tee reading exists for next hole
 	elseif. ( +. / (ww=. (3{. each glGPSName) i. ('r<0>2.0' 8!:0 (2+h)),each <'T') < #glGPSName) do.
-		ww=. 0{I. ww < #glGPSName NB. First one which meets criterion
+		ww=. 0{ (ww < #glGPSName)#ww NB. First one which meets criterion
 		glGPSLatLon=: glGPSLatLon, ww{glGPSLatLon
 		glGPSAlt=: glGPSAlt, ww{glGPSAlt
 		glGPSName=: glGPSName, <(>'r<0>2.0' 8!:0 (1+h)),'GC'
 		glGPSMeasured=: glGPSMeasured, 0
 	NB. Check if any reading exists on next hole
 	elseif.  (+. / (ww=. (2{. each glGPSName) i. ('r<0>2.0' 8!:0 (2+h))) < #glGPSName) do.
-		ww=. 0{I. ww < #glGPSName NB. First one which meets criterion
+		ww=. 0{ (ww < #glGPSName)#ww NB. First one which meets criterion
 		glGPSLatLon=: glGPSLatLon, ww{glGPSLatLon
 		glGPSAlt=: glGPSAlt, ww{glGPSAlt
 		glGPSName=: glGPSName, <(>'r<0>2.0' 8!:0 (1+h)),'GC'
