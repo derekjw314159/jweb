@@ -6,8 +6,9 @@ NB. rating_green_e
 NB. =========================================================
 jweb_rating_green_e=: 3 : 0
 NB. Retrieve the details
-NB. y has two elements only
-'filename keyy'=. y
+NB. y has three elements only: filename / key / showmap
+y=. 3{. y, <'0'
+'filename keyy showmap'=. y
 glFilename=: dltb filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 keyy=. <keyy
@@ -107,6 +108,7 @@ stdout LT2,'<input type="hidden" name="prevname" value="',(":;glGrUpdateName),'"
 stdout LT2,'<input type="hidden" name="prevtime" value="',(;glGrUpdateTime),'">'
 stdout LT2,'<input type="hidden" name="keyplan" value="',(;keyy),'">'
 stdout LT2,'<input type="hidden" name="filename" value="',(;glFilename),'">'
+stdout LT2,'<input type="hidden" name="showmap" value="',(;showmap),'">'
 
 NB. Measurements
 stdout LT1,'<h4>Distance, Green Target, Green Surface</h4>'
@@ -351,11 +353,12 @@ end.
 stdout 'Content-type: text/html',LF,LF
 stdout LF,'<!DOCTYPE html>',LF,'<html><head>' 
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
+hidemap=. '0' = ''$>showmap NB. Convert hidden variable to number
 NB. Choose page based on what was pressed
 	if. 0= 4!:0 <'control_calc' do.
 		stdout '</head><body onLoad="redirect(''',(":httpreferer),''')"'
 	elseif. 1 do.
-		stdout '</head><body onLoad="redirect(''/jw/rating/plannomap/v/',glFilename,'/',(;":1+glGrHole),''')"'
+		stdout '</head><body onLoad="redirect(''/jw/rating/plan',(hidemap#'nomap'),'/v/',glFilename,'/',(;":1+glGrHole),''')"'
     end.
 stdout LF,'</body></html>'
 exit ''

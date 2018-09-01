@@ -145,6 +145,7 @@ rating_plan_view=: 3 : 0
 1 rating_plan_view y
 :
 showmap=. x
+params=. cgiparms ''
 NB. Retrieve the details
 NB. y has two elements, coursename & hole (+1)
 hole=. ''$ 0". >1{y
@@ -200,7 +201,7 @@ stdout '<tr><th>Tee</th><th>Card</th><th>Par M/W</th><th>Alt</th><th>Mn</th><th>
 stdout '</thead><tbody>'
 utKeyRead glFilepath,'_green'
 for_t.  i. #glTees do.
-	stdout LF,'<tr><td><a href="/jw/rating/tee/e/',glFilename,'/',(1 1 0 0 1#5{.>EnKey hole ; '' ; (t{glTees) ; 0 ; 0 ; 0),'">',(>t{glTeesName),'</td>'
+	stdout LF,'<tr><td><a href="/jw/rating/tee/e/',glFilename,'/',(1 1 0 0 1#5{.>EnKey hole ; '' ; (t{glTees) ; 0 ; 0 ; 0),'/',(":showmap),'">',(>t{glTeesName),'</td>'
 	backpath=. PathTeeToGreen hole ; t{glTees
 	crow=. <. 0.5 + glMY * |-/LatLontoFullOS 0 _1{backpath NB. Crows flight distance
 	stdout '<td>',(": <. 0.5 + (<t,hole){glTeesYards),' <span style="color: gray;">[',(":crow),']</span></td>'
@@ -315,7 +316,7 @@ NB.stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr
 		str=. '<a href="/jw/rating/layup/e/',(glFilename),'/'
 		str=. str, ;": 1+rr{glPlanHole
 		str=. str, (;rr{glPlanTee),'/'
-		str=. str, ((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),(": 1+rr{glPlanShot),'">'
+		str=. str, ((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),(": 1+rr{glPlanShot),'/',(":showmap),'">'
 		str=. str, (": rr{glPlanHitYards),( rr{glPlanHitYards ~: glPlanCrowDist)#' <span style="color: gray">[',(": rr{glPlanCrowDist),']</span>'
 		str=. str, (rr{glPlanLayupType)
 		str=. str, (('L'=rr{glPlanLayupType)#(3{.": >rr{glPlanLayupCategory)),'</a>'
@@ -341,9 +342,10 @@ NB.stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr
 		    other=. other, (0<#>rr{glPlanTransitionOverride)#' Tran O/R:',;>rr{glPlanTransitionOverride
 		    other=. other, (0<#>rr{glPlanTransitionAdj)#' Tran Adj:',;>rr{glPlanTransitionAdj
 		    NB. Edit / Copy links
-		    str=. '<a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">E</a>'
-		    str=. str,' <a href="/jw/rating/landingcopy/e/',(glFilename),'/',(;rr{glPlanID),'">C</a>'
-		    str=. str,' <a href="/jw/rating/landingcopyshot/e/',(glFilename),'/',(;rr{glPlanID),'">X</a>'
+			NB. Extra parameter for showmap
+		    str=. '<a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'/',(":showmap),'">E</a>'
+		    str=. str,' <a href="/jw/rating/landingcopy/e/',(glFilename),'/',(;rr{glPlanID),'/',(":showmap),'">C</a>'
+		    str=. str,' <a href="/jw/rating/landingcopyshot/e/',(glFilename),'/',(;rr{glPlanID),'/',(":showmap),'">X</a>'
 		    stdout LT4,'Edit / Copy / Xcopy' djwTDClass str 
 		    stdout LT4, 'Altitude' djwTDClass ;'b<.>' 8!:0 rr{glPlanAlt
 		    stdout LT4, 'FW Width' djwTDClass ;'b<.>' 8!:0 rr{glPlanFWWidth
@@ -374,7 +376,7 @@ NB.stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr
 		    other=. other, (0<#>rr{glPlanRollTwice)#' Ro2:',;>rr{glPlanRollTwice
 		    other=. other, (0<#>rr{glPlanTransitionOverride)#' Tran O/R:',;>rr{glPlanTransitionOverride
 		    other=. other, (0<#>rr{glPlanTransitionAdj)#' Tran Adj:',;>rr{glPlanTransitionAdj
-		    stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">E</a>'
+		    stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'/',(":showmap),'">E</a>'
 		    stdout LT4,'<td></td><td></td><td></td>'
 		    stdout LT3,'<td style="border-right: 1px solid lightgray">',((rr{glPlanBunkLine){'-y'),'</td>' NB. Show bunker in LoP
 			stdout '<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>' NB. At green
@@ -423,7 +425,7 @@ NB.stdout '<td>',((rr{glPlanGender){'MW'),((rr{glPlanAbility){'SB'),'-',(": 1+rr
 		other=. other, (0<#>rr{glPlanBunkSqueeze)#' BuSq:',;>rr{glPlanBunkSqueeze
 		other=. other, (0<#>rr{glPlanTransitionOverride)#' Tran O/R:',;>rr{glPlanTransitionOverride
 		other=. other, (0<#>rr{glPlanTransitionAdj)#' Tran Adj:',;>rr{glPlanTransitionAdj
-		stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'">E</a> <a href="/jw/rating/landing/d/',glFilename,'/',(;rr{glPlanID),'">D</a>'
+		stdout LT4,'<td><a href="/jw/rating/landing/e/',(glFilename),'/',(;rr{glPlanID),'/',(":showmap),'">E</a> <a href="/jw/rating/landing/d/',glFilename,'/',(;rr{glPlanID),'/',(":showmap),'">D</a>'
 		stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanAlt),'</td>'
 		stdout LT3,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 rr{glPlanFWWidth),'</td>'
 		stdout LT3,'<td style="border-right: 1px solid lightgray">',((rr{glPlanBunkLZ){'-y'),'</td>'
@@ -516,7 +518,7 @@ other=. other, (0<#>ww{glGrOOBPercent)#' OOB%:',>ww{glGrOOBPercent
 other=. other, (0<#>ww{glGrWaterBehind)#' Wat:Behind',>ww{glGrWaterBehind
 other=. other, (0<#>ww{glGrWaterCart)#' WatCart:',>ww{glGrWaterCart
 other=. other, (0<#>ww{glGrWaterPercent)#' Wat%:',>ww{glGrWaterPercent
-stdout LT4,'<td><a href="/jw/rating/green/e/',glFilename,'/',(>ww{glGrID),'">Edit</a></td>'
+stdout LT4,'<td><a href="/jw/rating/green/e/',glFilename,'/',(>ww{glGrID),'/',(":showmap),'">Edit</a></td>'
 stdout LT4,'<td>',(> (glTees i. ww{glGrTee){glTeesName),'</td>'
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 ww{glGrFrontYards),'</td>'
 stdout LT4,'<td style="border-right: 1px solid lightgray">',(;'b<.>' 8!:0 ww{glGrAlt),'</td>'

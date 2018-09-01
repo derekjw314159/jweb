@@ -8,9 +8,9 @@ NB. View scores for participant
 jweb_rating_landing_e=: 3 : 0
 NB. Retrieve the details
 
-NB. y has two elements only
-
-'filename keyy'=. y
+NB. y has three elements only: filename / key / showmap
+y=. 3{. y, <'0'
+'filename keyy showmap'=. y
 glFilename=: dltb filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 keyy=. <keyy
@@ -107,6 +107,7 @@ stdout LT2,'<input type="hidden" name="prevname" value="',(":;glPlanUpdateName),
 stdout LT2,'<input type="hidden" name="prevtime" value="',(;glPlanUpdateTime),'">'
 stdout LT2,'<input type="hidden" name="keyplan" value="',(;keyy),'">'
 stdout LT2,'<input type="hidden" name="filename" value="',(;glFilename),'">'
+stdout LT2,'<input type="hidden" name="showmap" value="',(;showmap),'">'
 
 NB. Table of values - Common Values
 stdout LT1,'<h4>Common Measurements</h4>'
@@ -377,15 +378,16 @@ keyplan utKeyPut glFilepath,'_plan'
 stdout 'Content-type: text/html',LF,LF
 stdout LF,'<!DOCTYPE html>',LF,'<html><head>' 
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
+hidemap=. '0' = ''$>showmap NB. Convert hidden variable to number
 NB. Choose page based on what was pressed
 	if. (0= 4!:0 <'control_delete')  do.
 		NB. Delete the landing record
 		keyplan utKeyDrop glFilepath,'_plan'
-		stdout '</head><body onLoad="redirect(''/jw/rating/plannomap/v/',glFilename,'/',(;":1+glPlanHole),''')"'
+		stdout '</head><body onLoad="redirect(''/jw/rating/plan',(hidemap#'nomap'),'/v/',glFilename,'/',(;":1+glPlanHole),''')"'
 	elseif. 0= 4!:0 <'control_calc' do.
 		stdout '</head><body onLoad="redirect(''',(":httpreferer),''')"'
 	elseif. 1 do.
-		stdout '</head><body onLoad="redirect(''/jw/rating/plannomap/v/',glFilename,'/',(;":1+glPlanHole),''')"'
+		stdout '</head><body onLoad="redirect(''/jw/rating/plan',(hidemap#'nomap'),'/v/',glFilename,'/',(;":1+glPlanHole),''')"'
     end.
 stdout LF,'</body></html>'
 exit ''
@@ -410,9 +412,10 @@ jweb_rating_landingcopy_e=: 3 : 0
 0 jweb_rating_landingcopy_e y
 :
 NB. Retrieve the details
-NB. y has two elements only
+NB. y has three elements only: filename / key / showmap
+y=. 3{. y, <'0'
+'filename keyy showmap'=. y
 
-'filename keyy'=. y
 glFilename=: dltb filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 keyy=. <keyy
@@ -452,6 +455,8 @@ NB. Look for measurement point at the nearest distance
 hole=. ix{glPlanHole
 ww=. I. glPlanHole = hole
 ww=. ww -. ix NB. can't be self
+NB. Can't be carry or squeeze
+ww=. (ww{glPlanRecType e. 'PM')#ww
 NB. Restrict to this shot and gender and ability if x=1
 if. x=1 do.
     ww=. ( (ix{glPlanGender) = ww{glPlanGender) # ww
@@ -471,8 +476,8 @@ if. 0<#ww do.
 	(ix{glPlanID) CopyPlanRecord ww{glPlanID
     end.
 end.
-
-stdout '</head><body onLoad="redirect(''/jw/rating/plannomap/v/',glFilename,'/',(;":1+hole),''')"'
+hidemap=. '0' = ''$>showmap
+stdout '</head><body onLoad="redirect(''/jw/rating/plan',(hidemap#'nomap'),'/v/',glFilename,'/',(;":1+hole),''')"'
 stdout LF,'</body></html>'
 exit ''
 )
@@ -484,9 +489,10 @@ NB. Copy data from nearest point
 jweb_rating_landing_d=: 3 : 0
 NB. Retrieve the details
 
-NB. y has two elements only
+NB. y has three elements only: filename / key / showmap
+y=. 3{. y, <'0'
+'filename keyy showmap'=. y
 
-'filename keyy'=. y
 glFilename=: dltb filename
 glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
 keyy=. <keyy
@@ -522,7 +528,8 @@ NB. Delete the record
 keyy utKeyRead glFilepath,'_plan'
 (,keyy)utKeyDrop glFilepath,'_plan'
 
-stdout '</head><body onLoad="redirect(''/jw/rating/plannomap/v/',glFilename,'/',(;":1+glPlanHole),''')"'
+hidemap=. '0' = ''$>showmap
+stdout '</head><body onLoad="redirect(''/jw/rating/plan',(hidemap#'nomap'),'/v/',glFilename,'/',(;":1+glPlanHole),''')"'
 stdout LF,'</body></html>'
 exit ''
 )

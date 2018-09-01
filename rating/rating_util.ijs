@@ -493,6 +493,7 @@ NB. This is the monster function to loop round and build
 NB. all the measurement distances
 NB. Usage: BuildPlan holes ; tees ; genders ; abilities
 BuildPlan=: 3 : 0
+NB. '1' + 0
 if. 0=L. y do. y=. 4{. <y end.
 y=. 4{. y
 (' ' cut 'holes tees genders abilities')=. y
@@ -829,6 +830,7 @@ NB. Remove dead measurement records
 NB. Usage CleanupPlan holes
 NB. -------------------------------------------------------------
 CleanupPlan=: 3 : 0
+NB.  '1' + 0
 'holes tees genders abilities'=. y
 holes=. ,<. 0.5 + holes
 holes=. (holes e. Holes '') # holes	NB. Augmented to cover >18 holes
@@ -843,6 +845,9 @@ ww=. ww *. glPlanOOBDist = 0
 ww=. ww *. glPlanTreeDist = 0
 ww=. ww *. glPlanHole e. holes
 ww=. ww *. glPlanRecType = 'M'
+NB. Need to retain if there is a roll measurement
+ww=. ww *. 0 = >#each glPlanRollLevel
+ww=. ww *. 0 = >#each glPlanRollSlope
 ( ww # glPlanID) utKeyDrop glFilepath,'_plan'
 
 NB. Delete if a measurement record and at the hole

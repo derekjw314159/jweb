@@ -8,9 +8,9 @@ NB. View scores for participant
 jweb_rating_layup_e=: 3 : 0
 NB. Retrieve the details
 
-NB. y has three elements, which need to be decomposed
-
-'filename hole_tee gender_ability_shot'=. y
+NB. y has four elements, which need to be decomposed
+y=. 4{. y, <'0'
+'filename hole_tee gender_ability_shot showmap'=. y
 hole=. ''$ 0". }:hole_tee
 hole=. <. 0.5 + hole
 hole=. 0 >. 17 <. hole-1
@@ -69,8 +69,8 @@ if. ( -. glPlanLayupType e. 'LR' ) do.  NB. Not found, or transition
 	glPlanUpdateTime=: ,< 6!:0 'YYYY-MM-DD hh:mm:ss.sss'
 	glPlanLayupCategory=: ,<'forced'
 	glPlanLayupReason=: ,<'Water'
-	glPlanRollLevel=: ,<''
-	glPlanRollSlope=: ,<''
+	NB. glPlanRollLevel=: ,<''
+	NB. glPlanRollSlope=: ,<''
 	ww=. utKeyPut glFilepath,'_plan'
 end. 
 
@@ -114,6 +114,7 @@ if. seq = 'L' do.
 	stdout LT2,'<input type="hidden" name="prevtime" value="',(;glPlanUpdateTime),'">'
 	stdout LT2,'<input type="hidden" name="keyplan" value="',(;ix),'">'
 	stdout LT2,'<input type="hidden" name="filename" value="',(;glFilename),'">'
+	stdout LT2,'<input type="hidden" name="showmap" value="',(;showmap),'">'
 
 	stdout LT1,'<table>',LT2,'<thead>',LT3,'<tr>'
 	stdout LT4,'<th>Layup</th>',LT4,'<th>Previous</th>',LT4,'<th>Hit/Layup</th>',LT4,'<th>Cumulative</th>',LT4,'<th>Remain</th>',LT4,'<th>Total</th>',LT3,'</tr>',LT2,'</thead>',LT2,'<tbody>'
@@ -196,7 +197,7 @@ NB. Second table is simple roll logic
 	prevrollroll=. glPlanRollDist
 	stdout '</td><td>',(,": prevroll - prevrollroll),'</td>' NB. Carry
 	stdout LT4,'<td><input value="',(": prevrollroll),'" tabindex="',(":3+extraline),'" ',(InputFieldnum 'rollroll';4),'></td>'
-	stdout LT4,'<td><input value="',(":,prevroll),'" tabindex="',(":3+extraline),'" ',(InputFieldnum 'roll'; 4),'>'
+	stdout LT4,'<td><input value="',(":,prevroll),'" tabindex="',(":3+extraline),'" ',(InputFieldnum 'roll'; 4),' autofocus="autofocus">'
 	stdout '<input type="hidden" name="prevroll" value="',(":,prevroll),'">'
 	stdout '<input type="hidden" name="prevrollroll" value="',(":,prevrollroll),'">'
 	stdout '</td><td>',(,":glPlanRemGroundYards),'</td>',LT3,'</tr>'
@@ -328,6 +329,7 @@ end.
 stdout 'Content-type: text/html',LF,LF
 stdout LF,'<!DOCTYPE html>',LF,'<html><head>' 
 stdout LF,'<script src="/javascript/pagescroll.js"></script>',LF
+hidemap=. '0' = ''$>showmap NB. Convert hidden variable to number
 NB. Choose page based on what was pressed
 	if. (0= 4!:0 <'control_delete') +. deletelayup do.
 		NB. Delete the layup record
@@ -338,11 +340,11 @@ NB. Choose page based on what was pressed
 		(<keyplan) utKeyPut glFilepath,'_plan'
 		BuildPlan glPlanHole ; glPlanTee ; glPlanGender ; glPlanAbility
 		(,<keyplan) utKeyRead glFilepath,'_plan' NB. Changed above
-		stdout '</head><body onLoad="redirect(''/jw/rating/plannomap/v/',glFilename,'/',(;":1+glPlanHole),''')">'
+		stdout '</head><body onLoad="redirect(''/jw/rating/plan',(hidemap#'nomap'),'/v/',glFilename,'/',(;":1+glPlanHole),''')"'
 	elseif. 0= 4!:0 <'control_calc' do.
 		stdout '</head><body onLoad="redirect(''',(":httpreferer),''')">'
 	elseif. 1 do.
-		stdout '</head><body onLoad="redirect(''/jw/rating/plannomap/v/',glFilename,'/',(;":1+glPlanHole),''')">'
+		stdout '</head><body onLoad="redirect(''/jw/rating/plan',(hidemap#'nomap'),'/v/',glFilename,'/',(;":1+glPlanHole),''')"'
     end.
 stdout LF,'</body></html>'
 exit ''
