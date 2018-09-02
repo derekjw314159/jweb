@@ -148,7 +148,7 @@ djwSelect 'fromtee' ; 1 ; glTeesName ; (<"0 glTees) ; <<''$glPlanTee
 stdout LT4,'</td>'
 t_index=. glTees i. glPlanTee
 dist=. (<t_index, glPlanHole){glTeesYards
-stdout LT4,'<td><input value="',(":;dist - glPlanMeasDist),'" tabindex="2" ',(InputFieldnum 'yards'; 3),'>',LT4,'</td>'
+stdout LT4,'<td><input value="',(":;dist - glPlanMeasDist),'" tabindex="2" ',(InputFieldnum 'yards'; 3),' autofocus="autofocus">',LT4,'</td>'
 stdout LT4,'<td>'
 djwSelect 'type' ; 3 ; ('/' cut 'Fairway/Water/Bunkers/Extreme Rough'); (<"0 'FWBR') ; <<''$glPlanCarryType
 stdout LT4,'</td>'
