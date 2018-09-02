@@ -265,6 +265,21 @@ else.
 	utKeyPut glFilepath,'_green'
 end.
 
+NB. Calculate diameter automatically
+for_i. i. #glGrLength do.
+	if. 0<i{glGrDiam do. continue. end. NB. Ignore if already entered
+	dim=. (i{glGrWidth),i{glGrLength
+	dim=. dim /: dim NB. Sort
+	ratio=. (_1{dim) % (0{dim) + 0=0{dim NB. Avoid zero divide
+	if. (ratio > 2) *. (ratio <: 3) do. diam=. (+/ 2 1 * dim) % 3
+	elseif. (ratio >3) do. diam=. (+/3 1 * dim) % 4
+	elseif. 1 do. diam=. 0.5 * +/dim
+	end.
+	glGrDiam=: (<. 0.5 + diam) i } glGrDiam
+	utKeyPut glFilepath,'_green'
+end.
+utKeyPut glFilepath,'_green'
+
 NB. Green tiered
 res=. ('Hole ',(":1+hole),' Green tiered') prompt_v ;glGrTiered
 if. ('Q'={.>0{res) do.
