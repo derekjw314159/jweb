@@ -382,13 +382,21 @@ y=. (y e. Holes '' ) # y NB. Limit to valid holes
 NB. Delete any infeasible
 msk=. +. glGPSLatLon
 msk=. (90 >: 0{"1 msk) *. (180 >: 1{"1 msk) *. (0 <: 0{"1 msk) *. (_180 <: 1{"1 msk)
-msk=. msk *. glGPSMeasured
+NB. msk=. msk *. glGPSMeasured
 glGPSName=: msk # glGPSName
 glGPSLatLon=: msk # glGPSLatLon
 glGPSAlt=: msk#glGPSAlt
 glGPSMeasured=: msk # glGPSMeasured
 
 for_h. y do. NB. Start of hole loop <h>
+	NB. Delete any unmeasured for this hole, i.e. keep if measured, or if different hole
+	msk=.  (2{.each glGPSName) ~: (<;'r<0>2.0' 8!:0 (1+h))
+	msk=. msk +. glGPSMeasured
+	glGPSName=: msk # glGPSName
+	glGPSLatLon=: msk # glGPSLatLon
+	glGPSAlt=: msk#glGPSAlt
+	glGPSMeasured=: msk # glGPSMeasured
+
     NB. Green centres
     xx=. ('r<0>2.0' 8!:0 (1+h)),each(' ' cut 'GC GF GB')
     xx=. glGPSName i. xx
