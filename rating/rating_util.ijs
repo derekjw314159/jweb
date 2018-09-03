@@ -413,7 +413,7 @@ for_h. y do. NB. Start of hole loop <h>
 	NB. Check if any other points exist for this hole
 	elseif.  (+. / (ww=. (2{. each glGPSName) i. ('r<0>2.0' 8!:0 (1+h))) < #glGPSName) do.
 		ww=. 0{ (ww < #glGPSName)#ww NB. First one which meets criterion
-		glGPSLatLon=: glGPSLatLon, ww{glGPSLatLon
+		glGPSLatLon=: glGPSLatLon, ww{glGPSLatLon + 0j0.0005 NB. Need to add a few yards to avoid clash
 		glGPSAlt=: glGPSAlt, ww{glGPSAlt
 		glGPSName=: glGPSName, <(>'r<0>2.0' 8!:0 (1+h)),'GC'
 		glGPSMeasured=: glGPSMeasured, 0
