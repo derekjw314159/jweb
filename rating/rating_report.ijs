@@ -1013,8 +1013,8 @@ waterline=. 'glPlanWaterLine' matrix_pull hole ; tee ; gender
 waterline=. ; +. / each waterline
 waterline=. waterline >. waterexists NB. Override if not entered as LOP
 fname fappend~ 'C' write_input 21 16 ;  3 4  ; <<"0 (;waterline){' y'
-2 write_xl hole ; tee ; gender ; (hole+1) ; 18; 34 ; 0 ; 'Water LoP Scratch' ; <(0{waterline) { (<'') ; 'Y'
-2 write_xl hole ; tee ; gender ; (hole+1) ; 19; 34 ; 0 ; 'Water LoP Bogey' ; <(1{waterline) { (<'') ; 'Y'
+2 write_xl hole ; tee ; gender ; (hole+1) ; 18; 34 ; 0 ; 'Water LoP Scratch' ; <(0{waterline) { '' ; 'Y'
+2 write_xl hole ; tee ; gender ; (hole+1) ; 19; 34 ; 0 ; 'Water LoP Bogey' ; <(1{waterline) { '' ; 'Y'
 NB. Overall rating
 fname fappend~ 'R' write_footer 18 17 ; 3 ; 'Water Rating'
 fwtot=. fwtot + (0=fwtot) * +. / ; waterline NB. Minimum of 1 if water exists
@@ -1059,6 +1059,7 @@ fname fappend~ 'C' write_input 11 6 ; sz ; (;lay)
 write_xl hole ; tee ; gender ; (hole+1) ; 56 ; 13 15 17 19 21 23 25 ; 0 ; 'R&R Mounds' ; ; (3;4) {. each lay
 2 write_xl hole ; tee ; gender ; (hole+1) ; 7 ; 13 15 17 19 21 23 25 ; 0 ; 'R&R Mounds' ; ; (3;4) {. each }: each lay
 fwtot=. fwtot + > +/each lay
+1 write_xl hole ; tee ; gender ; 'Greens Data' ; 18 ; (4+2*hole) ; 0 ; 'R&R Mounds' ; <glGrRRMounds{'' ; 1
 NB. Carry
 fname fappend~ ('cell' ; 'input') write_row_head 8 7 ; 0.55 0.7 ; '<i>Y</i>' ; ":0{>0{carryyards
 fname fappend~ ('cell' ; 'input') write_row_head 9.25 7 ; 0.5 0.75 ; '<i>H</i>'; (":glGrRRRoughLength),'&quot;' 
@@ -1079,6 +1080,8 @@ fname fappend~ write_cell 10.5  9 ; 0.5 ; <<'<b>R</b>'
 fname fappend~ write_calc 11  9 ; 3 4 ; 2$lay
 write_xl hole ; tee ; gender ; (hole+1) ; 61 ; 13 19 ; 0 ; 'R&R: Rise & Drop' ; <boxnonzero 2$lay
 fwtot=. fwtot + lay
+1 write_xl hole ; tee ; gender ; 'Greens Data' ; 19 ; (4+2*hole) ; 0 ; 'R&R Rise & Drop >50%' ; <(*lay)#'Y'
+1 write_xl hole ; tee ; gender ; 'Greens Data' ; 20 ; (4+2*hole) ; 0 ; 'R&R Rise & Drop height' ; <lay{'' ; '>5' ; '>10'
 NB. Unpleasant
 fname fappend~ write_row_head 8 10 ; 2.5 0.5; '<i>Unpleasant</i>'; '<b>U</b>'
 lay=. >+. / each (' ' cut 'glPlanRRUnpleasant glGrRRUnpleasant') matrix_pull hole ; tee ; gender 
@@ -1120,6 +1123,7 @@ carryyards=. 'B' carry_yards hole; tee ; gender
 fname fappend~ write_title 8 15 ; 3 1 ; '<b>BUNKERS</b>'
 fname fappend~ write_cell 8 16 ; 1.5 ; 'Gr Prot:' 
 fname fappend~ write_input 9.5 16 ;  1.5  ; <(glBunkFractionVal i. glGrBunkFraction){glBunkFractionText
+1 write_xl hole ; tee ; gender ; 'Greens Data' ; 23 ; (4+2*hole) ; 0 ; 'Green Bunker Fraction' ; <(glBunkFractionVal i. glGrBunkFraction){glBunkFractionDesc 
 fname fappend~ LF,'$pdf->SetFillColor(255, 255, 255);'
 ww=. ' ' cut 'S1 S2 S3 B1 B2 B3 B4'
 for_i. ww do.
@@ -1211,6 +1215,8 @@ fname fappend~ write_cell 10.5 23 ; 0.5 ; <<'<b>D</b>'
 fw=. lookup_bunker_depth gender ; ''$(glBunkDepthVal i. glGrBunkDepth){glBunkDepthNum 
 fname fappend~ write_calc  11 23 ; 3 4 ; 2$fw
 fwtot=. fwtot + fw
+1 write_xl hole ; tee ; gender ; 'Greens Data' ; 24 ; (4+2*hole) ; 0 ; 'Green Bunker Depth (Men)' ; <(glBunkDepthVal i. glGrBunkDepth){glBunkDepthMen 
+1 write_xl hole ; tee ; gender ; 'Greens Data' ; 25 ; (4+2*hole) ; 0 ; 'Green Bunker Depth (Women)' ; <(glBunkDepthVal i. glGrBunkDepth){glBunkDepthWomen 
 NB. In play twice
 fname fappend~ write_row_head 8 24 ; 2.5 0.5 ; '<i>Twice</i>' ; '<b>2</b>'
 fw=. 1< ; +/each lz NB. Must be at least two fairway bunkers in LZ
@@ -1257,6 +1263,7 @@ write_xl hole ; tee ; gender ; (hole+1) ; 85 ; 13 15 17 19 21 23 25 ; 0 ; 'OOB d
 msk=. (<_1 )+each #each oobdist NB. remove last one
 msk=. ; (3;4) {. each msk $ each <1
 2 write_xl hole ; tee ; gender ; (hole+1) ; 28 ; 13 15 17 19 21 23 25 ; 0 ; 'OOB distance' ; <msk #inv boxnonzero  ;}: each oobdist NB. Drop last one
+1 write_xl hole ; tee ; gender ; 'Greens Data' ; 28 ; (4+2*hole) ; 0 ; 'OOB distance' ; glGrOOBDist
 NB. Behind only applies to lateral distance
 fname fappend~ write_row_head 8 29 ; 2.5 0.5 ; '<i>Behind</i>' ; ''
 fwtot=. lookup_oob gender ; hityards ; <oobdist
@@ -1267,6 +1274,8 @@ behind=. behind { each <glOOBBehindNum,0
 fname fappend~ 'C' write_input 11 29 ; sz ; <'b' 8!:0 ; behind
 fwtot=. 0 >. each fwtot + each behind NB. Must be at least zero
 tvexists=. ooblat >each 0
+1 write_xl hole ; tee ; gender ; 'Greens Data' ; 29 ; (4+2*hole) ; 0 ; 'OOB behind Y/N' ; (*(glOOBBehindVal i. glGrOOBBehind){glOOBBehindNum){'' ;'Y'
+1 write_xl hole ; tee ; gender ; 'Greens Data' ; 30 ; (4+2*hole) ; 0 ; 'OOB behind num' ; 'b<>' 8!:0 (-(glOOBBehindVal i. glGrOOBBehind){glOOBBehindNum)
 NB. Distance to carry safely
 fname fappend~ 'R' write_cell 8 30 ; 3 ; '<i>Yds to Carry Safely</i>' 
 fname fappend~ write_input 11 30 ; sz ; (;carryyards)
@@ -1413,6 +1422,8 @@ fw=. fw,'&quot;'
 fname fappend~ write_input 21 30 ; 3 ; <<fw
 fname fappend~ write_input 24 30 ; 4 ; <(glGrContourVal i. glGrContour){glGrContourDesc
 fname fappend~ 'R' write_cell 18 31 ; 3 ; 'Table Value'
+1 write_xl hole ; tee ; gender ; 'Greens Data' ; 14 ; (4+2*hole) ; 0 ; 'Surface contours' ; <(glGrContourVal i. glGrContour){glGrContourDesc
+NB. Stimp
 fw=. lookup_green_surface glGrStimp ; glGrContourVal i. glGrContour
 fname fappend~ write_calc 21 31 ; 3 4 ; fw
 fwtot=. fw

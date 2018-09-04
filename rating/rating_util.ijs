@@ -79,11 +79,13 @@ glTopogStanceText=: ':' cut 'MP:MP/A:MA:SA:EA'
 glTopogStanceXL=: ':' cut 'MP:MP-MA:MA:SA:EA'
 NB. glTopogStanceNum=: 1 2 3 4 5
 glBunkFractionVal=: (<''),':' cut '<1/4:<1/2:<3/4:>3/4'
-glBunkFractionDesc=: ':' cut 'Zero:0 - 1/4:1/4 - 1/2:1/2 - 3/4:Greater than 3/4'
+glBunkFractionDesc=: ':' cut '0:>0 to 1/4:>1/4 to 1/2:>1/2 - 3/4:>3/4'
 glBunkFractionNum=: 0 1 2 3 4
 glBunkFractionText=: ':' cut 'Zero:0-&frac14;:&frac14;-&frac12;:&frac12;-&frac34;:&gt;&frac34;'
 glBunkDepthVal=: (<''),':' cut '2-3:3-5:5-6:6-8:8-10:10-12:12-15:>15'
 glBunkDepthDesc=: ':' cut '<2'':2'' - 3'':3'' - 5'':5'' - 6'':6'' - 8'':8'' - 10'':10'' - 12'':12'' - 15'':>15'''
+glBunkDepthMen=: ':' cut '<=3:<=3:>3:>3:>6:>6:>10:>10:>15'
+glBunkDepthWomen=: ':' cut '<=2:>2:>2:>5:>5:>8:>8:>12:>12'
 glBunkDepthText=:':' cut '&lt;2&#39;:2&#39;-3&#39;:3&#39;-5&#39;:5&#39;-6&#39;:6&#39;-8&#39;:8&#39;-10&#39;:10&#39;-12&#39;:12&#39;-15&#39;:&gt;15&#39;'
 glBunkDepthNum=: 0 2.5 4 5.5 7 9 11 13.5 16
 glBunkExtremeVal=: (<''),':' cut '+1:+2'
