@@ -1275,7 +1275,7 @@ fname fappend~ 'C' write_input 11 29 ; sz ; <'b' 8!:0 ; behind
 fwtot=. 0 >. each fwtot + each behind NB. Must be at least zero
 tvexists=. ooblat >each 0
 1 write_xl hole ; tee ; gender ; 'Greens Data' ; 29 ; (4+2*hole) ; 0 ; 'OOB behind Y/N' ; (*(glOOBBehindVal i. glGrOOBBehind){glOOBBehindNum){'' ;'Y'
-1 write_xl hole ; tee ; gender ; 'Greens Data' ; 30 ; (4+2*hole) ; 0 ; 'OOB behind num' ; 'b<>' 8!:0 (-(glOOBBehindVal i. glGrOOBBehind){glOOBBehindNum)
+1 write_xl hole ; tee ; gender ; 'Greens Data' ; 30 ; (4+2*hole) ; 0 ; 'OOB behind num' ; 'b<>' 8!:0 (glOOBBehindVal i. glGrOOBBehind){glOOBBehindNum
 NB. Distance to carry safely
 fname fappend~ 'R' write_cell 8 30 ; 3 ; '<i>Yds to Carry Safely</i>' 
 fname fappend~ write_input 11 30 ; sz ; (;carryyards)
