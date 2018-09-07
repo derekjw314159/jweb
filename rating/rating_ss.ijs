@@ -78,6 +78,14 @@ if. 0<#ww do.
 	exit 2
 end.
 
+stdout LF,'Other tees: '
+for_g. 0 1 do.
+	for_t. i. #glTees do.
+		stdout '<a href="/jw/rating/ss/e/',glFilename,'/',(":g),'/',(t{glTees),'">',(>g{' ' cut 'Men Women'),'-',(>t{glTeesName),'</a>  '
+	end.
+end.
+stdout LF,'<a href="/jw/rating/plannomap/v/',(glFilename),'">Return to plan</a>'
+
 NB. Values
 stdout LF,'<h3>Rating Values</h3>'
 stdout LF,'<table>',LT2,'<thead><tr>'

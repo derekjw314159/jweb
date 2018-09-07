@@ -33,6 +33,7 @@ if. 0<#err do.
 end.
 
 stdout LF,'<h2>''Input Macros for ', glCourseName,'</h2>'
+stdout LF,''' <a href="/jw/rating/plannomap/v/',(glFilename),'">Return to plan</a><br>',LF
 tab=. ;4$<'&nbsp;'
 NB. file exists if we have got this far
 NB. Work out the unique values and loop round by hole, tee and gender
@@ -67,9 +68,6 @@ for_i. ww do.
     stdout LF,(((' '); '&nbsp' ; TAB ; EM) stringreplace >i),'<br>'
 end.
 
-stdout LF,'<div class="span-20 last">'
-stdout LF,''' <a href="/jw/rating/plannomap/v/',(glFilename),'">Return to plan</a>'
-stdout LF,'</div>' 
 stdout LF,'</div>' NB. end main container
 stdout '</body></html>'
 res=. 1

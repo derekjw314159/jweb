@@ -1316,6 +1316,21 @@ utFileGet glFilepath
 stdout dltb ": glHoleOffset,gl9Hole{18 9
 )
 
+jweb_rating_gettees=: 3 : 0
+NB. =========================================================
+NB. gettees
+NB. Usage:
+NB.    Holes ''
+NB. ---------------------------------------------------------
+NB. Returns <<glTees>>
+NB. ONLY RUN in batch modet
+NB. =========================================================
+glFilename=: dltb > 0{ y
+glFilepath=: glDocument_Root,'/yii/',glBasename,'/protected/data/',glFilename
+utFileGet glFilepath
+stdout dltb glTees
+)
+
 ChopFiles=: 3 : 0
 NB. =====================================================================
 NB. ChopFiles

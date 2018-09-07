@@ -34,10 +34,22 @@ function rating_report_summary($params, $url, $post) {
 			$gender = 'W';
 			break;
 		}
-	// Retrieve the range of holes from ijf file
+	// Retrieve the range of holes by running ijs program to retrieve from ijf file
 	exec(($GLOBALS['ijconsole'] . ' ' . $GLOBALS['document_root'] . '/jweb/cgi/simulate.ijs r=rating/getholes/' . (implode('/', $params)) . ' PHP'), $res);
 	$holes=explode(" ", $res[0]);
-	echo '<h2>Course : ' . $course . '  Gender : ' . $gender . '  Tee : ' . $tee . '</h2><h3>All holes</h3>' ;
+	unset($res);
+	exec(($GLOBALS['ijconsole'] . ' ' . $GLOBALS['document_root'] . '/jweb/cgi/simulate.ijs r=rating/gettees/' . (implode('/', $params)) . ' PHP'), $res);
+	$tees= $res[0];
+	echo '<h2>Course : ' . $course . '  Gender : ' . $gender . '  Tee : ' . $tee . '</h2>';
+	echo '<h3>All holes</h3>' ;
+	// Display alternative gender and tee combinations
+	echo 'Other tees: ';
+	for($gen=0; $gen<2 ; $gen++){
+		for($t=0; $t<strlen($tees); $t++){
+			$str= substr("MW", $gen, 1) . substr($tees, $t, 1);
+			echo "<a href=\"/pw/rating/report/summary/" . $course . "/" . $gen . "/" . substr($str, 1, 1) . "\">" . $str . "</a>   ";
+		}
+	}
 // ---
 ?>
 <table>
@@ -59,7 +71,7 @@ function rating_report_summary($params, $url, $post) {
 	$lasthole=$firsthole + intval($holes[1]);
 	for($h=$firsthole; $h<$lasthole; $h++){
 		echo "\t\t<tr>" . PHP_EOL;
-		echo "\t\t\t<td>" . (sprintf('%02d', 1+$h)) . '</td>' . PHP_EOL;
+		echo "\t\t\t<td>" . "<a href=\"/jw/rating/plannomap/v/" . $course . "/" . (1+$h) ."\">" . (sprintf('%02d', 1+$h)) . '</a></td>' . PHP_EOL;
 		$webname = '/tcpdf/rating/' . $course . '_' . (sprintf('%02d' , 1+$h)) . $gender . $tee . '.pdf';
 		$filename = $GLOBALS['document_root'] . $webname ;
 		if(file_exists($filename)){
@@ -75,7 +87,7 @@ function rating_report_summary($params, $url, $post) {
 		}
 	// Summary file
 	echo "\t\t<tr>" . PHP_EOL;
-	echo "\t\t\t<td>All</td>" . PHP_EOL;
+	echo "\t\t\t<td><a href=\"/jw/rating/plannomap/v/" . $course ."\">All</a></td>" . PHP_EOL;
 	$webname = '/tcpdf/rating/' . $course . '_all_' . $gender . $tee . '.pdf';
 	$filename = $GLOBALS['document_root'] . $webname ;
 	if(file_exists($filename)){

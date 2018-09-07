@@ -130,6 +130,7 @@ for_h. (Holes '') do.
 		stdout '    <a href="/jw/rating/plan',((-. showmap)#'nomap'),'/v/',glFilename,'/',(": 1+h),'">',(":1+h),'</a>'
 end.
 stdout LF,'<br><a href="/jw/rating/xl/',glFilename,'">XL Macro</a>'
+stdout LF,'<br><a href="/jw/rating/ss/e/',glFilename,'/0/',(0{glTees),'">SS Estimate</a>'
 stdout LF,'<br><a href="/pw/rating/report/summary/',glFilename,'/0/',(0{glTees),'">Report Summary</a>'
 	
 stdout LF,'</div>' NB. container
@@ -584,6 +585,10 @@ if. hole<_1{Holes '' do.
 end.
 stdout ' <a href="/jw/rating/plan',((-. showmap)#'nomap'),'/v/',glFilename,'">All</a>'
 stdout ' <a href="/jw/rating/gps/e/',glFilename,'/',(":1+hole),'">GPS points</a>'
+
+stdout LF,'<br><a href="/jw/rating/xl/',glFilename,'">XL Macro</a>'
+stdout LF,'<br><a href="/jw/rating/ss/e/',glFilename,'/0/',(0{glTees),'">SS Estimate</a>'
+stdout LF,'<br><a href="/pw/rating/report/summary/',glFilename,'/0/',(0{glTees),'">Report Summary</a>'
 	
 stdout LF,'</div>' NB. container
 stdout '</body></html>'
