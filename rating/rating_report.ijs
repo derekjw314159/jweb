@@ -1215,8 +1215,8 @@ fname fappend~ write_cell 10.5 23 ; 0.5 ; <<'<b>D</b>'
 fw=. lookup_bunker_depth gender ; ''$(glBunkDepthVal i. glGrBunkDepth){glBunkDepthNum 
 fname fappend~ write_calc  11 23 ; 3 4 ; 2$fw
 fwtot=. fwtot + fw
-1 write_xl hole ; tee ; gender ; 'Greens Data' ; 24 ; (4+2*hole) ; 0 ; 'Green Bunker Depth (Men)' ; <(0<#>glGrBunkFraction)#(glBunkDepthVal i. glGrBunkDepth){glBunkDepthMen 
-1 write_xl hole ; tee ; gender ; 'Greens Data' ; 25 ; (4+2*hole) ; 0 ; 'Green Bunker Depth (Women)' ; <(0<#>glGrBunkFraction)#(glBunkDepthVal i. glGrBunkDepth){glBunkDepthWomen 
+1 write_xl hole ; tee ; gender ; 'Greens Data' ; 24 ; (4+2*hole) ; 0 ; 'Green Bunker Depth (Men)' ; <(0<#;glGrBunkFraction)#(glBunkDepthVal i. glGrBunkDepth){glBunkDepthMen 
+1 write_xl hole ; tee ; gender ; 'Greens Data' ; 25 ; (4+2*hole) ; 0 ; 'Green Bunker Depth (Women)' ; <(0<#;glGrBunkFraction)#(glBunkDepthVal i. glGrBunkDepth){glBunkDepthWomen 
 NB. In play twice
 fname fappend~ write_row_head 8 24 ; 2.5 0.5 ; '<i>Twice</i>' ; '<b>2</b>'
 fw=. 1< ; +/each lz NB. Must be at least two fairway bunkers in LZ
@@ -2362,6 +2362,9 @@ NB. Writes output to global variable <<glXLStr>>
 0 write_xl y
 :
 'hole tee gender sheet row column null note value'=. y
+NB. Strange behaviour if value is zero length number or zero length box
+NB. ..so change to string
+if. 0=#value do. value=. '' end.
 NB. Check if boxed or literal
 select. 3!:0 value
     case. 32 do.
@@ -2411,7 +2414,7 @@ for_vv. value do.
     end.
 	str=. str, '"', type, '", '
     str=. str, (;null{' ' cut'False True'),', ' NB. Null allowed?
-	str=. str, '"', note, '", ' NB. Note
+	str=. str, '"Hole ', (":hole+1),' : ',note, '", ' NB. Note
 	if. ('N' = type) do.
 		str=. str, ('_'; '-') stringreplace ":num
 	else.
