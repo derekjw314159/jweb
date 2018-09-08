@@ -205,6 +205,7 @@ ReadGPSActual=: 3 : 0
 require 'tables/csv'
 if. -. fexist glFilepath,'actual.txt' do.
 	res=. ''
+	return.
 end.
 ww=. readcsv glFilepath,'actual.txt'
 res=. (0{ww) i. 'Latitude' ; 'Longitude' ; 'Altitude' ; 'Time' ; 'Name' ; 'Icon' ; 'Description'
