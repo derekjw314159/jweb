@@ -203,7 +203,7 @@ NB.	Returns a javascript format set of coordinates
 NB. ============================================
 ReadGPSActual=: 3 : 0
 require 'tables/csv'
-if. fexist glFilepath,'actual.txt' do.
+if. -. fexist glFilepath,'actual.txt' do.
 	res=. ''
 end.
 ww=. readcsv glFilepath,'actual.txt'
