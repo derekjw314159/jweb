@@ -203,8 +203,9 @@ NB.	Returns a javascript format set of coordinates
 NB. ============================================
 ReadGPSActual=: 3 : 0
 require 'tables/csv'
-if. -. fexist glFilepath,'actual.txt' do.
-	res=. ''
+<<<<<<< HEAD
+if. -. fexist (glFilepath,'actual.txt') do.
+	res=. '[]'
 	return.
 end.
 ww=. readcsv glFilepath,'actual.txt'
@@ -1112,6 +1113,7 @@ NB. CheckMainFile
 NB. =======================================================
 NB. Check if extra variables exist
 CheckMainFile=: 3 : 0
+utFileGet glFilepath
 if. 0 ~: 4!:0 <'gl9Hole' do.
 	gl9Hole=: 0
 	glHoleOffset=: 0
@@ -1127,80 +1129,47 @@ NB. Safe read of plan and checks for new variables
 CheckPlanFile=: 3 : 0
 utKeyRead y
 dict=. >keyread y ; '_dictionary'
-if. ( -. (<'glPlanOOBPercent') e. dict ) do.
-	(,<'glPlanOOBPercent') utKeyAddColumn y
-	glPlanOOBPercent=: (#glPlanID)$<''
-	utKeyPut y
-end.
-if. ( -. (<'glPlanWaterPercent') e. dict ) do.
-	(,<'glPlanWaterPercent') utKeyAddColumn y
-	glPlanWaterPercent=: (#glPlanID)$<''
-	utKeyPut y
-end.
-if. ( -. (<'glPlanWaterLine') e. dict ) do.
-	(,<'glPlanWaterLine') utKeyAddColumn y
-	glPlanWaterLine=: (#glPlanID)$0
-	utKeyPut y
-end.
-if. ( -. (<'glPlanOOBLine') e. dict ) do.
-	(,<'glPlanOOBLine') utKeyAddColumn y
-	glPlanOOBLine=: (#glPlanID)$0
-	utKeyPut y
-end.
-if. ( -. (<'glPlanRollDist') e. dict ) do.
-	(,<'glPlanRollDist') utKeyAddColumn y
-	glPlanRollDist=: 2 * glPlanMeasDist - glPlanRemGroundYards NB. Should default to 20
-	utKeyPut y
-end.
-if. ( -. (<'glPlanCrowDist') e. dict ) do.
-	(,<'glPlanCrowDist') utKeyAddColumn y
-	glPlanCrowDist=: (#glPlanID)$0
-	utKeyPut y
-end.
-if. ( -. (<'glPlanCarryAffectsTee') e. dict ) do.
-	(,<'glPlanCarryAffectsTee') utKeyAddColumn y
-	glPlanCarryAffectsTee=: (#glPlanID)$' '
-	utKeyPut y
-end.
-if. ( -. (<'glPlanTreeTargObstructed') e. dict ) do.
-	(,<'glPlanTreeTargObstructed') utKeyAddColumn y
-	glPlanTreeTargObstructed=: (#glPlanID)$0
-	utKeyPut y
-end.
-if. ( -. (<'glPlanTreeLZObstructed') e. dict ) do.
-	(,<'glPlanTreeLZObstructed') utKeyAddColumn y
-	glPlanTreeLZObstructed=: (#glPlanID)$0
-	utKeyPut y
-end.
-if. ( -. (<'glPlanBunkLZCarry') e. dict ) do.
-	(,<'glPlanBunkLZCarry') utKeyAddColumn y
-	glPlanBunkLZCarry=: (#glPlanID)$0
-	utKeyPut y
-end.
-if. ( -. (<'glPlanBunkTargCarry') e. dict ) do.
-	(,<'glPlanBunkTargCarry') utKeyAddColumn y
-	glPlanBunkTargCarry=: (#glPlanID)$0
-	utKeyPut y
-end.
-if. ( -. (<'glPlanBunkExtreme') e. dict ) do.
-	(,<'glPlanBunkExtreme') utKeyAddColumn y
-	glPlanBunkExtreme=: (#glPlanID)$<''
-	utKeyPut y
-end.
-if. ( -. (<'glPlanBunkSqueeze') e. dict ) do.
-	(,<'glPlanBunkSqueeze') utKeyAddColumn y
-	glPlanBunkSqueeze=: (#glPlanID)$<''
-	utKeyPut y
-end.
-if. ( -. (<'glPlanTransitionAdj') e. dict ) do.
-	(,<'glPlanTransitionAdj') utKeyAddColumn y
-	glPlanTransitionAdj=: (#glPlanID)$<''
-	utKeyPut y
-end.
-if. ( -. (<'glPlanTransitionOverride') e. dict ) do.
-	(,<'glPlanTransitionOverride') utKeyAddColumn y
-	glPlanTransitionOverride=: (#glPlanID)$<''
-	utKeyPut y
+CheckFileItem y ; 'glPlanRollDist' ; dict ; (#glPlanID) ; 20
+CheckFileItem y ; 'glPlanRollSlope' ; dict ; (#glPlanID) ; <,<''
+CheckFileItem y ; 'glPlanRollLevel' ; dict ; (#glPlanID) ; <,<''
+CheckFileItem y ; 'glPlanRollExtreme' ; dict ; (#glPlanID) ; <,<''
+CheckFileItem y ; 'glPlanDoglegNeg' ; dict ; (#glPlanID) ; 0
+CheckFileItem y ; 'glPlanRollTwice' ; dict ; (#glPlanID) ; <,<''
+CheckFileItem y ; 'glPlanCrowDist' ; dict ; (#glPlanID) ; 0
+CheckFileItem y ; 'glPlanCarryAffectsTee' ; dict ; (#glPlanID) ; ' '
+CheckFileItem y ; 'glPlanTransitionAdj' ; dict ; (#glPlanID) ; <,<''
+CheckFileItem y ; 'glPlanLayupCategory' ; dict ; (#glPlanID) ; <,<''
+CheckFileItem y ; 'glPlanTopogStance' ; dict ; (#glPlanID) ; <,<''
+CheckFileItem y ; 'glPlanTransitionOverride' ; dict ; (#glPlanID) ; <,<''
+CheckFileItem y ; 'glPlanFWVisible' ; dict ; (#glPlanID) ; 0
+CheckFileItem y ; 'glPlanFWUnpleasant' ; dict ; (#glPlanID) ; 0
+CheckFileItem y ; 'glPlanFWObstructed' ; dict ; (#glPlanID) ; 0
+CheckFileItem y ; 'glPlanFWTargVisible' ; dict ; (#glPlanID) ; <,<'' 
+CheckFileItem y ; 'glPlanRRMounds' ; dict ; (#glPlanID) ; 0
+CheckFileItem y ; 'glPlanBunkLZ' ; dict ; (#glPlanID) ; 0
+CheckFileItem y ; 'glPlanBunkLine' ; dict ; (#glPlanID) ; 0
+CheckFileItem y ; 'glPlanBunkCarry' ; dict ; (#glPlanID) ; <,<''
+CheckFileItem y ; 'glPlanBunkLZCarry' ; dict ; (#glPlanID) ; 0
+CheckFileItem y ; 'glPlanBunkTargCarry' ; dict ; (#glPlanID) ; 0
+CheckFileItem y ; 'glPlanBunkExtreme' ; dict ; (#glPlanID) ; <,<''
+CheckFileItem y ; 'glPlanBunkSqueeze' ; dict ; (#glPlanID) ; <,<''
+CheckFileItem y ; 'glPlanOOBPercent' ; dict ; (#glPlanID) ; <,<''
+CheckFileItem y ; 'glPlanOOBLine' ; dict ; (#glPlanID) ; 0
+CheckFileItem y ; 'glPlanWaterPercent' ; dict ; (#glPlanID) ; <,<''
+CheckFileItem y ; 'glPlanWaterLine' ; dict ; (#glPlanID) ; 0
+CheckFileItem y ; 'glPlanTreeTargObstructed' ; dict ; (#glPlanID) ; 0
+CheckFileItem y ; 'glPlanTreeLZObstructed' ; dict ; (#glPlanID) ; 0
+)
+
+NB. ========================================================
+NB. CheckFileItem
+NB. ========================================================
+CheckFileItem=: 3 : 0
+'filename column dict len value'=. y
+if. ( -. (<column) e. dict ) do.
+	(,<column) utKeyAddColumn filename
+	(column)=: len$value
+	utKeyPut filename
 end.
 )
 
@@ -1211,30 +1180,39 @@ NB. Safe read of plan and checks for new variables
 CheckGreenFile=: 3 : 0
 utKeyRead y
 dict=. >keyread y ; '_dictionary'
-if. ( -. (<'glGrOOBBehind') e. dict ) do.
-	(,<'glGrOOBBehind') utKeyAddColumn y
-	glGrOOBBehind=: (#glGrID)$<''
-	utKeyPut y
-end.
-if. ( 32 ~: 3!:0 glGrOOBBehind ) do.
-	glGrOOBBehind=: glGrOOBBehind { glOOBBehindVal
-	utKeyPut y
-end.
-if. ( -. (<'glGrWaterBehind') e. dict ) do.
-	(,<'glGrWaterBehind') utKeyAddColumn y
-	glGrWaterBehind=: (#glGrID)$<''
-	utKeyPut y
-end.
-if. ( 32 ~: 3!:0 glGrWaterBehind ) do.
-	glGrWaterBehind=: glGrWaterBehind { glWaterBehindVal
-	utKeyPut y
-end.
-if. ( -. (<'glGrNotes') e. dict ) do.
-	(,<'glGrNotes') utKeyAddColumn y
-	glGrNotes=: (#glGrID)$<''
-	utKeyPut y
-end.
+CheckFileItem y ; 'glGrRRInconsistent' ; dict ; (#glGrID) ; <,<''
+CheckFileItem y ; 'glGrRRRiseDrop' ; dict ; (#glGrID) ; <,<''
+CheckFileItem y ; 'glGrRRUnpleasant' ; dict ; (#glGrID) ; 0
+CheckFileItem y ; 'glGrRRMounds' ; dict ; (#glGrID) ; 0
+CheckFileItem y ; 'glGrBunkFraction' ; dict ; (#glGrID) ; <,<''
+CheckFileItem y ; 'glGrBunkDepth' ; dict ; (#glGrID) ; <,<''
+CheckFileItem y ; 'glGrBunkExtreme' ; dict ; (#glGrID) ; <,<''
+CheckFileItem y ; 'glGrOOBDist' ; dict ; (#glGrID) ; 0
+CheckFileItem y ; 'glGrOOBBehind' ; dict ; (#glGrID) ; <,<''
+CheckFileItem y ; 'glGrOOBCart' ; dict ; (#glGrID) ; <,<''
+CheckFileItem y ; 'glGrOOBPercent' ; dict ; (#glGrID) ; <,<''
+CheckFileItem y ; 'glGrWaterBehind' ; dict ; (#glGrID) ; <,<''
+CheckFileItem y ; 'glGrWaterFraction' ; dict ; (#glGrID) ; <,<''
+CheckFileItem y ; 'glGrWaterSurrDist' ; dict ; (#glGrID) ; <,<''
+CheckFileItem y ; 'glGrWaterCart' ; dict ; (#glGrID) ; <,<''
+CheckFileItem y ; 'glGrWaterPercent' ; dict ; (#glGrID) ; <,<''
+CheckFileItem y ; 'glGrSurfaceUnpleasant' ; dict ; (#glGrID) ; 0
+CheckFileItem y ; 'glGrNotes' ; dict ; (#glGrID) ; <,<''
+CheckFileItem y ; 'glGrTee' ; dict ; (#glGrID) ; 0{glTees
+CheckFileItem y ; 'glGrFrontYards' ; dict ; (#glGrID) ; 0
 )
+
+NB. ========================================================
+NB. CheckTeeFile
+NB. ========================================================
+NB. Safe read of plan and checks for new variables
+CheckTeeFile=: 3 : 0
+utKeyRead y
+dict=. >keyread y ; '_dictionary'
+CheckFileItem y ; 'glTeTree' ; dict ; (#glTeID) ; <1 2 2$<''
+)
+
+
 
 CheckXLFile=: 3 : 0
 NB. =========================================================
@@ -1466,3 +1444,41 @@ elseif. 1 do.
 end.
 )
 
+
+ReadSwingBySwing=: 3 : 0
+NB. ======================================================================
+NB. ReadSwingBySwing
+NB. ======================================================================
+NB. Save as <<holes>> from "[" to "]"
+NB. 1 download the file to vim
+NB. Do carriage return (\r) at "{"
+NB. Search for second occurrence of "holes"
+NB. Save from the first [ to the corresponding ] and delete the rest
+NB. Resave
+NB. Run this function
+NB. Put the file back
+NB. AugmentGPS i. 18
+NB. BuildPlan i. 18
+
+utFileGet glFilepath
+require 'convert/json'
+require 'files'
+ww=. fread y
+ww=. dec_json ww NB. Decode json
+glGPSName=: 0$<''
+glGPSLatLon=: 0$0
+glGPSAlt=: 0$0
+glGPSMeasured=: 0$0
+for_h. i. 18 do.
+	green=. (<1 ; 3 4){>h{ww
+	glGPSName=: glGPSName,<(;'r<0>2.0' 8!:0 (1+h)),'GC'
+	glGPSAlt=: glGPSAlt, 0
+	glGPSLatLon=: glGPSLatLon, j. / >green
+	glGPSMeasured=: glGPSMeasured, 1
+	NB. Tee
+	tee=.(<1; 6 7 ){>0{>(<1 12){>h{ww
+	glGPSName=: glGPSName,<(;'r<0>2.0' 8!:0 (1+h)),'T',0{glTees
+	glGPSAlt=: glGPSAlt, 0
+	glGPSLatLon=: glGPSLatLon, j. / >tee
+	glGPSMeasured=: glGPSMeasured, 1
+end.

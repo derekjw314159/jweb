@@ -163,6 +163,8 @@ if. fexist glFilepath,'.ijf' do.
 	xx=. utKeyRead glFilepath,'_green'
 	CheckMainFile glFilepath
 	CheckPlanFile glFilepath,'_plan'  NB. Check for added variables
+	CheckGreenFile glFilepath,'_green' 
+	CheckTeeFile glFilepath,'_tee' 
 	err=. ''
 else.
 	err=. 'No such course'
