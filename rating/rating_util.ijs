@@ -1130,18 +1130,24 @@ utKeyRead y
 dict=. >keyread y ; '_dictionary'
 CheckFileItem y ; 'glPlanRollDist' ; dict ; (#glPlanID) ; 20
 CheckFileItem y ; 'glPlanRollSlope' ; dict ; (#glPlanID) ; <,<''
+CheckFileItem y ; 'glPlanRollLevel' ; dict ; (#glPlanID) ; <,<''
 CheckFileItem y ; 'glPlanRollExtreme' ; dict ; (#glPlanID) ; <,<''
 CheckFileItem y ; 'glPlanDoglegNeg' ; dict ; (#glPlanID) ; 0
+CheckFileItem y ; 'glPlanRollTwice' ; dict ; (#glPlanID) ; <,<''
 CheckFileItem y ; 'glPlanCrowDist' ; dict ; (#glPlanID) ; 0
 CheckFileItem y ; 'glPlanCarryAffectsTee' ; dict ; (#glPlanID) ; ' '
 CheckFileItem y ; 'glPlanTransitionAdj' ; dict ; (#glPlanID) ; <,<''
+CheckFileItem y ; 'glPlanLayupCategory' ; dict ; (#glPlanID) ; <,<''
 CheckFileItem y ; 'glPlanTopogStance' ; dict ; (#glPlanID) ; <,<''
 CheckFileItem y ; 'glPlanTransitionOverride' ; dict ; (#glPlanID) ; <,<''
 CheckFileItem y ; 'glPlanFWVisible' ; dict ; (#glPlanID) ; 0
+CheckFileItem y ; 'glPlanFWUnpleasant' ; dict ; (#glPlanID) ; 0
+CheckFileItem y ; 'glPlanFWObstructed' ; dict ; (#glPlanID) ; 0
 CheckFileItem y ; 'glPlanFWTargVisible' ; dict ; (#glPlanID) ; <,<'' 
 CheckFileItem y ; 'glPlanRRMounds' ; dict ; (#glPlanID) ; 0
 CheckFileItem y ; 'glPlanBunkLZ' ; dict ; (#glPlanID) ; 0
 CheckFileItem y ; 'glPlanBunkLine' ; dict ; (#glPlanID) ; 0
+CheckFileItem y ; 'glPlanBunkCarry' ; dict ; (#glPlanID) ; <,<''
 CheckFileItem y ; 'glPlanBunkLZCarry' ; dict ; (#glPlanID) ; 0
 CheckFileItem y ; 'glPlanBunkTargCarry' ; dict ; (#glPlanID) ; 0
 CheckFileItem y ; 'glPlanBunkExtreme' ; dict ; (#glPlanID) ; <,<''
@@ -1180,6 +1186,7 @@ CheckFileItem y ; 'glGrRRMounds' ; dict ; (#glGrID) ; 0
 CheckFileItem y ; 'glGrBunkFraction' ; dict ; (#glGrID) ; <,<''
 CheckFileItem y ; 'glGrBunkDepth' ; dict ; (#glGrID) ; <,<''
 CheckFileItem y ; 'glGrBunkExtreme' ; dict ; (#glGrID) ; <,<''
+CheckFileItem y ; 'glGrOOBDist' ; dict ; (#glGrID) ; 0
 CheckFileItem y ; 'glGrOOBBehind' ; dict ; (#glGrID) ; <,<''
 CheckFileItem y ; 'glGrOOBCart' ; dict ; (#glGrID) ; <,<''
 CheckFileItem y ; 'glGrOOBPercent' ; dict ; (#glGrID) ; <,<''
@@ -1190,6 +1197,8 @@ CheckFileItem y ; 'glGrWaterCart' ; dict ; (#glGrID) ; <,<''
 CheckFileItem y ; 'glGrWaterPercent' ; dict ; (#glGrID) ; <,<''
 CheckFileItem y ; 'glGrSurfaceUnpleasant' ; dict ; (#glGrID) ; 0
 CheckFileItem y ; 'glGrNotes' ; dict ; (#glGrID) ; <,<''
+CheckFileItem y ; 'glGrTee' ; dict ; (#glGrID) ; 0{glTees
+CheckFileItem y ; 'glGrFrontYards' ; dict ; (#glGrID) ; 0
 )
 
 NB. ========================================================
