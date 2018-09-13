@@ -203,6 +203,10 @@ NB.	Returns a javascript format set of coordinates
 NB. ============================================
 ReadGPSActual=: 3 : 0
 require 'tables/csv'
+if. -. fexist glFilepath,'actual.txt' do.
+	res=. ''
+	return.
+end.
 ww=. readcsv glFilepath,'actual.txt'
 res=. (0{ww) i. 'Latitude' ; 'Longitude' ; 'Altitude' ; 'Time' ; 'Name' ; 'Icon' ; 'Description'
 res=. res {"1 (ww,"1 a:) NB. Order the columns
