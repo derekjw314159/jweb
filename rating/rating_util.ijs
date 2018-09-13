@@ -1436,7 +1436,21 @@ end.
 
 
 ReadSwingBySwing=: 3 : 0
+NB. ======================================================================
+NB. ReadSwingBySwing
+NB. ======================================================================
 NB. Save as <<holes>> from "[" to "]"
+NB. 1 download the file to vim
+NB. Do carriage return (\r) at "{"
+NB. Search for second occurrence of "holes"
+NB. Save from the first [ to the corresponding ] and delete the rest
+NB. Resave
+NB. Run this function
+NB. Put the file back
+NB. AugmentGPS i. 18
+NB. BuildPlan i. 18
+
+utFileGet glFilepath
 require 'convert/json'
 require 'files'
 ww=. fread y
