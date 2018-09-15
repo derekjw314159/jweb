@@ -1029,7 +1029,7 @@ NB. =====================================================================
 NB. InitiateCourse
 NB. =====================================================================
 NB. Usage:
-NB.    InitiateCourse pi ; 4 4 , 5 5 , ..  (pars)
+NB.    InitiateCourse pi 
 NB.
 NB. 1. Copy seven files from the latest one
 NB. 2. Alter glCourseName, glCourseLead, glCourseDate and write to glFilepath
@@ -1040,7 +1040,7 @@ NB. 6. Use gpsbabel to convert to unicsv, saving as ".txt" file
 NB. 7. Run ReadGPS and save to glFilepath
 NB. 8. Run this function InitiateCourse pi (for safety)
 NB. 4. Execute:  glTePar=: ((18*$glTees),2)$,1 0 2 |:(($glTees),18 2)$,18 2 $ 4 4, 5 5 , 3 3 5 3 4 ... and write to '.._tee'
-'pi par'=. y
+pi=. y
 if. pi ~: 3.14159 do. return. end.
 utFileGet glFilepath
 NB. Clear out the plan records
@@ -1053,7 +1053,7 @@ holes=. $Holes ''
 glTeUpdateName=: (holes*$glTees)$<''
 glTeUpdateTime=: glTeUpdateName
 glTeAlt=: ($glTeUpdateName)$0
-glTePar=: ((holes*$glTees),2)$,1 0 2 |:(($glTees),holes, 2)$,(holes, 2) $ par
+glTePar=: 0 0{"1 ,. (,|:(glTeesYards>200){3 4)
 ww=.(3 4 5 i. glTePar){('' ; '.' ; '.')
 glTeTree=: (($ww),2)$,ww,"1 ww NB. Have to add extra dimension for the ability
 glTeTee=: ($glTeUpdateName)$ ; {. each glTeesName
